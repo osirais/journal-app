@@ -1,9 +1,11 @@
 import { useState } from "react";
 import { Alert, StyleSheet, View } from "react-native";
-import { supabase } from "../lib/supabase";
+import { supabase } from "@/lib/supabase";
 import { Button, Input } from "@rneui/themed";
+import { useRouter } from "expo-router";
 
 export default function Auth() {
+  const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -15,8 +17,9 @@ export default function Auth() {
       password: password
     });
 
-    if (error) Alert.alert(error.message);
     setLoading(false);
+    if (error) return Alert.alert(error.message);
+    router.replace("/(auth)/home");
   }
 
   async function signUpWithEmail() {
