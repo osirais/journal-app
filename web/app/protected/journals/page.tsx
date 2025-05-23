@@ -10,6 +10,7 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { formatDateAgo } from "@/utils/format-date-ago";
+import Link from "next/link";
 
 type Journal = {
   id: string;
@@ -159,45 +160,51 @@ export default function JournalsPage() {
           </div>
         ) : (
           journals.map((journal) => (
-            <Card
-              key={journal.id}
-              className="flex min-h-[80px] cursor-pointer items-center overflow-hidden transition-shadow hover:shadow-md"
-            >
-              <CardContent className="w-full p-0">
-                <div className="flex items-center p-4">
-                  {journal.thumbnail_url ? (
-                    <div className="mr-4 h-16 w-16 flex-shrink-0 overflow-hidden rounded">
-                      <img src={journal.thumbnail_url} alt="" className="h-16 w-16 object-cover" />
-                    </div>
-                  ) : (
-                    <div className="bg-muted mr-4 flex h-16 w-16 flex-shrink-0 items-center justify-center rounded">
-                      <FileEdit className="text-muted-foreground h-8 w-8" />
-                    </div>
-                  )}
-
-                  <div className="min-w-0 flex-1">
-                    <h3 className="truncate text-lg font-medium">{journal.title}</h3>
-
-                    {journal.description && (
-                      <p className="text-muted-foreground mt-1 line-clamp-1 text-sm">
-                        {journal.description}
-                      </p>
+            <Link key={journal.id} href={`/protected/entries/${journal.id}`} className="block">
+              <Card
+                key={journal.id}
+                className="flex min-h-[80px] cursor-pointer items-center overflow-hidden transition-shadow hover:shadow-md"
+              >
+                <CardContent className="w-full p-0">
+                  <div className="flex items-center p-6">
+                    {journal.thumbnail_url ? (
+                      <div className="mr-4 h-16 w-16 flex-shrink-0 overflow-hidden rounded">
+                        <img
+                          src={journal.thumbnail_url}
+                          alt=""
+                          className="h-16 w-16 object-cover"
+                        />
+                      </div>
+                    ) : (
+                      <div className="bg-muted mr-4 flex h-16 w-16 flex-shrink-0 items-center justify-center rounded">
+                        <FileEdit className="text-muted-foreground h-8 w-8" />
+                      </div>
                     )}
 
-                    <div className="text-muted-foreground mt-2 flex items-center gap-4 text-xs">
-                      <div className="flex items-center">
-                        <CalendarIcon className="mr-1 h-3 w-3" />
-                        <span>Created {formatDateAgo(new Date(journal.created_at))}</span>
-                      </div>
-                      <div className="flex items-center">
-                        <Clock className="mr-1 h-3 w-3" />
-                        <span>Updated {formatDateAgo(new Date(journal.updated_at))}</span>
+                    <div className="min-w-0 flex-1">
+                      <h3 className="truncate text-lg font-medium">{journal.title}</h3>
+
+                      {journal.description && (
+                        <p className="text-muted-foreground mt-1 line-clamp-1 text-sm">
+                          {journal.description}
+                        </p>
+                      )}
+
+                      <div className="text-muted-foreground mt-2 flex items-center gap-4 text-xs">
+                        <div className="flex items-center">
+                          <CalendarIcon className="mr-1 h-3 w-3" />
+                          <span>Created {formatDateAgo(new Date(journal.created_at))}</span>
+                        </div>
+                        <div className="flex items-center">
+                          <Clock className="mr-1 h-3 w-3" />
+                          <span>Updated {formatDateAgo(new Date(journal.updated_at))}</span>
+                        </div>
                       </div>
                     </div>
                   </div>
-                </div>
-              </CardContent>
-            </Card>
+                </CardContent>
+              </Card>
+            </Link>
           ))
         )}
       </div>
