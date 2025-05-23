@@ -104,31 +104,26 @@ export default function JournalsPage() {
             </Button>
           </div>
 
-          <div className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="title">Title</Label>
-              <Input
-                id="title"
-                placeholder="Enter journal title"
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
-                disabled={creating}
-                required
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="description">Description (optional)</Label>
-              <Textarea
-                id="description"
-                placeholder="Enter journal description"
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-                disabled={creating}
-                className="resize-none"
-                rows={3}
-              />
-            </div>
+          <div className="grid grid-flow-row gap-4">
+            <Label htmlFor="title">Title</Label>
+            <Input
+              id="title"
+              placeholder="Enter journal title"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              disabled={creating}
+              required
+            />
+            <Label htmlFor="description">Description (optional)</Label>
+            <Textarea
+              id="description"
+              placeholder="Enter journal description"
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              disabled={creating}
+              className="resize-none"
+              rows={3}
+            />
 
             {createError && (
               <div className="bg-destructive/10 text-destructive rounded-md p-3 text-sm">

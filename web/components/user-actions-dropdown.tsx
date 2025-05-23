@@ -45,7 +45,7 @@ export const UserActionsDropdown: FC<UserActionsDropdownProps> = ({ username }) 
         </DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem
-          className="text-destructive focus:text-destructive flex cursor-pointer items-center gap-2"
+          className="flex cursor-pointer items-center gap-2 text-red-500"
           onClick={() => {
             startTransition(() => {
               signOutAction();

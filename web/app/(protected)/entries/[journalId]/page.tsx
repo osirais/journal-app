@@ -122,34 +122,28 @@ export default function EntriesPage() {
             </Button>
           </div>
 
-          <div className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="title">Title</Label>
-              <Input
-                id="title"
-                placeholder="Enter entry title"
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
-                disabled={creating}
-                required
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="content">Content</Label>
-              <TiptapEditor
-                content={content}
-                onChange={(newContent) => setContent(newContent)}
-                placeholder="add content..."
-              />
-            </div>
-
-            {createError && (
-              <div className="bg-destructive/10 text-destructive rounded-md p-3 text-sm">
-                {createError}
-              </div>
-            )}
+          <div className="grid grid-flow-row gap-4">
+            <Label htmlFor="title">Title</Label>
+            <Input
+              id="title"
+              placeholder="Enter entry title"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              disabled={creating}
+              required
+            />
+            <Label htmlFor="content">Content</Label>
+            <TiptapEditor
+              content={content}
+              onChange={(newContent) => setContent(newContent)}
+              placeholder="add content..."
+            />
           </div>
+          {createError && (
+            <div className="bg-destructive/10 text-destructive rounded-md p-3 text-sm">
+              {createError}
+            </div>
+          )}
         </CardContent>
       </Card>
 
