@@ -9,7 +9,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu";
-import { BookText, ChevronDown, LogOut, User } from "lucide-react";
+import { ChevronDown, LayoutDashboard, LogOut, User } from "lucide-react";
 import Link from "next/link";
 import { type FC, useTransition } from "react";
 
@@ -38,9 +38,9 @@ export const UserActionsDropdown: FC<UserActionsDropdownProps> = ({ username }) 
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
         <DropdownMenuItem asChild>
-          <Link href="/journals" className="flex w-full cursor-pointer items-center gap-2">
-            <BookText size={16} />
-            <span>Journals</span>
+          <Link href="/dashboard" className="flex w-full cursor-pointer items-center gap-2">
+            <LayoutDashboard size={16} />
+            <span>Dashboard</span>
           </Link>
         </DropdownMenuItem>
         <DropdownMenuSeparator />
