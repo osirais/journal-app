@@ -33,7 +33,7 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           <Navbar />
-          <div className="min-h-screen px-8 py-20">{children}</div>
+          <div className="min-h-screen">{children}</div>
         </ThemeProvider>
       </body>
     </html>
