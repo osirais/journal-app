@@ -51,8 +51,8 @@ export default async function AuthButton() {
   }
 
   return data ? (
-    <div className="flex items-center gap-4">
-      <div className="grid grid-cols-[max-content_max-content] place-items-center gap-1">
+    <div className="flex items-center gap-2">
+      <div className="grid grid-cols-[max-content_max-content] place-items-center gap-1 px-4">
         <User size={16} />
         {data.username}
       </div>
@@ -61,6 +61,11 @@ export default async function AuthButton() {
           Sign out
         </Button>
       </form>
+      <Link href="/journals">
+        <Button type="submit" variant="ghost" className={`${hoverBgClass} ${cursorPointer}`}>
+          Journals
+        </Button>
+      </Link>
     </div>
   ) : (
     <div className="flex gap-2">

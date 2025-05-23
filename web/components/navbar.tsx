@@ -7,7 +7,7 @@ import { NotebookPen } from "lucide-react";
 export const Navbar: FC = () => {
   return (
     <nav className="border-b-foreground/10 flex h-16 w-full justify-center border-b">
-      <div className="flex w-full max-w-5xl items-center justify-between px-5 py-3 text-sm">
+      <div className="flex w-full max-w-7xl items-center justify-between px-5 py-3 text-sm">
         <div className="flex items-center gap-5 font-semibold">
           <Link
             href="/"
