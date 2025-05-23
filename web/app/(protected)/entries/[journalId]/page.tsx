@@ -21,6 +21,7 @@ import { formatDateAgo } from "@/utils/format-date-ago";
 import { useParams } from "next/navigation";
 import { TiptapEditor } from "@/components/tiptap-editor";
 import { Markdown } from "@/components/markdown";
+import { getColorFromString } from "@/utils/get-color-from-string";
 
 type Entry = {
   id: string;
@@ -241,12 +242,16 @@ export default function EntriesPage() {
                     </div>
 
                     {/* Tags */}
-                    {entry.tags?.length > 0 && (
+                    {entry.tags.length > 0 && (
                       <div className="mt-2 flex flex-wrap gap-2">
                         {entry.tags.map((tag) => (
                           <span
                             key={tag}
-                            className="bg-muted text-muted-foreground rounded-full px-2 py-0.5 text-xs"
+                            style={{
+                              backgroundColor: getColorFromString(tag) + "50",
+                              color: getColorFromString(tag)
+                            }}
+                            className="rounded-full px-2 py-0.5 text-xs"
                           >
                             {tag}
                           </span>
