@@ -1,25 +1,65 @@
+"use client";
+
 import { signUpAction } from "@/app/actions";
-import { FormMessage, Message } from "@/components/form-message";
 import { SubmitButton } from "@/components/submit-button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { createClient } from "@/utils/supabase/client";
+import { Check, LoaderCircle, X } from "lucide-react";
 import Link from "next/link";
+import { useEffect, useState } from "react";
 import { SmtpMessage } from "../smtp-message";
-import { Card } from "@/components/ui/card";
 
-export default async function Signup(props: { searchParams: Promise<Message> }) {
-  const searchParams = await props.searchParams;
-  if ("message" in searchParams) {
-    return (
-      <div className="flex h-screen w-full flex-1 items-center justify-center gap-2 p-4 sm:max-w-md">
-        <FormMessage message={searchParams} />
-      </div>
-    );
-  }
+export default function SignUpForm() {
+  const supabase = createClient();
+
+  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+
+  const [isCheckingUsername, setIsCheckingUsername] = useState(false);
+  const [isUsernameAvailable, setIsUsernameAvailable] = useState<
+    boolean | null
+  >(null);
+
+  useEffect(() => {
+    if (username) {
+      if (!/^[a-zA-Z0-9._-]{3,32}$/.test(username)) {
+        setIsUsernameAvailable(false);
+        setIsCheckingUsername(false);
+        return;
+      }
+
+      setIsCheckingUsername(true);
+      setIsUsernameAvailable(null);
+
+      const checkUsername = async () => {
+        try {
+          const { data } = await supabase
+            .from("users")
+            .select("username")
+            .eq("username", username)
+            .maybeSingle();
+
+          setIsUsernameAvailable(!data);
+        } catch (error) {
+          console.error(error);
+          setIsUsernameAvailable(null);
+        } finally {
+          setIsCheckingUsername(false);
+        }
+      };
+
+      const timeoutId = setTimeout(checkUsername, 500);
+      return () => clearTimeout(timeoutId);
+    } else {
+      setIsUsernameAvailable(null);
+    }
+  }, [username, supabase]);
 
   return (
-    <Card className="p-6">
-      <form className="mx-auto flex min-w-64 max-w-64 flex-col">
+    <>
+      <form className="mx-auto flex max-w-64 min-w-64 flex-col">
         <h1 className="text-2xl font-medium">Sign up</h1>
         <p className="text text-foreground text-sm">
           Already have an account?{" "}
@@ -28,23 +68,85 @@ export default async function Signup(props: { searchParams: Promise<Message> }) 
           </Link>
         </p>
         <div className="mt-8 flex flex-col gap-2 [&>input]:mb-3">
+          <div>
+            <Label htmlFor="username">Username</Label>
+            <div className="relative">
+              <Input
+                id="username"
+                type="text"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                placeholder="Your username"
+                required
+                className={`${
+                  isUsernameAvailable === true
+                    ? "not-focus-visible:border-green-500 focus-visible:ring-green-500"
+                    : isUsernameAvailable === false
+                      ? "not-focus-visible:border-red-500 focus-visible:ring-red-500"
+                      : ""
+                }`}
+              />
+              {username && (
+                <div className="absolute top-1/2 right-3 -translate-y-1/2 transform">
+                  {isCheckingUsername ? (
+                    <LoaderCircle className="text-muted-foreground h-4 w-4 animate-spin" />
+                  ) : isUsernameAvailable === true ? (
+                    <Check className="h-4 w-4 text-green-500" />
+                  ) : isUsernameAvailable === false ? (
+                    <X className="h-4 w-4 text-red-500" />
+                  ) : null}
+                </div>
+              )}
+            </div>
+            <div className="mt-1 text-xs">
+              {username.length > 0 && !/^[a-zA-Z0-9._-]*$/.test(username) && (
+                <p className="text-red-500">
+                  Username can only contain letters, numbers, underscores,
+                  periods, and hyphens
+                </p>
+              )}
+              {username.length < 3 ||
+                (username.length > 32 && (
+                  <p className="text-red-500">
+                    Username must be 3-32 characters
+                  </p>
+                ))}
+              {isUsernameAvailable === false && (
+                <p className="text-red-500">Username is already taken</p>
+              )}
+            </div>
+          </div>
           <Label htmlFor="email">Email</Label>
-          <Input name="email" placeholder="you@example.com" required />
+          <Input
+            id="email"
+            type="email"
+            placeholder="you@example.com"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+          />
           <Label htmlFor="password">Password</Label>
           <Input
+            id="password"
             type="password"
-            name="password"
             placeholder="Your password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
             minLength={6}
             required
           />
-          <SubmitButton formAction={signUpAction} pendingText="Signing up...">
+            <SubmitButton
+            pendingText="Signing up..."
+            onClick={async (e) => {
+              e.preventDefault();
+              await signUpAction(username, email, password);
+            }}
+            >
             Sign up
-          </SubmitButton>
-          <FormMessage message={searchParams} />
+            </SubmitButton>
         </div>
       </form>
       <SmtpMessage />
-    </Card>
+    </>
   );
 }

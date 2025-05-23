@@ -5,10 +5,7 @@ import { createClient } from "@/utils/supabase/server";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 
-export const signUpAction = async (formData: FormData) => {
-  const username = formData.get("username")?.toString();
-  const email = formData.get("email")?.toString();
-  const password = formData.get("password")?.toString();
+export const signUpAction = async (username: string, email: string, password: string) => {
   const supabase = await createClient();
   const origin = (await headers()).get("origin");
 
