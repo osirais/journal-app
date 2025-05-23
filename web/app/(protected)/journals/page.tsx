@@ -160,7 +160,7 @@ export default function JournalsPage() {
           </div>
         ) : (
           journals.map((journal) => (
-            <Link key={journal.id} href={`/protected/entries/${journal.id}`} className="block">
+            <Link key={journal.id} href={`/entries/${journal.id}`} className="block">
               <Card
                 key={journal.id}
                 className="flex min-h-[80px] cursor-pointer items-center overflow-hidden transition-shadow hover:shadow-md"
