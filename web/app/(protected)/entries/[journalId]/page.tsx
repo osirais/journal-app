@@ -8,6 +8,14 @@ import { CalendarIcon, Plus, Clock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger
+} from "@/components/ui/dialog";
 import { formatDateAgo } from "@/utils/format-date-ago";
 import { useParams } from "next/navigation";
 import { TiptapEditor } from "@/components/tiptap-editor";
@@ -32,6 +40,8 @@ export default function EntriesPage() {
   const [content, setContent] = useState("");
   const [creating, setCreating] = useState(false);
   const [createError, setCreateError] = useState<string | null>(null);
+
+  const [dialogOpen, setDialogOpen] = useState(false);
 
   useEffect(() => {
     if (!journalId) return;
@@ -85,6 +95,8 @@ export default function EntriesPage() {
       axios.get(`/api/entries?journalId=${journalId}`).then((res) => {
         setEntries(res.data.entries || []);
       });
+
+      setDialogOpen(false);
     } catch (err: any) {
       setCreateError(err.response?.data?.error || "Failed to create entry");
     } finally {
@@ -107,45 +119,49 @@ export default function EntriesPage() {
         </div>
       )}
 
-      <Card className="mb-6 overflow-hidden">
-        <CardContent className="p-6">
-          <div className="mb-4 flex items-center justify-between">
-            <h2 className="text-lg font-semibold">Create New Entry</h2>
-            <Button
-              onClick={handleCreate}
-              disabled={creating}
-              size="sm"
-              className="h-9 w-9 rounded-full p-0"
-            >
-              {creating ? <Plus className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />}
+      <div className="mb-6 flex items-center justify-between">
+        <h2 className="text-lg font-semibold">Create New Entry</h2>
+        <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+          <DialogTrigger asChild>
+            <Button size="sm" className="h-9 w-9 cursor-pointer rounded-full p-0">
+              <Plus className="h-4 w-4" />
               <span className="sr-only">Create entry</span>
             </Button>
-          </div>
+          </DialogTrigger>
+          <DialogContent className="sm:max-w-xl">
+            <DialogHeader>
+              <DialogTitle>Create Entry</DialogTitle>
+              <DialogDescription>Add a new entry to your journal</DialogDescription>
+            </DialogHeader>
 
-          <div className="grid grid-flow-row gap-4">
-            <Label htmlFor="title">Title</Label>
-            <Input
-              id="title"
-              placeholder="Enter entry title"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              disabled={creating}
-              required
-            />
-            <Label htmlFor="content">Content</Label>
-            <TiptapEditor
-              content={content}
-              onChange={(newContent) => setContent(newContent)}
-              placeholder="add content..."
-            />
-          </div>
-          {createError && (
-            <div className="bg-destructive/10 text-destructive rounded-md p-3 text-sm">
-              {createError}
+            <div className="grid grid-flow-row gap-4">
+              <Label htmlFor="title">Title</Label>
+              <Input
+                id="title"
+                placeholder="Enter entry title"
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                disabled={creating}
+                required
+              />
+              <Label htmlFor="content">Content</Label>
+              <TiptapEditor
+                content={content}
+                onChange={(newContent) => setContent(newContent)}
+                placeholder="Add content..."
+              />
+              {createError && (
+                <div className="bg-destructive/10 text-destructive rounded-md p-3 text-sm">
+                  {createError}
+                </div>
+              )}
+              <Button onClick={handleCreate} disabled={creating}>
+                {creating ? "Creating..." : "Create"}
+              </Button>
             </div>
-          )}
-        </CardContent>
-      </Card>
+          </DialogContent>
+        </Dialog>
+      </div>
 
       <div className="space-y-3">
         {loading ? (

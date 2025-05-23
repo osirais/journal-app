@@ -11,6 +11,14 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { formatDateAgo } from "@/utils/format-date-ago";
 import Link from "next/link";
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger
+} from "@/components/ui/dialog";
 
 type Journal = {
   id: string;
@@ -29,6 +37,7 @@ export default function JournalsPage() {
   const [description, setDescription] = useState("");
   const [creating, setCreating] = useState(false);
   const [createError, setCreateError] = useState<string | null>(null);
+  const [dialogOpen, setDialogOpen] = useState(false);
 
   useEffect(() => {
     axios
@@ -67,6 +76,7 @@ export default function JournalsPage() {
       ]);
       setTitle("");
       setDescription("");
+      setDialogOpen(false);
 
       axios.get("/api/journals").then((res) => {
         setJournals(res.data.journals || []);
@@ -89,20 +99,25 @@ export default function JournalsPage() {
         </div>
       )}
 
-      <Card className="mb-6 overflow-hidden">
-        <CardContent className="p-6">
-          <div className="mb-4 flex items-center justify-between">
-            <h2 className="text-lg font-semibold">Create New Journal</h2>
+      <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+        <div className="mb-6 flex items-center justify-between">
+          <h2 className="text-lg font-semibold">Create New Journal</h2>
+          <DialogTrigger asChild>
             <Button
-              onClick={handleCreate}
-              disabled={creating}
               size="sm"
-              className="h-9 w-9 rounded-full p-0"
+              className="h-9 w-9 cursor-pointer rounded-full p-0"
+              onClick={() => setDialogOpen(true)}
             >
-              {creating ? <Plus className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />}
-              <span className="sr-only">Create journal</span>
+              <Plus className="h-4 w-4" />
+              <span className="sr-only">Open create journal dialog</span>
             </Button>
-          </div>
+          </DialogTrigger>
+        </div>
+
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Create New Journal</DialogTitle>
+          </DialogHeader>
 
           <div className="grid grid-flow-row gap-4">
             <Label htmlFor="title">Title</Label>
@@ -114,6 +129,7 @@ export default function JournalsPage() {
               disabled={creating}
               required
             />
+
             <Label htmlFor="description">Description (optional)</Label>
             <Textarea
               id="description"
@@ -131,8 +147,14 @@ export default function JournalsPage() {
               </div>
             )}
           </div>
-        </CardContent>
-      </Card>
+
+          <DialogFooter className="mt-4">
+            <Button onClick={handleCreate} disabled={creating}>
+              {creating ? "Creating..." : "Create"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       <div className="space-y-3">
         {loading ? (
@@ -156,10 +178,7 @@ export default function JournalsPage() {
         ) : (
           journals.map((journal) => (
             <Link key={journal.id} href={`/entries/${journal.id}`} className="block">
-              <Card
-                key={journal.id}
-                className="flex min-h-[80px] cursor-pointer items-center overflow-hidden transition-shadow hover:shadow-md"
-              >
+              <Card className="flex min-h-[80px] cursor-pointer items-center overflow-hidden transition-shadow hover:shadow-md">
                 <CardContent className="w-full p-0">
                   <div className="flex items-center p-6">
                     {journal.thumbnail_url ? (
