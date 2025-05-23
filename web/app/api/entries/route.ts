@@ -39,7 +39,7 @@ export async function GET(req: Request) {
       `
       *,
       entry_tag (
-        tag:tag_id (name)
+        tag:tag_id (id, name)
       )
     `
     )
@@ -53,7 +53,7 @@ export async function GET(req: Request) {
 
   const transformedEntries = entries.map((entry) => ({
     ...entry,
-    tags: entry.entry_tag?.map((et: any) => et.tag?.name).filter(Boolean) || []
+    tags: entry.entry_tag?.map((et: any) => et.tag).filter(Boolean) || []
   }));
 
   return NextResponse.json({ entries: transformedEntries });
@@ -89,7 +89,6 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "tags must be an array of strings" }, { status: 400 });
   }
 
-  // verify the journal belongs to the user and is not deleted
   const { data: journal, error: journalError } = await supabase
     .from("journal")
     .select("id")
@@ -102,7 +101,6 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Journal not found or access denied" }, { status: 404 });
   }
 
-  // insert the entry
   const { data: entry, error } = await supabase
     .from("entry")
     .insert([
@@ -120,15 +118,14 @@ export async function POST(req: Request) {
   }
 
   if (tags && tags.length > 0) {
-    // normalize tags to lowercase and unique
     const normalizedTags = Array.from(
       new Set(tags.map((tag: string) => tag.toLowerCase().trim()))
     ).filter(Boolean);
 
-    // fetch existing tags from db that match these names
     const { data: existingTags, error: fetchTagsError } = await supabase
       .from("tag")
       .select("id, name")
+      .eq("user_id", user.id)
       .in("name", normalizedTags);
 
     if (fetchTagsError) {
@@ -138,12 +135,11 @@ export async function POST(req: Request) {
     const existingTagNames = existingTags?.map((t) => t.name.toLowerCase()) ?? [];
     const newTagNames = normalizedTags.filter((tag) => !existingTagNames.includes(tag));
 
-    // insert new tags if they don't exist
     let newTags = [];
     if (newTagNames.length > 0) {
       const { data: insertedTags, error: insertTagsError } = await supabase
         .from("tag")
-        .insert(newTagNames.map((name) => ({ name })))
+        .insert(newTagNames.map((name) => ({ name, user_id: user.id })))
         .select();
 
       if (insertTagsError) {
@@ -153,7 +149,6 @@ export async function POST(req: Request) {
       newTags = insertedTags ?? [];
     }
 
-    // combine existing and new tags
     const allTags = [...(existingTags ?? []), ...newTags];
 
     const entryTagRelations = allTags.map((tag) => ({

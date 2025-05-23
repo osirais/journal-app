@@ -21,7 +21,7 @@ import { formatDateAgo } from "@/utils/format-date-ago";
 import { useParams } from "next/navigation";
 import { TiptapEditor } from "@/components/tiptap-editor";
 import { Markdown } from "@/components/markdown";
-import { getColorFromString } from "@/utils/get-color-from-string";
+import { TagComponent, TagType } from "@/components/tag-component";
 
 type Entry = {
   id: string;
@@ -41,7 +41,7 @@ const KeyCodes = {
 const delimiters = [KeyCodes.comma, KeyCodes.enter, KeyCodes.tab];
 
 type EntryWithTags = Entry & {
-  tags: string[];
+  tags: TagType[];
 };
 
 export default function EntriesPage() {
@@ -104,7 +104,7 @@ export default function EntriesPage() {
           content,
           created_at: new Date().toISOString(),
           updated_at: new Date().toISOString(),
-          tags: [...tags.map((tag) => tag.text.toLowerCase())]
+          tags: []
         },
         ...prev
       ]);
@@ -252,16 +252,7 @@ export default function EntriesPage() {
                     {entry.tags.length > 0 && (
                       <div className="mt-2 flex flex-wrap gap-2">
                         {entry.tags.map((tag) => (
-                          <span
-                            key={tag}
-                            style={{
-                              backgroundColor: getColorFromString(tag) + "50",
-                              color: getColorFromString(tag)
-                            }}
-                            className="rounded-full px-2 py-0.5 text-xs"
-                          >
-                            {tag}
-                          </span>
+                          <TagComponent key={tag.id} journalId={journalId as string} tag={tag} />
                         ))}
                       </div>
                     )}

@@ -35,10 +35,12 @@ CREATE TABLE IF NOT EXISTS entry (
 
 CREATE TABLE IF NOT EXISTS tag (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v7(),
-    name CITEXT UNIQUE NOT NULL,
+    user_id UUID NOT NULL REFERENCES users(id),
+    name CITEXT NOT NULL,
     created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
-    deleted_at TIMESTAMPTZ
+    deleted_at TIMESTAMPTZ,
+    CONSTRAINT user_tag_unique UNIQUE(user_id, name)
 );
 
 CREATE TABLE IF NOT EXISTS entry_tag (
