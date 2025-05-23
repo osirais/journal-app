@@ -215,13 +215,13 @@ export const TiptapEditor: FC<TiptapEditorProps> = ({
             }
           }}
         >
-          <ToggleGroupItem value="bulletList" aria-label="Bullet list">
+          <ToggleGroupItem value="bulletList" aria-label="Bullet list" className="cursor-pointer">
             <List className="h-4 w-4" />
           </ToggleGroupItem>
-          <ToggleGroupItem value="orderedList" aria-label="Ordered list">
+          <ToggleGroupItem value="orderedList" aria-label="Ordered list" className="cursor-pointer">
             <ListOrdered className="h-4 w-4" />
           </ToggleGroupItem>
-          <ToggleGroupItem value="blockquote" aria-label="Blockquote">
+          <ToggleGroupItem value="blockquote" aria-label="Blockquote" className="cursor-pointer">
             <Quote className="h-4 w-4" />
           </ToggleGroupItem>
         </ToggleGroup>
@@ -230,14 +230,17 @@ export const TiptapEditor: FC<TiptapEditorProps> = ({
           <Button
             variant="outline"
             size="sm"
+            className="cursor-pointer"
             onClick={() => editor.chain().focus().undo().run()}
             disabled={!editor.can().undo()}
           >
             <Undo className="h-4 w-4" />
           </Button>
+
           <Button
             variant="outline"
             size="sm"
+            className="cursor-pointer"
             onClick={() => editor.chain().focus().redo().run()}
             disabled={!editor.can().redo()}
           >
