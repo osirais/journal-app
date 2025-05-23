@@ -21,7 +21,6 @@ export async function GET(req: Request) {
     return NextResponse.json({ error: "journalId query parameter required" }, { status: 400 });
   }
 
-  // verify the journal belongs to the user and is not deleted
   const { data: journal, error: journalError } = await supabase
     .from("journal")
     .select("id")
@@ -36,7 +35,14 @@ export async function GET(req: Request) {
 
   const { data: entries, error } = await supabase
     .from("entry")
-    .select("*")
+    .select(
+      `
+      *,
+      entry_tag (
+        tag:tag_id (name)
+      )
+    `
+    )
     .eq("journal_id", journalId)
     .is("deleted_at", null)
     .order("created_at", { ascending: false });
@@ -45,7 +51,12 @@ export async function GET(req: Request) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 
-  return NextResponse.json({ entries });
+  const transformedEntries = entries.map((entry) => ({
+    ...entry,
+    tags: entry.entry_tag?.map((et: any) => et.tag?.name).filter(Boolean) || []
+  }));
+
+  return NextResponse.json({ entries: transformedEntries });
 }
 
 export async function POST(req: Request) {
@@ -61,7 +72,7 @@ export async function POST(req: Request) {
   }
 
   const body = await req.json();
-  const { journalId, title, content } = body;
+  const { journalId, title, content, tags } = body;
 
   if (!journalId || typeof journalId !== "string") {
     return NextResponse.json({ error: "journalId is required" }, { status: 400 });
@@ -72,6 +83,10 @@ export async function POST(req: Request) {
       { error: "content is required and must be a string" },
       { status: 400 }
     );
+  }
+
+  if (tags && !Array.isArray(tags)) {
+    return NextResponse.json({ error: "tags must be an array of strings" }, { status: 400 });
   }
 
   // verify the journal belongs to the user and is not deleted
@@ -87,6 +102,7 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Journal not found or access denied" }, { status: 404 });
   }
 
+  // insert the entry
   const { data: entry, error } = await supabase
     .from("entry")
     .insert([
@@ -101,6 +117,55 @@ export async function POST(req: Request) {
 
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 500 });
+  }
+
+  if (tags && tags.length > 0) {
+    // normalize tags to lowercase and unique
+    const normalizedTags = Array.from(
+      new Set(tags.map((tag: string) => tag.toLowerCase().trim()))
+    ).filter(Boolean);
+
+    // fetch existing tags from db that match these names
+    const { data: existingTags, error: fetchTagsError } = await supabase
+      .from("tag")
+      .select("id, name")
+      .in("name", normalizedTags);
+
+    if (fetchTagsError) {
+      return NextResponse.json({ error: fetchTagsError.message }, { status: 500 });
+    }
+
+    const existingTagNames = existingTags?.map((t) => t.name.toLowerCase()) ?? [];
+    const newTagNames = normalizedTags.filter((tag) => !existingTagNames.includes(tag));
+
+    // insert new tags if they don't exist
+    let newTags = [];
+    if (newTagNames.length > 0) {
+      const { data: insertedTags, error: insertTagsError } = await supabase
+        .from("tag")
+        .insert(newTagNames.map((name) => ({ name })))
+        .select();
+
+      if (insertTagsError) {
+        return NextResponse.json({ error: insertTagsError.message }, { status: 500 });
+      }
+
+      newTags = insertedTags ?? [];
+    }
+
+    // combine existing and new tags
+    const allTags = [...(existingTags ?? []), ...newTags];
+
+    const entryTagRelations = allTags.map((tag) => ({
+      entry_id: entry.id,
+      tag_id: tag.id
+    }));
+
+    const { error: entryTagError } = await supabase.from("entry_tag").insert(entryTagRelations);
+
+    if (entryTagError) {
+      return NextResponse.json({ error: entryTagError.message }, { status: 500 });
+    }
   }
 
   return NextResponse.json({ entry }, { status: 201 });

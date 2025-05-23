@@ -27,6 +27,7 @@
     "react-activity-calendar": "^2.7.12",
     "react-dom": "19.1.0",
     "react-markdown": "^10.1.0",
+    "react-tag-input": "^6.10.6",
     "tiptap-markdown": "^0.8.10"
   },
   "devDependencies": {

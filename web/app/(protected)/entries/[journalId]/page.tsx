@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import axios from "axios";
+import { WithContext as ReactTags, Tag } from "react-tag-input";
 import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { CalendarIcon, Plus, Clock } from "lucide-react";
@@ -29,10 +30,23 @@ type Entry = {
   updated_at: string;
 };
 
+// for tag hotkey stuff
+const KeyCodes = {
+  comma: 188,
+  enter: 13,
+  tab: 9
+};
+
+const delimiters = [KeyCodes.comma, KeyCodes.enter, KeyCodes.tab];
+
+type EntryWithTags = Entry & {
+  tags: string[];
+};
+
 export default function EntriesPage() {
   const { journalId } = useParams();
 
-  const [entries, setEntries] = useState<Entry[]>([]);
+  const [entries, setEntries] = useState<EntryWithTags[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -40,6 +54,8 @@ export default function EntriesPage() {
   const [content, setContent] = useState("");
   const [creating, setCreating] = useState(false);
   const [createError, setCreateError] = useState<string | null>(null);
+
+  const [tags, setTags] = useState<Tag[]>([]);
 
   const [dialogOpen, setDialogOpen] = useState(false);
 
@@ -73,10 +89,12 @@ export default function EntriesPage() {
     setCreateError(null);
 
     try {
+      // Send tags as array of strings, extracted from the tags state
       await axios.post("/api/entries", {
         journalId,
         title,
-        content
+        content,
+        tags: tags.map((tag) => tag.text.toLowerCase()) // normalize to lower case
       });
 
       setEntries((prev) => [
@@ -85,12 +103,14 @@ export default function EntriesPage() {
           title,
           content,
           created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString()
+          updated_at: new Date().toISOString(),
+          tags: [...tags.map((tag) => tag.text.toLowerCase())]
         },
         ...prev
       ]);
       setTitle("");
       setContent("");
+      setTags([]);
 
       axios.get(`/api/entries?journalId=${journalId}`).then((res) => {
         setEntries(res.data.entries || []);
@@ -102,6 +122,16 @@ export default function EntriesPage() {
     } finally {
       setCreating(false);
     }
+  };
+
+  const handleDeleteTag = (i: number) => {
+    setTags(tags.filter((_, index) => index !== i));
+  };
+
+  const handleAdditionTag = (tag: Tag) => {
+    // Avoid duplicates (case insensitive)
+    if (tags.some((t) => t.text.toLowerCase() === tag.text.toLowerCase())) return;
+    setTags([...tags, tag]);
   };
 
   if (!journalId) {
@@ -150,6 +180,20 @@ export default function EntriesPage() {
                 onChange={(newContent) => setContent(newContent)}
                 placeholder="Add content..."
               />
+
+              <Label htmlFor="tags">Tags</Label>
+              <ReactTags
+                tags={tags}
+                handleDelete={handleDeleteTag}
+                handleAddition={handleAdditionTag}
+                delimiters={delimiters}
+                inputFieldPosition="bottom"
+                autocomplete
+                placeholder="Add new tag"
+                allowDragDrop={false}
+                readOnly={creating}
+              />
+
               {createError && (
                 <div className="bg-destructive/10 text-destructive rounded-md p-3 text-sm">
                   {createError}
@@ -195,6 +239,21 @@ export default function EntriesPage() {
                     <div className="text-muted-foreground mt-1 text-sm">
                       <Markdown>{entry.content}</Markdown>
                     </div>
+
+                    {/* Tags */}
+                    {entry.tags?.length > 0 && (
+                      <div className="mt-2 flex flex-wrap gap-2">
+                        {entry.tags.map((tag) => (
+                          <span
+                            key={tag}
+                            className="bg-muted text-muted-foreground rounded-full px-2 py-0.5 text-xs"
+                          >
+                            {tag}
+                          </span>
+                        ))}
+                      </div>
+                    )}
+
                     <div className="text-muted-foreground mt-2 flex items-center gap-4 text-xs">
                       <div className="flex items-center">
                         <CalendarIcon className="mr-1 h-3 w-3" />
