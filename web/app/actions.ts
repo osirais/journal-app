@@ -32,7 +32,7 @@ export const signUpAction = async (username: string, email: string, password: st
 
   const { error: profileError } = await supabase
     .from("users")
-    .insert([{ id: authData.user.id, username }]);
+    .insert([{ id: authData.user.id, username, name: username }]);
 
   if (profileError) {
     console.error(profileError.code + " " + profileError.message);
