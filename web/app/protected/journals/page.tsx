@@ -4,7 +4,11 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import { CalendarIcon, Clock, FileEdit } from "lucide-react";
+import { CalendarIcon, Clock, FileEdit, Plus } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { formatDateAgo } from "@/utils/format-date-ago";
 
 type Journal = {
@@ -20,6 +24,10 @@ export default function JournalsPage() {
   const [journals, setJournals] = useState<Journal[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
+  const [creating, setCreating] = useState(false);
+  const [createError, setCreateError] = useState<string | null>(null);
 
   useEffect(() => {
     axios
@@ -34,6 +42,41 @@ export default function JournalsPage() {
       });
   }, []);
 
+  const handleCreate = async () => {
+    if (!title.trim()) {
+      setCreateError("Title is required");
+      return;
+    }
+
+    setCreating(true);
+    setCreateError(null);
+
+    try {
+      await axios.post("/api/journals", { title, description });
+      setJournals((prev) => [
+        {
+          id: "temp_" + Math.random(),
+          title,
+          description,
+          thumbnail_url: null,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString()
+        },
+        ...prev
+      ]);
+      setTitle("");
+      setDescription("");
+
+      axios.get("/api/journals").then((res) => {
+        setJournals(res.data.journals || []);
+      });
+    } catch (err: any) {
+      setCreateError(err.response?.data?.error || "Failed to create journal");
+    } finally {
+      setCreating(false);
+    }
+  };
+
   return (
     <div className="container mx-auto max-w-3xl py-8">
       <h1 className="mb-2 text-3xl font-bold">Journals</h1>
@@ -45,19 +88,66 @@ export default function JournalsPage() {
         </div>
       )}
 
+      <Card className="mb-6 overflow-hidden">
+        <CardContent className="p-6">
+          <div className="mb-4 flex items-center justify-between">
+            <h2 className="text-lg font-semibold">Create New Journal</h2>
+            <Button
+              onClick={handleCreate}
+              disabled={creating}
+              size="sm"
+              className="h-9 w-9 rounded-full p-0"
+            >
+              {creating ? <Plus className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />}
+              <span className="sr-only">Create journal</span>
+            </Button>
+          </div>
+
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="title">Title</Label>
+              <Input
+                id="title"
+                placeholder="Enter journal title"
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                disabled={creating}
+                required
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="description">Description (optional)</Label>
+              <Textarea
+                id="description"
+                placeholder="Enter journal description"
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                disabled={creating}
+                className="resize-none"
+                rows={3}
+              />
+            </div>
+
+            {createError && (
+              <div className="bg-destructive/10 text-destructive rounded-md p-3 text-sm">
+                {createError}
+              </div>
+            )}
+          </div>
+        </CardContent>
+      </Card>
+
       <div className="space-y-3">
         {loading ? (
-          // Loading skeletons
           Array.from({ length: 3 }).map((_, i) => (
-            <Card key={i} className="overflow-hidden">
-              <CardContent className="p-0">
-                <div className="p-4">
-                  <div className="flex items-start gap-4">
-                    <Skeleton className="h-12 w-12 rounded" />
-                    <div className="flex-1 space-y-2">
-                      <Skeleton className="h-4 w-3/4" />
-                      <Skeleton className="h-3 w-1/2" />
-                    </div>
+            <Card key={i} className="flex min-h-[80px] items-center overflow-hidden">
+              <CardContent className="w-full p-0">
+                <div className="flex items-center gap-4 p-4">
+                  <Skeleton className="h-16 w-16 rounded" />
+                  <div className="flex-1 space-y-2">
+                    <Skeleton className="h-4 w-3/4" />
+                    <Skeleton className="h-3 w-1/2" />
                   </div>
                 </div>
               </CardContent>
@@ -71,17 +161,13 @@ export default function JournalsPage() {
           journals.map((journal) => (
             <Card
               key={journal.id}
-              className="cursor-pointer overflow-hidden transition-shadow hover:shadow-md"
+              className="flex min-h-[80px] cursor-pointer items-center overflow-hidden transition-shadow hover:shadow-md"
             >
-              <CardContent className="p-0">
-                <div className="flex items-start p-4">
+              <CardContent className="w-full p-0">
+                <div className="flex items-center p-4">
                   {journal.thumbnail_url ? (
-                    <div className="mr-4 flex-shrink-0">
-                      <img
-                        src={journal.thumbnail_url || "/placeholder.svg"}
-                        alt=""
-                        className="h-16 w-16 rounded object-cover"
-                      />
+                    <div className="mr-4 h-16 w-16 flex-shrink-0 overflow-hidden rounded">
+                      <img src={journal.thumbnail_url} alt="" className="h-16 w-16 object-cover" />
                     </div>
                   ) : (
                     <div className="bg-muted mr-4 flex h-16 w-16 flex-shrink-0 items-center justify-center rounded">
