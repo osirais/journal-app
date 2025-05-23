@@ -26,23 +26,11 @@ CREATE TABLE IF NOT EXISTS journal (
 CREATE TABLE IF NOT EXISTS entry (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v7(),
     journal_id UUID NOT NULL REFERENCES journal(id),
-    title TEXT,
-    rank INT4 NOT NULL,
-    created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
-    updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
-    deleted_at TIMESTAMPTZ,
-    UNIQUE (journal_id, rank)
-);
-
-CREATE TABLE IF NOT EXISTS block (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v7(),
-    entry_id UUID NOT NULL REFERENCES entry(id),
-    rank INT4 NOT NULL,
+    title TEXT NOT NULL,
     content TEXT NOT NULL,
     created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
-    deleted_at TIMESTAMPTZ,
-    UNIQUE (entry_id, rank)
+    deleted_at TIMESTAMPTZ
 );
 
 CREATE TABLE IF NOT EXISTS tag (
