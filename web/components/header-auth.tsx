@@ -4,6 +4,7 @@ import Link from "next/link";
 import { Badge } from "./ui/badge";
 import { Button } from "./ui/button";
 import { createClient } from "@/utils/supabase/server";
+import { User } from "lucide-react";
 
 export default async function AuthButton() {
   const supabase = await createClient();
@@ -11,6 +12,8 @@ export default async function AuthButton() {
   const {
     data: { user }
   } = await supabase.auth.getUser();
+
+  const { data } = await supabase.from("users").select("*").eq("id", user?.id).single();
 
   const hoverBgClass = "hover:bg-white/20";
   const cursorPointer = "cursor-pointer";
@@ -47,9 +50,12 @@ export default async function AuthButton() {
     );
   }
 
-  return user ? (
+  return data ? (
     <div className="flex items-center gap-4">
-      Hey, {user.email}!
+      <div className="grid grid-cols-[max-content_max-content] place-items-center gap-1">
+        <User size={16} />
+        {data.username}
+      </div>
       <form action={signOutAction}>
         <Button type="submit" variant="ghost" className={`${hoverBgClass} ${cursorPointer}`}>
           Sign out
