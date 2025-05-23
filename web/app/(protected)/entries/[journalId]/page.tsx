@@ -11,6 +11,7 @@ import { Input } from "@/components/ui/input";
 import { formatDateAgo } from "@/utils/format-date-ago";
 import { useParams } from "next/navigation";
 import { TiptapEditor } from "@/components/tiptap-editor";
+import { Markdown } from "@/components/markdown";
 
 type Entry = {
   id: string;
@@ -182,7 +183,7 @@ export default function EntriesPage() {
                   <div className="min-w-0 flex-1">
                     <h3 className="truncate text-lg font-medium">{entry.title || "Untitled"}</h3>
                     <div className="text-muted-foreground mt-1 text-sm">
-                      Content: {entry.content}
+                      <Markdown>{entry.content}</Markdown>
                     </div>
                     <div className="text-muted-foreground mt-2 flex items-center gap-4 text-xs">
                       <div className="flex items-center">
