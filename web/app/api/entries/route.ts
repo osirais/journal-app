@@ -39,7 +39,7 @@ export async function GET(req: Request) {
     .select("*")
     .eq("journal_id", journalId)
     .is("deleted_at", null)
-    .order("rank", { ascending: true });
+    .order("created_at", { ascending: false });
 
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 500 });
@@ -61,14 +61,17 @@ export async function POST(req: Request) {
   }
 
   const body = await req.json();
-  const { journalId, title, rank } = body;
+  const { journalId, title, content } = body;
 
   if (!journalId || typeof journalId !== "string") {
     return NextResponse.json({ error: "journalId is required" }, { status: 400 });
   }
 
-  if (typeof rank !== "number") {
-    return NextResponse.json({ error: "rank must be a number" }, { status: 400 });
+  if (!content || typeof content !== "string") {
+    return NextResponse.json(
+      { error: "content is required and must be a string" },
+      { status: 400 }
+    );
   }
 
   // verify the journal belongs to the user and is not deleted
@@ -90,7 +93,7 @@ export async function POST(req: Request) {
       {
         journal_id: journalId,
         title: title ?? null,
-        rank
+        content
       }
     ])
     .select()

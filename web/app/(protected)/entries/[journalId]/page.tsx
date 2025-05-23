@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import { CalendarIcon, Plus, FileEdit, Clock } from "lucide-react";
+import { CalendarIcon, Plus, Clock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
@@ -14,7 +14,7 @@ import { useParams } from "next/navigation";
 type Entry = {
   id: string;
   title: string | null;
-  rank: number;
+  content: string;
   created_at: string;
   updated_at: string;
 };
@@ -27,7 +27,7 @@ export default function EntriesPage() {
   const [error, setError] = useState<string | null>(null);
 
   const [title, setTitle] = useState("");
-  const [rank, setRank] = useState("");
+  const [content, setContent] = useState("");
   const [creating, setCreating] = useState(false);
   const [createError, setCreateError] = useState<string | null>(null);
 
@@ -52,9 +52,8 @@ export default function EntriesPage() {
       setCreateError("Title is required");
       return;
     }
-    const rankNumber = parseInt(rank);
-    if (isNaN(rankNumber)) {
-      setCreateError("Rank must be a number");
+    if (!content.trim()) {
+      setCreateError("Content is required");
       return;
     }
 
@@ -65,21 +64,21 @@ export default function EntriesPage() {
       await axios.post("/api/entries", {
         journalId,
         title,
-        rank: rankNumber
+        content
       });
 
       setEntries((prev) => [
         {
           id: "temp_" + Math.random(),
           title,
-          rank: rankNumber,
+          content,
           created_at: new Date().toISOString(),
           updated_at: new Date().toISOString()
         },
         ...prev
       ]);
       setTitle("");
-      setRank("");
+      setContent("");
 
       axios.get(`/api/entries?journalId=${journalId}`).then((res) => {
         setEntries(res.data.entries || []);
@@ -135,12 +134,12 @@ export default function EntriesPage() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="rank">Rank</Label>
+              <Label htmlFor="content">Content</Label>
               <Input
-                id="rank"
-                placeholder="Enter entry rank (number)"
-                value={rank}
-                onChange={(e) => setRank(e.target.value)}
+                id="content"
+                placeholder="Enter entry content"
+                value={content}
+                onChange={(e) => setContent(e.target.value)}
                 disabled={creating}
                 required
               />
@@ -184,7 +183,9 @@ export default function EntriesPage() {
                 <div className="flex items-center p-6">
                   <div className="min-w-0 flex-1">
                     <h3 className="truncate text-lg font-medium">{entry.title || "Untitled"}</h3>
-                    <div className="text-muted-foreground mt-1 text-sm">Rank: {entry.rank}</div>
+                    <div className="text-muted-foreground mt-1 text-sm">
+                      Content: {entry.content}
+                    </div>
                     <div className="text-muted-foreground mt-2 flex items-center gap-4 text-xs">
                       <div className="flex items-center">
                         <CalendarIcon className="mr-1 h-3 w-3" />
