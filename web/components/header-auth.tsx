@@ -12,54 +12,56 @@ export default async function AuthButton() {
     data: { user }
   } = await supabase.auth.getUser();
 
+  const hoverBgClass = "hover:bg-white/20";
+  const cursorPointer = "cursor-pointer";
+
   if (!hasEnvVars) {
     return (
-      <>
-        <div className="flex items-center gap-4">
-          <div>
-            <Badge variant={"default"} className="pointer-events-none font-normal">
-              Please update .env.local file with anon key and url
-            </Badge>
-          </div>
-          <div className="flex gap-2">
-            <Button
-              asChild
-              size="sm"
-              variant={"outline-solid"}
-              disabled
-              className="pointer-events-none cursor-none opacity-75"
-            >
-              <Link href="/login">Sign in</Link>
-            </Button>
-            <Button
-              asChild
-              size="sm"
-              variant={"default"}
-              disabled
-              className="pointer-events-none cursor-none opacity-75"
-            >
-              <Link href="/register">Sign up</Link>
-            </Button>
-          </div>
+      <div className="flex items-center gap-4">
+        <div>
+          <Badge variant="default" className="pointer-events-none font-normal">
+            Please update .env.local file with anon key and url
+          </Badge>
         </div>
-      </>
+        <div className="flex gap-2">
+          <Button
+            asChild
+            size="sm"
+            variant="ghost"
+            disabled
+            className={`pointer-events-none opacity-75 ${hoverBgClass} ${cursorPointer}`}
+          >
+            <Link href="/login">Sign in</Link>
+          </Button>
+          <Button
+            asChild
+            size="sm"
+            variant="ghost"
+            disabled
+            className={`pointer-events-none opacity-75 ${hoverBgClass} ${cursorPointer}`}
+          >
+            <Link href="/register">Sign up</Link>
+          </Button>
+        </div>
+      </div>
     );
   }
+
   return user ? (
     <div className="flex items-center gap-4">
       Hey, {user.email}!
       <form action={signOutAction}>
-        <Button type="submit" variant={"outline-solid"}>
+        <Button type="submit" variant="ghost" className={`${hoverBgClass} ${cursorPointer}`}>
           Sign out
         </Button>
       </form>
     </div>
   ) : (
     <div className="flex gap-2">
-      <Button asChild size="sm" variant={"outline-solid"}>
+      <Button asChild size="sm" variant="ghost" className={`${hoverBgClass} ${cursorPointer}`}>
         <Link href="/login">Sign in</Link>
       </Button>
-      <Button asChild size="sm" variant={"default"}>
+      <Button asChild size="sm" variant="ghost" className={`${hoverBgClass} ${cursorPointer}`}>
         <Link href="/register">Sign up</Link>
       </Button>
     </div>
