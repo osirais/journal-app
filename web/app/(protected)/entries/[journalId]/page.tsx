@@ -90,12 +90,11 @@ export default function EntriesPage() {
     setCreateError(null);
 
     try {
-      // Send tags as array of strings, extracted from the tags state
       await axios.post("/api/entries", {
         journalId,
         title,
         content,
-        tags: tags.map((tag) => tag.text.toLowerCase()) // normalize to lower case
+        tags: tags.map((tag) => tag.text.toLowerCase())
       });
 
       setEntries((prev) => [
@@ -130,7 +129,6 @@ export default function EntriesPage() {
   };
 
   const handleAdditionTag = (tag: Tag) => {
-    // Avoid duplicates (case insensitive)
     if (tags.some((t) => t.text.toLowerCase() === tag.text.toLowerCase())) return;
     setTags([...tags, tag]);
   };
@@ -183,18 +181,27 @@ export default function EntriesPage() {
               />
 
               <Label htmlFor="tags">Tags</Label>
-              <ReactTags
-                tags={tags}
-                handleDelete={handleDeleteTag}
-                handleAddition={handleAdditionTag}
-                delimiters={delimiters}
-                inputFieldPosition="bottom"
-                autocomplete
-                placeholder="Add new tag"
-                allowDragDrop={false}
-                readOnly={creating}
-              />
-
+              <Card className="p-2">
+                <ReactTags
+                  tags={tags}
+                  handleDelete={handleDeleteTag}
+                  handleAddition={handleAdditionTag}
+                  delimiters={delimiters}
+                  inputFieldPosition="top"
+                  autocomplete
+                  placeholder="Add new tag"
+                  allowDragDrop={false}
+                  readOnly={creating}
+                  classNames={{
+                    tags: "flex flex-wrap gap-2 mt-2",
+                    tag: "rounded-full px-2 py-0.5 text-xs text-muted-foreground bg-black/20 dark:bg-white/20",
+                    tagInput: "w-full",
+                    tagInputField: "w-full focus:outline-none text-sm",
+                    selected: "flex flex-wrap gap-2",
+                    remove: "ml-2 text-xs cursor-pointer text-destructive hover:underline"
+                  }}
+                />
+              </Card>
               {createError && (
                 <div className="bg-destructive/10 text-destructive rounded-md p-3 text-sm">
                   {createError}
