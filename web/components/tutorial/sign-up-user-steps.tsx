@@ -70,7 +70,7 @@ export default function SignUpUserSteps() {
       <TutorialStep title="Sign up your first user">
         <p>
           Head over to the{" "}
-          <Link href="/sign-up" className="text-foreground/80 font-bold hover:underline">
+          <Link href="/register" className="text-foreground/80 font-bold hover:underline">
             Sign up
           </Link>{" "}
           page and sign up your first user. It's okay if this is just you for now. Your awesome idea

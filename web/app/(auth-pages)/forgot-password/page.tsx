@@ -16,7 +16,7 @@ export default async function ForgotPassword(props: { searchParams: Promise<Mess
           <h1 className="text-2xl font-medium">Reset Password</h1>
           <p className="text-secondary-foreground text-sm">
             Already have an account?{" "}
-            <Link className="text-primary underline" href="/sign-in">
+            <Link className="text-primary underline" href="/login">
               Sign in
             </Link>
           </p>

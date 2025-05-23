@@ -1,4 +1,4 @@
-import { signInAction } from "@/app/actions";
+import { loginAction } from "@/app/actions";
 import { FormMessage, Message } from "@/components/form-message";
 import { SubmitButton } from "@/components/submit-button";
 import { Card } from "@/components/ui/card";
@@ -14,7 +14,7 @@ export default async function Login(props: { searchParams: Promise<Message> }) {
         <h1 className="text-2xl font-medium">Sign in</h1>
         <p className="text-foreground text-sm">
           Don't have an account?{" "}
-          <Link className="text-foreground font-medium underline" href="/sign-up">
+          <Link className="text-foreground font-medium underline" href="/register">
             Sign up
           </Link>
         </p>
@@ -28,7 +28,7 @@ export default async function Login(props: { searchParams: Promise<Message> }) {
             </Link>
           </div>
           <Input type="password" name="password" placeholder="Your password" required />
-          <SubmitButton pendingText="Signing In..." formAction={signInAction}>
+          <SubmitButton pendingText="Signing In..." formAction={loginAction}>
             Sign in
           </SubmitButton>
           <FormMessage message={searchParams} />

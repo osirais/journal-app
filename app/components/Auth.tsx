@@ -10,7 +10,7 @@ export default function Auth() {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
 
-  async function signInWithEmail() {
+  async function loginWithEmail() {
     setLoading(true);
     const { error } = await supabase.auth.signInWithPassword({
       email,
@@ -22,7 +22,7 @@ export default function Auth() {
     router.replace("/(auth)/home");
   }
 
-  async function signUpWithEmail() {
+  async function registerWithEmail() {
     setLoading(true);
     const {
       data: { session },
@@ -61,10 +61,10 @@ export default function Auth() {
         />
       </View>
       <View className="mt-5 w-full py-1">
-        <Button title="Sign in" disabled={loading} onPress={signInWithEmail} />
+        <Button title="Sign in" disabled={loading} onPress={loginWithEmail} />
       </View>
       <View className="w-full py-1">
-        <Button title="Sign up" disabled={loading} onPress={signUpWithEmail} />
+        <Button title="Sign up" disabled={loading} onPress={registerWithEmail} />
       </View>
     </View>
   );

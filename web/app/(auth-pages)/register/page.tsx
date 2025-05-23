@@ -1,6 +1,6 @@
 "use client";
 
-import { signUpAction } from "@/app/actions";
+import { registerAction } from "@/app/actions";
 import { SubmitButton } from "@/components/submit-button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -63,7 +63,7 @@ export default function SignUpForm() {
         <h1 className="text-2xl font-medium">Sign up</h1>
         <p className="text text-foreground text-sm">
           Already have an account?{" "}
-          <Link className="text-primary font-medium underline" href="/sign-in">
+          <Link className="text-primary font-medium underline" href="/login">
             Sign in
           </Link>
         </p>
@@ -139,7 +139,7 @@ export default function SignUpForm() {
             pendingText="Signing up..."
             onClick={async (e) => {
               e.preventDefault();
-              await signUpAction(username, email, password);
+              await registerAction(username, email, password);
             }}
             >
             Sign up
