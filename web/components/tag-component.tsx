@@ -19,7 +19,7 @@ export const TagComponent: FC<TagProps> = ({ journalId, tag }) => {
   const color = getColorFromString(tag.name);
 
   return (
-    <Link href={`/entries/${journalId}?tag=${tag.id}`}>
+    <Link href={`/journal/${journalId}?tag=${tag.id}`}>
       <div
         style={{
           backgroundColor: color + "50",
