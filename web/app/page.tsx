@@ -2,10 +2,19 @@ import { Navbar } from "@/components/navbar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { createClient } from "@/utils/supabase/server";
 import { ArrowRight, BookOpen, Heart, TrendingUp } from "lucide-react";
 import Link from "next/link";
 
-const Page = () => {
+const Page = async () => {
+  const supabase = await createClient();
+
+  const {
+    data: { user }
+  } = await supabase.auth.getUser();
+
+  const signedIn = !!user;
+
   return (
     <div className="bg-background min-h-screen">
       <Navbar />
@@ -26,9 +35,9 @@ const Page = () => {
             </p>
           </div>
           <div className="flex flex-col justify-center gap-4 sm:flex-row">
-            <Link href="/login">
+            <Link href={signedIn ? "/dashboard" : "/login"}>
               <Button size="lg" className="group flex cursor-pointer items-center px-8 text-lg">
-                Get Started
+                {signedIn ? "To Dashboard" : "Get Started"}
                 <ArrowRight className="ml-2 h-5 w-5 transform transition-transform duration-200 group-hover:translate-x-1" />
               </Button>
             </Link>
