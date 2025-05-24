@@ -7,9 +7,9 @@ export const dynamic = "force-dynamic";
 export async function GET(req: Request) {
   const supabase = await createClient();
 
-  const url = new URL(req.url);
-  const tagId = url.searchParams.get("tag");
-  const journalId = url.searchParams.get("journalId");
+  const searchParams = new URL(req.url).searchParams;
+  const tagId = searchParams.get("tag");
+  const journalId = searchParams.get("journalId");
 
   const {
     data: { user },
