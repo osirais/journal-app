@@ -6,15 +6,12 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { createClient } from "@/utils/supabase/client";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 import Link from "next/link";
+import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
-export default function EntryPage({
-  params
-}: {
-  params: {
-    entryId: string;
-  };
-}) {
+export default function EntryPage() {
+  const { entryId } = useParams();
+
   const [journal, setJournal] = useState<any>(null);
   const [entry, setEntry] = useState<any>(null);
 
@@ -23,8 +20,6 @@ export default function EntryPage({
 
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-
-  const entryId = params.entryId;
 
   useEffect(() => {
     const fetchData = async () => {
