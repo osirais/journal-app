@@ -1,7 +1,7 @@
 "use server";
 
-import { encodedRedirect } from "@/utils/utils";
 import { createClient } from "@/utils/supabase/server";
+import { encodedRedirect } from "@/utils/utils";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 
@@ -44,7 +44,7 @@ export async function registerAction(username: string, email: string, password: 
     "/register",
     "Thanks for signing up! Please check your email for a verification link."
   );
-};
+}
 
 export async function loginAction(formData: FormData) {
   const email = formData.get("email") as string;
@@ -61,7 +61,7 @@ export async function loginAction(formData: FormData) {
   }
 
   return redirect("/journals");
-};
+}
 
 export async function forgotPasswordAction(formData: FormData) {
   const email = formData.get("email")?.toString();
@@ -91,7 +91,7 @@ export async function forgotPasswordAction(formData: FormData) {
     "/forgot-password",
     "Check your email for a link to reset your password."
   );
-};
+}
 
 export async function resetPasswordAction(formData: FormData) {
   const supabase = await createClient();
@@ -116,10 +116,10 @@ export async function resetPasswordAction(formData: FormData) {
   }
 
   encodedRedirect("success", "/reset-password", "Password updated");
-};
+}
 
 export async function signOutAction() {
   const supabase = await createClient();
   await supabase.auth.signOut();
   return redirect("/login");
-};
+}

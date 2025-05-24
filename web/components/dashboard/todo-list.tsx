@@ -1,8 +1,8 @@
 "use client";
 
-import React from "react";
-import { Checkbox } from "@/components/ui/checkbox";
 import { Card } from "@/components/ui/card";
+import { Checkbox } from "@/components/ui/checkbox";
+import React from "react";
 
 interface Todo {
   id: string;

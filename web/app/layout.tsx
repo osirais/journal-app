@@ -1,5 +1,5 @@
-import { Geist } from "next/font/google";
 import { ThemeProvider } from "next-themes";
+import { Geist } from "next/font/google";
 import "./globals.css";
 import { Navbar } from "@/components/navbar";
 

@@ -1,14 +1,10 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import axios from "axios";
-import { WithContext as ReactTags, Tag } from "react-tag-input";
-import { Card, CardContent } from "@/components/ui/card";
-import { Skeleton } from "@/components/ui/skeleton";
-import { CalendarIcon, Plus, Clock } from "lucide-react";
+import { Markdown } from "@/components/markdown";
+import { TagComponent, TagType } from "@/components/tag-component";
+import { TiptapEditor } from "@/components/tiptap-editor";
 import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
+import { Card, CardContent } from "@/components/ui/card";
 import {
   Dialog,
   DialogContent,
@@ -17,11 +13,15 @@ import {
   DialogTitle,
   DialogTrigger
 } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Skeleton } from "@/components/ui/skeleton";
 import { formatDateAgo } from "@/utils/format-date-ago";
+import axios from "axios";
+import { CalendarIcon, Clock, Plus } from "lucide-react";
 import { useParams } from "next/navigation";
-import { TiptapEditor } from "@/components/tiptap-editor";
-import { Markdown } from "@/components/markdown";
-import { TagComponent, TagType } from "@/components/tag-component";
+import { useEffect, useState } from "react";
+import { WithContext as ReactTags, Tag } from "react-tag-input";
 
 type Entry = {
   id: string;

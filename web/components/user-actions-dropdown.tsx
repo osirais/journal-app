@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { ChevronDown, LayoutDashboard, LogOut, User } from "lucide-react";
 import Link from "next/link";
-import { type FC, useTransition } from "react";
+import { useTransition, type FC } from "react";
 
 interface UserActionsDropdownProps {
   username: string;

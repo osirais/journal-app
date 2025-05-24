@@ -5,7 +5,10 @@
   "printWidth": 100,
   "trailingComma": "none",
   "arrowParens": "always",
-  "plugins": ["prettier-plugin-tailwindcss"],
+  "plugins": [
+    "@ianvs/prettier-plugin-sort-imports",
+    "prettier-plugin-tailwindcss"
+  ],
   "overrides": [
     {
       "files": "*.html",

@@ -1,6 +1,6 @@
-import { FC } from "react";
-import Link from "next/link";
 import { getColorFromString } from "@/utils/get-color-from-string";
+import Link from "next/link";
+import { FC } from "react";
 
 interface TagProps {
   journalId: string;

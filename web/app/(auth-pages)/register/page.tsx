@@ -18,9 +18,7 @@ export default function SignUpForm() {
   const [password, setPassword] = useState("");
 
   const [isCheckingUsername, setIsCheckingUsername] = useState(false);
-  const [isUsernameAvailable, setIsUsernameAvailable] = useState<
-    boolean | null
-  >(null);
+  const [isUsernameAvailable, setIsUsernameAvailable] = useState<boolean | null>(null);
 
   useEffect(() => {
     if (username) {
@@ -59,7 +57,7 @@ export default function SignUpForm() {
 
   return (
     <>
-      <form className="mx-auto flex max-w-64 min-w-64 flex-col">
+      <form className="mx-auto flex min-w-64 max-w-64 flex-col">
         <h1 className="text-2xl font-medium">Sign up</h1>
         <p className="text text-foreground text-sm">
           Already have an account?{" "}
@@ -87,7 +85,7 @@ export default function SignUpForm() {
                 }`}
               />
               {username && (
-                <div className="absolute top-1/2 right-3 -translate-y-1/2 transform">
+                <div className="absolute right-3 top-1/2 -translate-y-1/2 transform">
                   {isCheckingUsername ? (
                     <LoaderCircle className="text-muted-foreground h-4 w-4 animate-spin" />
                   ) : isUsernameAvailable === true ? (
@@ -101,15 +99,12 @@ export default function SignUpForm() {
             <div className="mt-1 text-xs">
               {username.length > 0 && !/^[a-zA-Z0-9._-]*$/.test(username) && (
                 <p className="text-red-500">
-                  Username can only contain letters, numbers, underscores,
-                  periods, and hyphens
+                  Username can only contain letters, numbers, underscores, periods, and hyphens
                 </p>
               )}
               {username.length < 3 ||
                 (username.length > 32 && (
-                  <p className="text-red-500">
-                    Username must be 3-32 characters
-                  </p>
+                  <p className="text-red-500">Username must be 3-32 characters</p>
                 ))}
               {isUsernameAvailable === false && (
                 <p className="text-red-500">Username is already taken</p>
@@ -135,15 +130,15 @@ export default function SignUpForm() {
             minLength={6}
             required
           />
-            <SubmitButton
+          <SubmitButton
             pendingText="Signing up..."
             onClick={async (e) => {
               e.preventDefault();
               await registerAction(username, email, password);
             }}
-            >
+          >
             Sign up
-            </SubmitButton>
+          </SubmitButton>
         </div>
       </form>
       <SmtpMessage />

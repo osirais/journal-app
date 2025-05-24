@@ -1,5 +1,5 @@
-import React from "react";
 import { Card } from "@/components/ui/card";
+import React from "react";
 import { ActivityCalendar } from "react-activity-calendar";
 
 interface ActivityData {

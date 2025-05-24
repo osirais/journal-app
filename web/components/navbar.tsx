@@ -1,8 +1,8 @@
-import Link from "next/link";
-import type { FC } from "react";
 import HeaderAuth from "@/components/header-auth";
 import { ThemeSwitcher } from "@/components/theme-switcher";
 import { NotebookPen } from "lucide-react";
+import Link from "next/link";
+import type { FC } from "react";
 
 export const Navbar: FC = () => {
   return (

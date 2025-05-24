@@ -1,24 +1,24 @@
 "use client";
 
-import { useState, useEffect, FC } from "react";
-import { useEditor, EditorContent, BubbleMenu } from "@tiptap/react";
+import { Button } from "@/components/ui/button";
+import { Separator } from "@/components/ui/separator";
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
+import { cn } from "@/lib/utils";
+import { BubbleMenu, EditorContent, useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import {
   Bold,
+  Heading1,
+  Heading2,
   Italic,
   List,
   ListOrdered,
-  Heading1,
-  Heading2,
-  Undo,
-  Redo,
   Pilcrow,
-  Quote
+  Quote,
+  Redo,
+  Undo
 } from "lucide-react";
-import { cn } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
-import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
-import { Separator } from "@/components/ui/separator";
+import { FC, useEffect, useState } from "react";
 import { Markdown } from "tiptap-markdown";
 
 interface TiptapEditorProps {
