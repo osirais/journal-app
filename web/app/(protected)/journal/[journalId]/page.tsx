@@ -20,10 +20,9 @@ import { formatDateAgo } from "@/utils/format-date-ago";
 import axios from "axios";
 import { CalendarIcon, Clock, Plus } from "lucide-react";
 import Link from "next/link";
-import { useParams } from "next/navigation";
+import { useParams, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { WithContext as ReactTags, Tag } from "react-tag-input";
-import { useSearchParams } from "next/navigation";
 
 type Entry = {
   id: string;
@@ -49,9 +48,8 @@ type EntryWithTags = Entry & {
 export default function EntriesPage() {
   const { journalId } = useParams();
 
-const searchParams = useSearchParams();
-const tag = searchParams.get("tag");
-
+  const searchParams = useSearchParams();
+  const tag = searchParams.get("tag");
 
   const [entries, setEntries] = useState<EntryWithTags[]>([]);
   const [loading, setLoading] = useState(true);
@@ -148,12 +146,11 @@ const tag = searchParams.get("tag");
       <h1 className="mb-2 text-3xl font-bold">Entries</h1>
       <p className="text-muted-foreground mb-6">Entries for journal {journalId}</p>
 
-  {tag && (
+      {tag && (
         <div className="mb-4 rounded bg-blue-100 px-4 py-2 text-sm text-blue-800">
           Showing entries filtered by tag: <strong>{tag}</strong> (not working yet)
         </div>
       )}
-
 
       {error && (
         <div className="mb-6 rounded border border-red-200 bg-red-50 px-4 py-3 text-red-700">
