@@ -19,7 +19,9 @@ export const Navbar: FC = () => {
         </div>
         <div className="flex items-center gap-3">
           <HeaderAuth />
-          <ThemeSwitcher />
+          <div style={{ width: 32, height: 32 }}>
+            <ThemeSwitcher />
+          </div>
         </div>
       </div>
     </nav>
