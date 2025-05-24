@@ -263,7 +263,7 @@ export default function EntriesPage() {
           entries.map((entry) => (
             <Card
               key={entry.id}
-              className="flex min-h-[80px] cursor-pointer items-center overflow-hidden transition-shadow hover:shadow-md"
+              className="flex min-h-[80px] items-center overflow-hidden transition-shadow hover:shadow-md"
             >
               <CardContent className="w-full p-0">
                 <div className="flex items-center p-6">
