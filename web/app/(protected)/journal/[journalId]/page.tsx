@@ -238,10 +238,7 @@ export default function EntriesPage() {
         ) : (
           entries.map((entry) => (
             <Link key={entry.id} href={`/entry/${entry.id}`} className="block">
-              <Card
-                key={entry.id}
-                className="flex min-h-[80px] cursor-pointer items-center overflow-hidden transition-shadow hover:shadow-md"
-              >
+              <Card className="flex min-h-[80px] cursor-pointer items-center overflow-hidden transition-shadow hover:shadow-md">
                 <CardContent className="w-full p-0">
                   <div className="flex items-center p-6">
                     <div className="min-w-0 flex-1">
