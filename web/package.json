@@ -4,7 +4,8 @@
     "d": "bun dev",
     "dev": "next dev",
     "build": "next build",
-    "start": "next start"
+    "start": "next start",
+    "prettier": "prettier --write \"./**/*.{js,jsx,mjs,cjs,ts,tsx,json}\""
   },
   "dependencies": {
     "@radix-ui/react-checkbox": "^1.3.2",
