@@ -9,9 +9,13 @@ import { Label } from "@/components/ui/label";
 import { createClient } from "@/utils/supabase/client";
 import { Check, LoaderCircle, X } from "lucide-react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { FC, useEffect, useState } from "react";
 
 export const RegisterCard: FC = () => {
+  const searchParams = useSearchParams();
+  const error = searchParams.get("error") ?? "";
+
   const supabase = createClient();
 
   const [username, setUsername] = useState("");
@@ -75,6 +79,7 @@ export const RegisterCard: FC = () => {
               Sign in
             </Link>
           </p>
+
           <div className="mt-8 flex flex-col gap-2 [&>input]:mb-3">
             <div>
               <Label htmlFor="username">Username</Label>
@@ -149,6 +154,11 @@ export const RegisterCard: FC = () => {
             >
               Sign up
             </SubmitButton>
+            {error && (
+              <div className="mt-4 rounded-md border border-red-500 bg-red-500/20 p-3 text-sm text-red-500">
+                {decodeURIComponent(error)}
+              </div>
+            )}
           </div>
         </form>
       </Card>
