@@ -1,3 +1,4 @@
+import { Navbar } from "@/components/navbar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -7,6 +8,7 @@ import Link from "next/link";
 const Page = () => {
   return (
     <div className="bg-background min-h-screen">
+      <Navbar />
       <main className="container mx-auto px-4 py-16 md:py-24">
         <div className="mx-auto max-w-4xl space-y-8 text-center">
           <div className="space-y-4">

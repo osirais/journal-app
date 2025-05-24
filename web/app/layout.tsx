@@ -32,8 +32,7 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <Navbar />
-          <div className="min-h-screen">{children}</div>
+          {children}
         </ThemeProvider>
       </body>
     </html>
