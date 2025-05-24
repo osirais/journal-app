@@ -10,7 +10,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { SmtpMessage } from "../smtp-message";
 
-export default function SignUpForm() {
+export default function Register() {
   const supabase = createClient();
 
   const [username, setUsername] = useState("");
