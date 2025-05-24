@@ -149,7 +149,7 @@ export default function JournalsPage() {
           </div>
 
           <DialogFooter className="mt-4">
-            <Button onClick={handleCreate} disabled={creating}>
+            <Button onClick={handleCreate} disabled={creating} className="cursor-pointer">
               {creating ? "Creating..." : "Create"}
             </Button>
           </DialogFooter>
