@@ -59,6 +59,7 @@ export default function EntriesPage() {
   const [content, setContent] = useState("");
   const [creating, setCreating] = useState(false);
   const [createError, setCreateError] = useState<string | null>(null);
+  const [tagName, setTagName] = useState<string | null>(null);
 
   const [tags, setTags] = useState<Tag[]>([]);
 
@@ -68,6 +69,17 @@ export default function EntriesPage() {
     if (!journalId) return;
 
     const fetchString = `/api/entries?journalId=${journalId}${tagId ? `&tag=${tagId}` : ""}`;
+
+    if (tagId) {
+      axios
+        .get(`/api/tags?id=${tagId}`)
+        .then((res) => {
+          setTagName(res.data.name);
+        })
+        .catch((err) => {
+          setError(err.response?.data?.error || "Failed to load tag name");
+        });
+    }
 
     setLoading(true);
     axios
@@ -149,8 +161,9 @@ export default function EntriesPage() {
       <p className="text-muted-foreground mb-6">Entries for journal {journalId}</p>
 
       {tagId && (
-        <div className="mb-4 rounded bg-blue-100 px-4 py-2 text-sm text-blue-800">
-          Showing entries filtered by tagId: <strong>{tagId}</strong>
+        <div className="py-4">
+          Showing entries filtered by tagId:{" "}
+          <TagComponent journalId={journalId as string} tag={{ id: tagId, name: tagName || "" }} />
         </div>
       )}
 
@@ -248,7 +261,10 @@ export default function EntriesPage() {
           </div>
         ) : (
           entries.map((entry) => (
-            <Card key={entry.id} className="flex min-h-[80px] cursor-pointer items-center overflow-hidden transition-shadow hover:shadow-md">
+            <Card
+              key={entry.id}
+              className="flex min-h-[80px] cursor-pointer items-center overflow-hidden transition-shadow hover:shadow-md"
+            >
               <CardContent className="w-full p-0">
                 <div className="flex items-center p-6">
                   <div className="min-w-0 flex-1">
