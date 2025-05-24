@@ -49,7 +49,7 @@ export default function EntriesPage() {
   const { journalId } = useParams();
 
   const searchParams = useSearchParams();
-  const tag = searchParams.get("tag");
+  const tagId = searchParams.get("tag");
 
   const [entries, setEntries] = useState<EntryWithTags[]>([]);
   const [loading, setLoading] = useState(true);
@@ -67,9 +67,11 @@ export default function EntriesPage() {
   useEffect(() => {
     if (!journalId) return;
 
+    const fetchString = `/api/entries?journalId=${journalId}${tagId ? `&tag=${tagId}` : ""}`;
+
     setLoading(true);
     axios
-      .get(`/api/entries?journalId=${journalId}`)
+      .get(fetchString)
       .then((res) => {
         setEntries(res.data.entries || []);
         setLoading(false);
@@ -146,9 +148,9 @@ export default function EntriesPage() {
       <h1 className="mb-2 text-3xl font-bold">Entries</h1>
       <p className="text-muted-foreground mb-6">Entries for journal {journalId}</p>
 
-      {tag && (
+      {tagId && (
         <div className="mb-4 rounded bg-blue-100 px-4 py-2 text-sm text-blue-800">
-          Showing entries filtered by tag: <strong>{tag}</strong> (not working yet)
+          Showing entries filtered by tagId: <strong>{tagId}</strong>
         </div>
       )}
 

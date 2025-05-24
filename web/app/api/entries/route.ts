@@ -1,3 +1,4 @@
+import { TagType } from "@/components/tag-component";
 import { createClient } from "@/utils/supabase/server";
 import { NextResponse } from "next/server";
 
@@ -5,6 +6,10 @@ export const dynamic = "force-dynamic";
 
 export async function GET(req: Request) {
   const supabase = await createClient();
+
+  const url = new URL(req.url);
+  const tagId = url.searchParams.get("tag");
+  const journalId = url.searchParams.get("journalId");
 
   const {
     data: { user },
@@ -15,8 +20,6 @@ export async function GET(req: Request) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const url = new URL(req.url);
-  const journalId = url.searchParams.get("journalId");
   if (!journalId) {
     return NextResponse.json({ error: "journalId query parameter required" }, { status: 400 });
   }
@@ -56,7 +59,13 @@ export async function GET(req: Request) {
     tags: entry.entry_tag?.map((et: any) => et.tag).filter(Boolean) || []
   }));
 
-  return NextResponse.json({ entries: transformedEntries });
+  const filteredEntries = tagId
+    ? transformedEntries.filter((entry) =>
+        entry.tags.some((tag: TagType) => tag.id === tagId)
+      )
+    : transformedEntries;
+
+  return NextResponse.json({ entries: filteredEntries });
 }
 
 export async function POST(req: Request) {

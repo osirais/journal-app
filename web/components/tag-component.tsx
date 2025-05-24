@@ -19,7 +19,8 @@ export const TagComponent: FC<TagProps> = ({ journalId, tag }) => {
   const color = getColorFromString(tag.name);
 
   return (
-    <Link href={`/journal/${journalId}?tag=${tag.id}`}>
+    // reload document to only show entries with tag, maybe improve this later
+    <a href={`/journal/${journalId}?tag=${tag.id}`}>
       <div
         style={{
           backgroundColor: color + "50",
@@ -29,6 +30,6 @@ export const TagComponent: FC<TagProps> = ({ journalId, tag }) => {
       >
         {tag.name}
       </div>
-    </Link>
+    </a>
   );
 };
