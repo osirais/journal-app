@@ -1,36 +1,5 @@
-import { loginAction } from "@/app/actions";
-import { SubmitButton } from "@/components/submit-button";
-import { Card } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import Link from "next/link";
+import { LoginCard } from "@/components/auth/login-card";
 
-export default async function Login() {
-  return (
-    <Card className="p-6">
-      <form className="flex min-w-64 flex-1 flex-col">
-        <h1 className="text-2xl font-medium">Sign in</h1>
-        <p className="text-foreground text-sm">
-          Don't have an account?{" "}
-          <Link className="text-foreground font-medium underline" href="/register">
-            Sign up
-          </Link>
-        </p>
-        <div className="mt-8 flex flex-col gap-2 [&>input]:mb-3">
-          <Label htmlFor="email">Email</Label>
-          <Input name="email" placeholder="you@example.com" required />
-          <div className="flex items-center justify-between">
-            <Label htmlFor="password">Password</Label>
-            <Link className="text-foreground text-xs underline" href="/forgot-password">
-              Forgot Password?
-            </Link>
-          </div>
-          <Input type="password" name="password" placeholder="Your password" required />
-          <SubmitButton pendingText="Signing In..." formAction={loginAction}>
-            Sign in
-          </SubmitButton>
-        </div>
-      </form>
-    </Card>
-  );
+export default function Login() {
+  return <LoginCard />;
 }
