@@ -248,40 +248,40 @@ export default function EntriesPage() {
           </div>
         ) : (
           entries.map((entry) => (
-            <Link key={entry.id} href={`/entry/${entry.id}`} className="block">
-              <Card className="flex min-h-[80px] cursor-pointer items-center overflow-hidden transition-shadow hover:shadow-md">
-                <CardContent className="w-full p-0">
-                  <div className="flex items-center p-6">
-                    <div className="min-w-0 flex-1">
+            <Card key={entry.id} className="flex min-h-[80px] cursor-pointer items-center overflow-hidden transition-shadow hover:shadow-md">
+              <CardContent className="w-full p-0">
+                <div className="flex items-center p-6">
+                  <div className="min-w-0 flex-1">
+                    <Link href={`/entry/${entry.id}`} className="block">
                       <h3 className="truncate text-lg font-medium">{entry.title || "Untitled"}</h3>
-                      <div className="text-muted-foreground mt-1 text-sm">
-                        <Markdown>{entry.content}</Markdown>
+                    </Link>
+                    <div className="text-muted-foreground mt-1 text-sm">
+                      <Markdown>{entry.content}</Markdown>
+                    </div>
+
+                    {/* Tags */}
+                    {entry.tags.length > 0 && (
+                      <div className="mt-2 flex flex-wrap gap-2">
+                        {entry.tags.map((tag) => (
+                          <TagComponent key={tag.id} journalId={journalId as string} tag={tag} />
+                        ))}
                       </div>
+                    )}
 
-                      {/* Tags */}
-                      {entry.tags.length > 0 && (
-                        <div className="mt-2 flex flex-wrap gap-2">
-                          {entry.tags.map((tag) => (
-                            <TagComponent key={tag.id} journalId={journalId as string} tag={tag} />
-                          ))}
-                        </div>
-                      )}
-
-                      <div className="text-muted-foreground mt-2 flex items-center gap-4 text-xs">
-                        <div className="flex items-center">
-                          <CalendarIcon className="mr-1 h-3 w-3" />
-                          <span>Created {formatDateAgo(new Date(entry.created_at))}</span>
-                        </div>
-                        <div className="flex items-center">
-                          <Clock className="mr-1 h-3 w-3" />
-                          <span>Updated {formatDateAgo(new Date(entry.updated_at))}</span>
-                        </div>
+                    <div className="text-muted-foreground mt-2 flex items-center gap-4 text-xs">
+                      <div className="flex items-center">
+                        <CalendarIcon className="mr-1 h-3 w-3" />
+                        <span>Created {formatDateAgo(new Date(entry.created_at))}</span>
+                      </div>
+                      <div className="flex items-center">
+                        <Clock className="mr-1 h-3 w-3" />
+                        <span>Updated {formatDateAgo(new Date(entry.updated_at))}</span>
                       </div>
                     </div>
                   </div>
-                </CardContent>
-              </Card>
-            </Link>
+                </div>
+              </CardContent>
+            </Card>
           ))
         )}
       </div>

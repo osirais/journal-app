@@ -60,9 +60,7 @@ export async function GET(req: Request) {
   }));
 
   const filteredEntries = tagId
-    ? transformedEntries.filter((entry) =>
-        entry.tags.some((tag: TagType) => tag.id === tagId)
-      )
+    ? transformedEntries.filter((entry) => entry.tags.some((tag: TagType) => tag.id === tagId))
     : transformedEntries;
 
   return NextResponse.json({ entries: filteredEntries });
