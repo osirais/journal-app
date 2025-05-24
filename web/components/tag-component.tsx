@@ -1,19 +1,11 @@
+import { TagType } from "@/types";
 import { getColorFromString } from "@/utils/get-color-from-string";
-import Link from "next/link";
 import { FC } from "react";
 
 interface TagProps {
   journalId: string;
   tag: TagType;
 }
-
-export type TagType = {
-  id: string;
-  name: string;
-  created_at?: string;
-  updated_at?: string;
-  deleted_at?: string | null;
-};
 
 export const TagComponent: FC<TagProps> = ({ journalId, tag }) => {
   const color = getColorFromString(tag.name);

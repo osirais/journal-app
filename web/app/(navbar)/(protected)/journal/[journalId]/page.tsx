@@ -1,7 +1,7 @@
 "use client";
 
 import { Markdown } from "@/components/markdown";
-import { TagComponent, TagType } from "@/components/tag-component";
+import { TagComponent } from "@/components/tag-component";
 import { TiptapEditor } from "@/components/tiptap-editor";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -16,7 +16,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
-import { JournalInfo } from "@/types";
+import { JournalInfo, TagType } from "@/types";
 import { formatDateAgo } from "@/utils/format-date-ago";
 import axios from "axios";
 import { CalendarIcon, Clock, Plus } from "lucide-react";

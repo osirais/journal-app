@@ -1,4 +1,4 @@
-import { TagType } from "@/components/tag-component";
+import { TagType } from "@/types";
 import { createClient } from "@/utils/supabase/server";
 import { NextResponse } from "next/server";
 
