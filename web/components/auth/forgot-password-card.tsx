@@ -1,3 +1,5 @@
+"use client";
+
 import { SmtpMessage } from "@/app/(auth-pages)/smtp-message";
 import { forgotPasswordAction } from "@/app/actions";
 import { SubmitButton } from "@/components/submit-button";
@@ -5,9 +7,13 @@ import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import Link from "next/link";
-import { FC } from "react";
+import { FC, useState } from "react";
 
 export const ForgotPasswordCard: FC = () => {
+  const [email, setEmail] = useState("");
+
+  const canSubmit = email.trim() !== "";
+
   return (
     <div className="grid grid-rows-[max-content_max-content] place-items-center gap-6">
       <Card className="p-6">
@@ -23,8 +29,20 @@ export const ForgotPasswordCard: FC = () => {
           </div>
           <div className="mt-8 flex flex-col gap-2 [&>input]:mb-3">
             <Label htmlFor="email">Email</Label>
-            <Input name="email" placeholder="you@example.com" required />
-            <SubmitButton formAction={forgotPasswordAction}>Reset Password</SubmitButton>
+            <Input
+              name="email"
+              placeholder="you@example.com"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+            />
+            <SubmitButton
+              formAction={forgotPasswordAction}
+              disabled={!canSubmit}
+              pendingText="Sending..."
+            >
+              Reset Password
+            </SubmitButton>
           </div>
         </form>
       </Card>

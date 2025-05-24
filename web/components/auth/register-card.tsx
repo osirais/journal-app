@@ -56,6 +56,14 @@ export const RegisterCard: FC = () => {
     }
   }, [username, supabase]);
 
+  const canSubmit =
+    username.length >= 3 &&
+    username.length <= 32 &&
+    /^[a-zA-Z0-9._-]+$/.test(username) &&
+    isUsernameAvailable === true &&
+    email.length > 0 &&
+    password.length > 0;
+
   return (
     <div className="grid grid-rows-[max-content_max-content] place-items-center gap-6">
       <Card className="w-max p-6">
@@ -104,10 +112,9 @@ export const RegisterCard: FC = () => {
                     Username can only contain letters, numbers, underscores, periods, and hyphens
                   </p>
                 )}
-                {username.length < 3 ||
-                  (username.length > 32 && (
-                    <p className="text-red-500">Username must be 3-32 characters</p>
-                  ))}
+                {(username.length < 3 || username.length > 32) && (
+                  <p className="text-red-500">Username must be 3-32 characters</p>
+                )}
                 {isUsernameAvailable === false && (
                   <p className="text-red-500">Username is already taken</p>
                 )}
@@ -134,6 +141,7 @@ export const RegisterCard: FC = () => {
             />
             <SubmitButton
               pendingText="Signing up..."
+              disabled={!canSubmit}
               onClick={async (e) => {
                 e.preventDefault();
                 await registerAction(username, email, password);

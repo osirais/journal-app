@@ -6,16 +6,13 @@ import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import Link from "next/link";
-import { FC, useEffect, useState } from "react";
+import { FC, useState } from "react";
 
 export const LoginCard: FC = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [formValid, setFormValid] = useState(false);
 
-  useEffect(() => {
-    setFormValid(email.trim() !== "" && password.trim() !== "");
-  }, [email, password]);
+  const canSubmit = email.trim() !== "" && password.trim() !== "";
 
   return (
     <Card className="p-6">
@@ -50,12 +47,7 @@ export const LoginCard: FC = () => {
             onChange={(e) => setPassword(e.target.value)}
             required
           />
-          <SubmitButton
-            pendingText="Signing In..."
-            formAction={loginAction}
-            disabled={!formValid}
-            className={formValid ? "cursor-pointer text-white" : "cursor-not-allowed text-gray-400"}
-          >
+          <SubmitButton pendingText="Signing In..." formAction={loginAction} disabled={!canSubmit}>
             Sign in
           </SubmitButton>
         </div>
