@@ -161,8 +161,8 @@ export default function EntriesPage() {
       <p className="text-muted-foreground mb-6">Entries for journal {journalId}</p>
 
       {tagId && (
-        <div className="py-4">
-          Showing entries filtered by tagId:{" "}
+        <div className="grid grid-cols-[max-content_max-content] place-items-center gap-2 py-4">
+          <p className="text-muted-foreground">Showing entries with tag</p>
           <TagComponent journalId={journalId as string} tag={{ id: tagId, name: tagName || "" }} />
         </div>
       )}
