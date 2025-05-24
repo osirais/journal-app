@@ -25,14 +25,7 @@ export async function GET(req: Request) {
   // select journal fields plus a count of entries (not deleted)
   const { data: journal, error } = await supabase
     .from("journal")
-    .select(
-      `
-      *,
-      entry_count:entry(
-        id
-      )
-    `
-    )
+    .select("*")
     .eq("id", journalId)
     .eq("author_id", user.id)
     .is("deleted_at", null)

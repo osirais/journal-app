@@ -16,6 +16,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
+import { JournalInfo } from "@/types";
 import { formatDateAgo } from "@/utils/format-date-ago";
 import axios from "axios";
 import { CalendarIcon, Clock, Plus } from "lucide-react";
@@ -63,7 +64,48 @@ export default function EntriesPage() {
 
   const [tags, setTags] = useState<Tag[]>([]);
 
+  const [journalInfo, setJournalInfo] = useState<JournalInfo | null>(null);
+
   const [dialogOpen, setDialogOpen] = useState(false);
+
+  useEffect(() => {
+    if (!journalId) return;
+
+    const fetchString = `/api/entries?journalId=${journalId}${tagId ? `&tag=${tagId}` : ""}`;
+
+    if (tagId) {
+      axios
+        .get(`/api/tags?id=${tagId}`)
+        .then((res) => {
+          setTagName(res.data.name);
+        })
+        .catch((err) => {
+          setError(err.response?.data?.error || "Failed to load tag name");
+        });
+    }
+
+    setLoading(true);
+
+    axios
+      .get(fetchString)
+      .then((res) => {
+        setEntries(res.data.entries || []);
+        setLoading(false);
+      })
+      .catch((err) => {
+        setError(err.response?.data?.error || "Failed to load entries");
+        setLoading(false);
+      });
+
+    axios
+      .get(`/api/journal-info?id=${journalId}`)
+      .then((res) => {
+        setJournalInfo(res.data);
+      })
+      .catch((err) => {
+        console.error("Failed to load journal info", err);
+      });
+  }, [journalId]);
 
   useEffect(() => {
     if (!journalId) return;
@@ -158,7 +200,6 @@ export default function EntriesPage() {
   return (
     <div className="container mx-auto max-w-3xl py-8">
       <h1 className="mb-2 text-3xl font-bold">Entries</h1>
-      <p className="text-muted-foreground mb-6">Entries for journal {journalId}</p>
 
       {tagId && (
         <div className="grid grid-cols-[max-content_max-content] place-items-center gap-2 py-4">
@@ -170,6 +211,16 @@ export default function EntriesPage() {
       {error && (
         <div className="mb-6 rounded border border-red-200 bg-red-50 px-4 py-3 text-red-700">
           {error}
+        </div>
+      )}
+
+      {journalInfo && (
+        <div className="mb-6 space-y-1">
+          <p className="text-muted-foreground">{journalInfo.journal.description}</p>
+          <p className="text-muted-foreground text-sm">
+            Created {formatDateAgo(new Date(journalInfo.journal.created_at))} •{" "}
+            {journalInfo.entries} entries
+          </p>
         </div>
       )}
 
