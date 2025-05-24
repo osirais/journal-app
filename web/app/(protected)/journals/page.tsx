@@ -177,7 +177,7 @@ export default function JournalsPage() {
           </div>
         ) : (
           journals.map((journal) => (
-            <Link key={journal.id} href={`/entries/${journal.id}`} className="block">
+            <Link key={journal.id} href={`/journal/${journal.id}`} className="block">
               <Card className="flex min-h-[80px] cursor-pointer items-center overflow-hidden transition-shadow hover:shadow-md">
                 <CardContent className="w-full p-0">
                   <div className="flex items-center p-6">
