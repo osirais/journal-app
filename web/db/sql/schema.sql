@@ -5,6 +5,7 @@ CREATE TABLE IF NOT EXISTS users (
     username CITEXT UNIQUE NOT NULL,
     name TEXT NOT NULL,
     avatar_url TEXT,
+    currency INTEGER NOT NULL DEFAULT 0,
     created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
     deleted_at TIMESTAMPTZ,
