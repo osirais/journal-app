@@ -3,13 +3,16 @@
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useArrowKeyNavigation } from "@/hooks/useArrowKeyNavigation";
 import { createClient } from "@/utils/supabase/client";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 import Link from "next/link";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 export default function EntryPage() {
+  const router = useRouter();
+
   const { entryId } = useParams();
 
   const [journal, setJournal] = useState<any>(null);
@@ -79,7 +82,24 @@ export default function EntryPage() {
     fetchData();
   }, [entryId]);
 
-  const renderContent = () => {
+  function goToPrevEntry() {
+    if (prevEntryId) {
+      router.push(`/entry/${prevEntryId}`);
+    }
+  }
+
+  function goToNextEntry() {
+    if (nextEntryId) {
+      router.push(`/entry/${nextEntryId}`);
+    }
+  }
+
+  useArrowKeyNavigation({
+    onLeft: goToPrevEntry,
+    onRight: goToNextEntry
+  });
+
+  function renderContent() {
     if (isLoading) {
       return (
         <>
@@ -109,7 +129,7 @@ export default function EntryPage() {
         <div>{entry.content}</div>
       </>
     );
-  };
+  }
 
   return (
     <div className="flex min-h-screen flex-col">
