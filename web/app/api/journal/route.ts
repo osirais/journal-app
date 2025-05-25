@@ -1,3 +1,4 @@
+import { JournalWithEntries } from "@/types";
 import { createClient } from "@/utils/supabase/server";
 import { NextResponse } from "next/server";
 
@@ -50,7 +51,7 @@ export async function GET(req: Request) {
   }
 
   return NextResponse.json({
-    journal,
+    ...journal,
     entries: entryCount.count || 0
-  });
+  } satisfies JournalWithEntries);
 }

@@ -16,7 +16,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
-import { JournalInfo, TagType } from "@/types";
+import { JournalWithEntries, TagType } from "@/types";
 import { formatDateAgo } from "@/utils/format-date-ago";
 import axios from "axios";
 import { CalendarIcon, Clock, Plus } from "lucide-react";
@@ -64,7 +64,7 @@ export default function EntriesPage() {
 
   const [tags, setTags] = useState<Tag[]>([]);
 
-  const [journalInfo, setJournalInfo] = useState<JournalInfo | null>(null);
+  const [journalInfo, setJournalInfo] = useState<JournalWithEntries | null>(null);
 
   const [dialogOpen, setDialogOpen] = useState(false);
 
@@ -98,7 +98,7 @@ export default function EntriesPage() {
       });
 
     axios
-      .get(`/api/journal-info?id=${journalId}`)
+      .get(`/api/journal?id=${journalId}`)
       .then((res) => {
         setJournalInfo(res.data);
       })
@@ -216,10 +216,10 @@ export default function EntriesPage() {
 
       {journalInfo && (
         <div className="mb-6 space-y-1">
-          <p className="text-muted-foreground">{journalInfo.journal.description}</p>
+          <p className="text-muted-foreground">{journalInfo.description}</p>
           <p className="text-muted-foreground text-sm">
-            Created {formatDateAgo(new Date(journalInfo.journal.created_at))} •{" "}
-            {journalInfo.entries} entries
+            Created {formatDateAgo(new Date(journalInfo.created_at))} • {journalInfo.entries}{" "}
+            entries
           </p>
         </div>
       )}
