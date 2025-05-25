@@ -11,7 +11,15 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { FC, Suspense, useEffect, useState } from "react";
 
-export const RegisterCard: FC = () => {
+export function RegisterCard() {
+  return (
+    <Suspense fallback={<Card className="p-6">Loading...</Card>}>
+      <RegisterCardContent />
+    </Suspense>
+  );
+}
+
+function RegisterCardContent() {
   const searchParams = useSearchParams();
   const error = searchParams.get("error") ?? "";
 
@@ -165,4 +173,4 @@ export const RegisterCard: FC = () => {
       </Suspense>
     </div>
   );
-};
+}
