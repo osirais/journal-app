@@ -5,7 +5,6 @@ CREATE TABLE IF NOT EXISTS users (
     username CITEXT UNIQUE NOT NULL,
     name TEXT NOT NULL,
     avatar_url TEXT,
-    currency INTEGER NOT NULL DEFAULT 0,
     created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
     deleted_at TIMESTAMPTZ,
@@ -48,4 +47,24 @@ CREATE TABLE IF NOT EXISTS entry_tag (
     entry_id UUID NOT NULL REFERENCES entry(id),
     tag_id UUID NOT NULL REFERENCES tag(id),
     PRIMARY KEY (entry_id, tag_id)
+);
+
+CREATE TABLE IF NOT EXISTS user_balance (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v7(),
+    user_id UUID NOT NULL REFERENCES users(id),
+    currency TEXT NOT NULL,
+    balance INT8 NOT NULL DEFAULT 0,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+    deleted_at TIMESTAMPTZ,
+    UNIQUE (user_id, currency)
+);
+
+CREATE TABLE IF NOT EXISTS balance_transaction (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v7(),
+    balance_id UUID NOT NULL REFERENCES user_balance(id),
+    currency TEXT NOT NULL,
+    amount INT8 NOT NULL,
+    reason TEXT NOT NULL,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
