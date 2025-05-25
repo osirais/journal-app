@@ -70,7 +70,8 @@ CREATE TABLE IF NOT EXISTS balance_transaction (
         REFERENCES user_balance(user_id, currency)
 );
 
-CREATE OR REPLACE VIEW users_with_stamps AS
+CREATE OR REPLACE VIEW users_with_stamps
+WITH (security_invoker = on) AS
 SELECT
     u.*,
     COALESCE(b.balance, 0) AS stamps
