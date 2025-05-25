@@ -9,7 +9,16 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu";
-import { ChevronDown, LayoutDashboard, LogOut, User, UserCog } from "lucide-react";
+import {
+  ChevronDown,
+  ClipboardList,
+  LayoutDashboard,
+  LogOut,
+  NotebookPen,
+  Trophy,
+  User,
+  UserCog
+} from "lucide-react";
 import Link from "next/link";
 import { useTransition, type FC } from "react";
 
@@ -41,6 +50,24 @@ export const UserActionsDropdown: FC<UserActionsDropdownProps> = ({ username }) 
           <Link href="/dashboard" className="flex w-full cursor-pointer items-center gap-2">
             <LayoutDashboard size={16} />
             <span>Dashboard</span>
+          </Link>
+        </DropdownMenuItem>
+        <DropdownMenuItem asChild>
+          <Link href="/journals" className="flex w-full cursor-pointer items-center gap-2">
+            <NotebookPen size={16} />
+            <span>Journals</span>
+          </Link>
+        </DropdownMenuItem>
+        <DropdownMenuItem asChild>
+          <Link href="/tasks" className="flex w-full cursor-pointer items-center gap-2">
+            <ClipboardList size={16} />
+            <span>Tasks</span>
+          </Link>
+        </DropdownMenuItem>
+        <DropdownMenuItem asChild>
+          <Link href="/achievements" className="flex w-full cursor-pointer items-center gap-2">
+            <Trophy size={16} />
+            <span>Achievements</span>
           </Link>
         </DropdownMenuItem>
         <DropdownMenuItem asChild>
