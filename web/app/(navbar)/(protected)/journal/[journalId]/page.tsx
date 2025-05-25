@@ -1,6 +1,7 @@
 "use client";
 
 import { EntryCard } from "@/components/entry-card";
+import { SortDropdown } from "@/components/sort-dropdown";
 import { TagComponent } from "@/components/tag-component";
 import { TiptapEditor } from "@/components/tiptap-editor";
 import { Button } from "@/components/ui/button";
@@ -277,6 +278,10 @@ export default function EntriesPage() {
             </div>
           </DialogContent>
         </Dialog>
+      </div>
+
+      <div className="mb-6">
+        <SortDropdown onSortChange={() => {}} defaultSort="work-in-progress" />
       </div>
 
       <div className="space-y-3">

@@ -2,8 +2,8 @@
 
 import { JournalCard } from "@/components/journal-card";
 import { JournalCardSkeleton } from "@/components/journal-card-skeleton";
+import { SortDropdown } from "@/components/sort-dropdown";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
 import {
   Dialog,
   DialogContent,
@@ -14,7 +14,6 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Skeleton } from "@/components/ui/skeleton";
 import { Textarea } from "@/components/ui/textarea";
 import { Journal } from "@/types";
 import axios from "axios";
@@ -149,6 +148,10 @@ export default function JournalsPage() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      <div className="mb-6">
+        <SortDropdown onSortChange={() => {}} defaultSort="work-in-progress" />
+      </div>
 
       <div className="grid grid-cols-2 gap-3">
         {loading ? (
