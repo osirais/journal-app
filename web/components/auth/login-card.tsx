@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { FC, Suspense, useState } from "react";
+import { Suspense, useState } from "react";
 
 export function LoginCard() {
   return (

@@ -1,5 +1,6 @@
 "use client";
 
+import Editor from "@/components/editor";
 import { EntryDrawer } from "@/components/entry-drawer";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
@@ -133,7 +134,7 @@ export default function EntryPage() {
           <div className="flex-1" />
         </div>
         <Separator />
-        <div>{entry.content}</div>
+        <Editor content={entry.content} />
       </>
     );
   }

@@ -9,7 +9,7 @@ import { createClient } from "@/utils/supabase/client";
 import { Check, LoaderCircle, X } from "lucide-react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { FC, Suspense, useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 
 export function RegisterCard() {
   return (
