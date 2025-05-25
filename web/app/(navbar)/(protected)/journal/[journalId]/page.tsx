@@ -16,13 +16,13 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
-import { JournalWithEntries, TagType } from "@/types";
+import type { JournalWithEntries, TagType } from "@/types";
 import { formatDateAgo } from "@/utils/format-date-ago";
 import axios from "axios";
-import { Plus } from "lucide-react";
+import { CalendarIcon, FileText, Plus } from "lucide-react";
 import { useParams, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
-import { WithContext as ReactTags, Tag } from "react-tag-input";
+import { WithContext as ReactTags, type Tag } from "react-tag-input";
 
 type Entry = {
   id: string;
@@ -32,7 +32,6 @@ type Entry = {
   updated_at: string;
 };
 
-// for tag hotkey stuff
 const KeyCodes = {
   comma: 188,
   enter: 13,
@@ -64,6 +63,7 @@ export default function EntriesPage() {
   const [tags, setTags] = useState<Tag[]>([]);
 
   const [journalInfo, setJournalInfo] = useState<JournalWithEntries | null>(null);
+  const [journalLoading, setJournalLoading] = useState(true);
 
   const [dialogOpen, setDialogOpen] = useState(false);
 
@@ -96,44 +96,18 @@ export default function EntriesPage() {
         setLoading(false);
       });
 
+    setJournalLoading(true);
     axios
       .get(`/api/journal?id=${journalId}`)
       .then((res) => {
         setJournalInfo(res.data);
+        setJournalLoading(false);
       })
       .catch((err) => {
         console.error("Failed to load journal info", err);
+        setJournalLoading(false);
       });
-  }, [journalId]);
-
-  useEffect(() => {
-    if (!journalId) return;
-
-    const fetchString = `/api/entries?journalId=${journalId}${tagId ? `&tag=${tagId}` : ""}`;
-
-    if (tagId) {
-      axios
-        .get(`/api/tags?id=${tagId}`)
-        .then((res) => {
-          setTagName(res.data.name);
-        })
-        .catch((err) => {
-          setError(err.response?.data?.error || "Failed to load tag name");
-        });
-    }
-
-    setLoading(true);
-    axios
-      .get(fetchString)
-      .then((res) => {
-        setEntries(res.data.entries || []);
-        setLoading(false);
-      })
-      .catch((err) => {
-        setError(err.response?.data?.error || "Failed to load entries");
-        setLoading(false);
-      });
-  }, [journalId]);
+  }, [journalId, tagId]);
 
   const handleCreate = async () => {
     if (!title.trim()) {
@@ -213,14 +187,29 @@ export default function EntriesPage() {
         </div>
       )}
 
-      {journalInfo && (
-        <div className="mb-6 space-y-1">
-          <p className="text-muted-foreground">{journalInfo.description}</p>
-          <p className="text-muted-foreground text-sm">
-            Created {formatDateAgo(new Date(journalInfo.created_at))} • {journalInfo.entries}{" "}
-            entries
-          </p>
+      {journalLoading ? (
+        <div className="mb-6 flex items-center gap-4">
+          <div className="flex-1 space-y-2">
+            <Skeleton className="h-3 w-2/3" />
+            <Skeleton className="h-3 w-1/3" />
+          </div>
         </div>
+      ) : (
+        journalInfo && (
+          <div className="mb-6 space-y-1">
+            <p className="text-muted-foreground">{journalInfo.description}</p>
+            <div className="text-muted-foreground flex items-center gap-4 text-sm">
+              <div className="flex items-center gap-1">
+                <CalendarIcon className="h-3 w-3" />
+                <span>Created {formatDateAgo(new Date(journalInfo.created_at))}</span>
+              </div>
+              <div className="flex items-center gap-1">
+                <FileText className="h-3 w-3" />
+                <span>{journalInfo.entries} entries</span>
+              </div>
+            </div>
+          </div>
+        )
       )}
 
       <div className="mb-6 flex items-center justify-between">
@@ -300,6 +289,7 @@ export default function EntriesPage() {
                   <div className="flex-1 space-y-2">
                     <Skeleton className="h-4 w-3/4" />
                     <Skeleton className="h-3 w-1/2" />
+                    <Skeleton className="h-3 w-2/3" />
                   </div>
                 </div>
               </CardContent>
@@ -307,6 +297,7 @@ export default function EntriesPage() {
           ))
         ) : entries.length === 0 ? (
           <div className="text-muted-foreground py-12 text-center">
+            <FileText className="mx-auto mb-2 h-8 w-8" />
             No entries found. Create your first entry to get started.
           </div>
         ) : (
