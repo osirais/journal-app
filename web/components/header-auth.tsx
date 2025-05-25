@@ -13,7 +13,7 @@ export default async function AuthButton() {
     data: { user }
   } = await supabase.auth.getUser();
 
-  const { data } = await supabase.from("users").select("*").eq("id", user?.id).single();
+  const { data } = await supabase.from("users_with_stamps").select("*").eq("id", user?.id).single();
 
   const hoverBgClass = "hover:bg-white/20";
   const cursorPointer = "cursor-pointer";
@@ -38,7 +38,7 @@ export default async function AuthButton() {
           className="mt-1 grid grid-cols-[max-content_max-content] items-center gap-2"
           title="Stamps"
         >
-          <span>{data.currency}</span>
+          <span>{data.stamps}</span>
           <Ticket size={16} />
         </div>
       </div>

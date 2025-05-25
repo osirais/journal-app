@@ -69,3 +69,12 @@ CREATE TABLE IF NOT EXISTS balance_transaction (
     FOREIGN KEY (user_id, currency)
         REFERENCES user_balance(user_id, currency)
 );
+
+CREATE OR REPLACE VIEW users_with_stamps AS
+SELECT
+    u.*,
+    COALESCE(b.balance, 0) AS stamps
+FROM users u
+LEFT JOIN user_balance b
+    ON b.user_id = u.id
+   AND b.currency = 'stamps';
