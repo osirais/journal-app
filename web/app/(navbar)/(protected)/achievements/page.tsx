@@ -1,8 +1,9 @@
+import { AchievementsMap } from "@/components/achievements-map";
+
 const Page = () => {
   return (
-    <div className="p-4">
-      <p>Achievements</p>
-      <p>page is a work in progress</p>
+    <div>
+      <AchievementsMap />
     </div>
   );
 };
