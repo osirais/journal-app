@@ -66,6 +66,57 @@ export async function GET(req: Request) {
   return NextResponse.json({ entries: filteredEntries });
 }
 
+const DAILY_ENTRY_REWARD = 5;
+
+async function handleDailyEntryReward(supabase: any, userId: string): Promise<number> {
+  const { data: lastTransaction, error: transactionError } = await supabase
+    .from("balance_transaction")
+    .select("id")
+    .eq("user_id", userId)
+    .eq("currency", "coins")
+    .eq("reason", "daily_entry")
+    .gt("created_at", new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString())
+    .limit(1)
+    .maybeSingle();
+
+  if (lastTransaction || transactionError) {
+    return 0;
+  }
+
+  const { data: userBalance, error: userBalanceError } = await supabase
+    .from("user_balance")
+    .select("balance")
+    .eq("user_id", userId)
+    .eq("currency", "coins")
+    .single();
+
+  if (!userBalance || userBalanceError) {
+    return 0;
+  }
+
+  const { error: insertTransactionError } = await supabase
+    .from("balance_transaction")
+    .insert([
+      { user_id: userId, currency: "coins", amount: DAILY_ENTRY_REWARD, reason: "daily_entry" }
+    ]);
+
+  if (insertTransactionError) {
+    return 0;
+  }
+
+  const { error: updateBalanceError } = await supabase
+    .from("user_balance")
+    .update({ balance: userBalance.balance + DAILY_ENTRY_REWARD })
+    .eq("user_id", userId)
+    .eq("currency", "coins");
+
+  if (updateBalanceError) {
+    return 0;
+  }
+
+  return DAILY_ENTRY_REWARD;
+}
+
 export async function POST(req: Request) {
   const supabase = await createClient();
 
@@ -170,5 +221,7 @@ export async function POST(req: Request) {
     }
   }
 
-  return NextResponse.json({ entry }, { status: 201 });
+  const reward = await handleDailyEntryReward(supabase, user.id);
+
+  return NextResponse.json({ entry, reward }, { status: 201 });
 }
