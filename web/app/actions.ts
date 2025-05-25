@@ -39,6 +39,15 @@ export async function registerAction(username: string, email: string, password: 
     return encodedRedirect("error", "/register", profileError.message);
   }
 
+  const { error: balanceError } = await supabase
+    .from("user_balance")
+    .insert([{ user_id: authData.user.id, currency: "stamps" }]);
+
+  if (balanceError) {
+    console.error(balanceError.code + " " + balanceError.message);
+    return encodedRedirect("error", "/register", balanceError.message);
+  }
+
   return encodedRedirect(
     "success",
     "/register",
