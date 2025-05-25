@@ -98,7 +98,7 @@ export function EntryDrawer({
   return (
     <Drawer direction="left">
       <DrawerTrigger asChild>
-        <Button variant="ghost" size="icon" className="relative">
+        <Button variant="ghost" size="icon" className="relative cursor-pointer">
           <List className="h-5 w-5" />
         </Button>
       </DrawerTrigger>
