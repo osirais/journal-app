@@ -80,11 +80,13 @@ export const JournalCard: FC<JournalCardProps> = ({ journal, onEdit, onDelete })
               </div>
             </div>
           </div>
-          {journal.description && (
-            <p className="text-muted-foreground mt-3 line-clamp-3 text-sm leading-relaxed">
-              {journal.description}
-            </p>
-          )}
+          <div className="mt-3 min-h-12">
+            {journal.description && (
+              <p className="text-muted-foreground line-clamp-3 text-sm leading-relaxed">
+                {journal.description}
+              </p>
+            )}
+          </div>
           <div className="mt-auto pt-4">
             <div className="flex h-full items-center justify-between gap-2">
               <Button asChild size="sm" variant="outline" className="flex-1">
