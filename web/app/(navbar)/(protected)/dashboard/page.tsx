@@ -28,7 +28,7 @@ const data = [
 const Page = () => {
   return (
     <div className="container mx-auto grid max-w-3xl grid-flow-row gap-6 py-8">
-      <div className="grid grid-cols-2 gap-6">
+      <div className="grid gap-6 md:grid-cols-2">
         <JournalCard />
         <TodoListCard />
       </div>

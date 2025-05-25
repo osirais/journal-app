@@ -153,7 +153,7 @@ export default function JournalsPage() {
         <SortDropdown onSortChange={() => {}} defaultSort="work-in-progress" />
       </div>
 
-      <div className="grid grid-cols-2 gap-3">
+      <div className="grid gap-3 md:grid-cols-2">
         {loading ? (
           Array.from({ length: 6 }).map((_, i) => <JournalCardSkeleton key={i} />)
         ) : journals.length === 0 ? (

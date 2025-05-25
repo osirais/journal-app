@@ -34,7 +34,7 @@ const Page = async () => {
               the power of journaling (in a fun way).
             </p>
           </div>
-          <div className="flex flex-col justify-center gap-4 sm:flex-row">
+          <div className="flex flex-col place-items-center justify-center gap-4 sm:flex-row">
             <Link href={signedIn ? "/dashboard" : "/login"}>
               <Button size="lg" className="group flex cursor-pointer items-center px-8 text-lg">
                 {signedIn ? "To Dashboard" : "Get Started"}
