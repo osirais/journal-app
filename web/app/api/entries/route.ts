@@ -73,7 +73,7 @@ async function handleDailyEntryReward(supabase: any, userId: string): Promise<nu
     .from("balance_transaction")
     .select("id")
     .eq("user_id", userId)
-    .eq("currency", "coins")
+    .eq("currency", "stamps")
     .eq("reason", "daily_entry")
     .gt("created_at", new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString())
     .limit(1)
@@ -87,7 +87,7 @@ async function handleDailyEntryReward(supabase: any, userId: string): Promise<nu
     .from("user_balance")
     .select("balance")
     .eq("user_id", userId)
-    .eq("currency", "coins")
+    .eq("currency", "stamps")
     .single();
 
   if (!userBalance || userBalanceError) {
@@ -97,7 +97,7 @@ async function handleDailyEntryReward(supabase: any, userId: string): Promise<nu
   const { error: insertTransactionError } = await supabase
     .from("balance_transaction")
     .insert([
-      { user_id: userId, currency: "coins", amount: DAILY_ENTRY_REWARD, reason: "daily_entry" }
+      { user_id: userId, currency: "stamps", amount: DAILY_ENTRY_REWARD, reason: "daily_entry" }
     ]);
 
   if (insertTransactionError) {
@@ -108,7 +108,7 @@ async function handleDailyEntryReward(supabase: any, userId: string): Promise<nu
     .from("user_balance")
     .update({ balance: userBalance.balance + DAILY_ENTRY_REWARD })
     .eq("user_id", userId)
-    .eq("currency", "coins");
+    .eq("currency", "stamps");
 
   if (updateBalanceError) {
     return 0;

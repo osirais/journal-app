@@ -24,6 +24,7 @@ import { CalendarIcon, FileText, Plus } from "lucide-react";
 import { useParams, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { WithContext as ReactTags, type Tag } from "react-tag-input";
+import { toast } from "sonner";
 
 type Entry = {
   id: string;
@@ -124,12 +125,18 @@ export default function EntriesPage() {
     setCreateError(null);
 
     try {
-      await axios.post("/api/entries", {
+      const response = await axios.post("/api/entries", {
         journalId,
         title,
         content,
         tags: tags.map((tag) => tag.text.toLowerCase())
       });
+
+      const { reward } = response.data;
+
+      if (reward) {
+        toast.success("Daily entry reward: +5 stamps!");
+      }
 
       setEntries((prev) => [
         {
