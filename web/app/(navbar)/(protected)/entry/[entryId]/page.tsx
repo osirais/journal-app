@@ -1,5 +1,6 @@
 "use client";
 
+import { EntryDrawer } from "@/components/entry-drawer";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -13,13 +14,13 @@ import { useEffect, useState } from "react";
 export default function EntryPage() {
   const router = useRouter();
 
-  const { entryId } = useParams();
+  const { entryId } = useParams<{ entryId: string }>();
 
   const [journal, setJournal] = useState<any>(null);
   const [entry, setEntry] = useState<any>(null);
 
-  const [prevEntryId, setPrevEntryId] = useState<number | null>(null);
-  const [nextEntryId, setNextEntryId] = useState<number | null>(null);
+  const [prevEntryId, setPrevEntryId] = useState<string | null>(null);
+  const [nextEntryId, setNextEntryId] = useState<string | null>(null);
 
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -124,7 +125,13 @@ export default function EntryPage() {
 
     return (
       <>
-        <h1 className="text-center text-2xl font-bold">{entry.title}</h1>
+        <div className="flex items-center justify-between">
+          <div className="flex-1">
+            <EntryDrawer journalId={journal.id} currentEntryId={entryId} />
+          </div>
+          <h1 className="wrap-anywhere flex-5 text-center text-2xl font-bold">{entry.title}</h1>
+          <div className="flex-1" />
+        </div>
         <Separator />
         <div>{entry.content}</div>
       </>
@@ -143,24 +150,24 @@ export default function EntryPage() {
                 <>
                   <Separator />
                   <div className="flex justify-between pt-4">
-                    {prevEntryId ? (
-                      <Button variant="outline" asChild>
-                        <Link href={`/entry/${prevEntryId}`} className="flex items-center gap-1">
-                          <ArrowLeft className="h-4 w-4" /> Previous Entry
-                        </Link>
-                      </Button>
-                    ) : (
-                      <div></div>
-                    )}
-                    {nextEntryId ? (
-                      <Button asChild>
-                        <Link href={`/entry/${nextEntryId}`} className="flex items-center gap-1">
-                          Next Entry <ArrowRight className="h-4 w-4" />
-                        </Link>
-                      </Button>
-                    ) : (
-                      <div></div>
-                    )}
+                    <div>
+                      {prevEntryId && (
+                        <Button variant="outline" asChild>
+                          <Link href={`/entry/${prevEntryId}`} className="flex items-center gap-1">
+                            <ArrowLeft className="h-4 w-4" /> Previous Entry
+                          </Link>
+                        </Button>
+                      )}
+                    </div>
+                    <div>
+                      {nextEntryId && (
+                        <Button asChild>
+                          <Link href={`/entry/${nextEntryId}`} className="flex items-center gap-1">
+                            Next Entry <ArrowRight className="h-4 w-4" />
+                          </Link>
+                        </Button>
+                      )}
+                    </div>
                   </div>
                 </>
               )}
