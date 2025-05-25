@@ -23,7 +23,7 @@ import axios from "axios";
 import { CalendarIcon, FileText, Plus } from "lucide-react";
 import { useParams, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
-import { WithContext as ReactTags, type Tag } from "react-tag-input";
+import { WithContext as ReactTags, SEPARATORS, type Tag } from "react-tag-input";
 import { toast } from "sonner";
 
 type Entry = {
@@ -34,13 +34,7 @@ type Entry = {
   updated_at: string;
 };
 
-const KeyCodes = {
-  comma: 188,
-  enter: 13,
-  tab: 9
-};
-
-const delimiters = [KeyCodes.comma, KeyCodes.enter, KeyCodes.tab];
+const separators = [SEPARATORS.COMMA, SEPARATORS.ENTER, SEPARATORS.SEMICOLON, SEPARATORS.TAB];
 
 type EntryWithTags = Entry & {
   tags: TagType[];
@@ -258,7 +252,7 @@ export default function EntriesPage() {
                   tags={tags}
                   handleDelete={handleDeleteTag}
                   handleAddition={handleAdditionTag}
-                  delimiters={delimiters}
+                  separators={separators}
                   inputFieldPosition="top"
                   autocomplete
                   placeholder="Add new tag"
