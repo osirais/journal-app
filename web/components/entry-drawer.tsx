@@ -9,6 +9,7 @@ import {
   DrawerTrigger
 } from "@/components/ui/drawer";
 import { Input } from "@/components/ui/input";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { createClient } from "@/utils/supabase/client";
 import { ChevronRight, List, Search, SortAsc, SortDesc } from "lucide-react";
@@ -145,45 +146,47 @@ export function EntryDrawer({
           </div>
         </div>
 
-        {isLoading ? (
-          <div className="flex h-40 items-center justify-center">
-            <div className="animate-pulse">Loading entries...</div>
-          </div>
-        ) : (
-          <div className="h-[calc(100vh-180px)]">
-            <div className="py-2">
-              {filteredEntries.length > 0 ? (
-                filteredEntries.map((entry) => (
-                  <button
-                    key={entry.id}
-                    onClick={() => goToEntry(entry.id)}
-                    className={`hover:bg-muted/50 flex w-full items-center justify-between px-4 py-3 text-left transition-colors ${
-                      entry.id === currentEntryId ? "bg-muted font-medium" : ""
-                    }`}
-                  >
-                    <div>
-                      <div className="flex items-center gap-2">{entry.title}</div>
-                      {entry.title && (
-                        <div className="text-muted-foreground max-w-[250px] truncate text-sm">
-                          {new Date(entry.created_at).toLocaleDateString(undefined, {
-                            month: "2-digit",
-                            day: "2-digit",
-                            year: "2-digit"
-                          })}
-                        </div>
-                      )}
-                    </div>
-                    <ChevronRight className="text-muted-foreground h-4 w-4" />
-                  </button>
-                ))
-              ) : (
-                <div className="text-muted-foreground py-8 text-center">
-                  {searchQuery ? `No entries matching "${searchQuery}"` : "No entries available"}
-                </div>
-              )}
+        <div className="flex min-h-0 flex-1 flex-col">
+          {isLoading ? (
+            <div className="flex h-40 items-center justify-center">
+              <div className="animate-pulse">Loading entries...</div>
             </div>
-          </div>
-        )}
+          ) : (
+            <ScrollArea className="min-h-0 flex-1">
+              <div className="py-2">
+                {filteredEntries.length > 0 ? (
+                  filteredEntries.map((entry) => (
+                    <button
+                      key={entry.id}
+                      onClick={() => goToEntry(entry.id)}
+                      className={`hover:bg-muted/50 flex w-full items-center justify-between px-4 py-3 text-left transition-colors ${
+                        entry.id === currentEntryId ? "bg-muted font-medium" : ""
+                      }`}
+                    >
+                      <div>
+                        <div className="flex items-center gap-2">{entry.title}</div>
+                        {entry.title && (
+                          <div className="text-muted-foreground max-w-[250px] truncate text-sm">
+                            {new Date(entry.created_at).toLocaleDateString(undefined, {
+                              month: "2-digit",
+                              day: "2-digit",
+                              year: "2-digit"
+                            })}
+                          </div>
+                        )}
+                      </div>
+                      <ChevronRight className="text-muted-foreground h-4 w-4" />
+                    </button>
+                  ))
+                ) : (
+                  <div className="text-muted-foreground py-8 text-center">
+                    {searchQuery ? `No entries matching "${searchQuery}"` : "No entries available"}
+                  </div>
+                )}
+              </div>
+            </ScrollArea>
+          )}
+        </div>
       </DrawerContent>
     </Drawer>
   );
