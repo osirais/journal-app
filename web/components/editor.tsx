@@ -9,7 +9,7 @@ export default function Editor({ content }: { content?: string }) {
     content: content,
     editorProps: {
       attributes: {
-        class: "prose prose-sm sm:prose-base lg:prose-sm xl:prose-md m-5 focus:outline-none"
+        class: "prose prose-current"
       }
     }
   });
