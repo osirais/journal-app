@@ -283,7 +283,7 @@ export default function EntriesPage() {
                   {createError}
                 </div>
               )}
-              <Button onClick={handleCreate} disabled={creating}>
+              <Button onClick={handleCreate} disabled={creating} className="cursor-pointer">
                 {creating ? "Creating..." : "Create"}
               </Button>
             </div>
