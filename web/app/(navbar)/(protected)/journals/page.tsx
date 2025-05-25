@@ -1,5 +1,6 @@
 "use client";
 
+import { JournalCard } from "@/components/journal-card";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import {
@@ -14,20 +15,10 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Textarea } from "@/components/ui/textarea";
-import { formatDateAgo } from "@/utils/format-date-ago";
+import { Journal } from "@/types";
 import axios from "axios";
-import { CalendarIcon, Clock, FileEdit, Plus } from "lucide-react";
-import Link from "next/link";
+import { Plus } from "lucide-react";
 import { useEffect, useState } from "react";
-
-type Journal = {
-  id: string;
-  title: string;
-  description: string | null;
-  thumbnail_url: string | null;
-  created_at: string;
-  updated_at: string;
-};
 
 export default function JournalsPage() {
   const [journals, setJournals] = useState<Journal[]>([]);
@@ -66,11 +57,13 @@ export default function JournalsPage() {
       setJournals((prev) => [
         {
           id: "temp_" + Math.random(),
+          author_id: "temp",
           title,
           description,
           thumbnail_url: null,
           created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString()
+          updated_at: new Date().toISOString(),
+          deleted_at: null
         },
         ...prev
       ]);
@@ -156,7 +149,7 @@ export default function JournalsPage() {
         </DialogContent>
       </Dialog>
 
-      <div className="space-y-3">
+      <div className="grid grid-cols-2 gap-3">
         {loading ? (
           Array.from({ length: 3 }).map((_, i) => (
             <Card key={i} className="flex min-h-[80px] items-center overflow-hidden">
@@ -176,50 +169,7 @@ export default function JournalsPage() {
             No journals found. Create your first journal to get started.
           </div>
         ) : (
-          journals.map((journal) => (
-            <Link key={journal.id} href={`/journal/${journal.id}`} className="block">
-              <Card className="flex min-h-[80px] cursor-pointer items-center overflow-hidden transition-shadow hover:shadow-md">
-                <CardContent className="w-full p-0">
-                  <div className="flex items-center p-6">
-                    {journal.thumbnail_url ? (
-                      <div className="mr-4 h-16 w-16 flex-shrink-0 overflow-hidden rounded">
-                        <img
-                          src={journal.thumbnail_url}
-                          alt=""
-                          className="h-16 w-16 object-cover"
-                        />
-                      </div>
-                    ) : (
-                      <div className="bg-muted mr-4 flex h-16 w-16 flex-shrink-0 items-center justify-center rounded">
-                        <FileEdit className="text-muted-foreground h-8 w-8" />
-                      </div>
-                    )}
-
-                    <div className="min-w-0 flex-1">
-                      <h3 className="truncate text-lg font-medium">{journal.title}</h3>
-
-                      {journal.description && (
-                        <p className="text-muted-foreground mt-1 line-clamp-1 text-sm">
-                          {journal.description}
-                        </p>
-                      )}
-
-                      <div className="text-muted-foreground mt-2 flex items-center gap-4 text-xs">
-                        <div className="flex items-center">
-                          <CalendarIcon className="mr-1 h-3 w-3" />
-                          <span>Created {formatDateAgo(new Date(journal.created_at))}</span>
-                        </div>
-                        <div className="flex items-center">
-                          <Clock className="mr-1 h-3 w-3" />
-                          <span>Updated {formatDateAgo(new Date(journal.updated_at))}</span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            </Link>
-          ))
+          journals.map((journal) => <JournalCard key={journal.id} journal={journal} />)
         )}
       </div>
     </div>

@@ -1,4 +1,4 @@
-export type JournalWithEntries = {
+export type Journal = {
   id: string;
   author_id: string;
   title: string;
@@ -7,6 +7,9 @@ export type JournalWithEntries = {
   created_at: string;
   updated_at: string;
   deleted_at: string | null;
+};
+
+export type JournalWithEntries = Journal & {
   entries: number;
 };
 
