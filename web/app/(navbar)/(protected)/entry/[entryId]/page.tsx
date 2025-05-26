@@ -1,18 +1,20 @@
 "use client";
 
-import Editor from "@/components/editor";
+import EntryEditor from "@/components/editor";
 import { EntryDrawer } from "@/components/entry-drawer";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useArrowKeyNavigation } from "@/hooks/useArrowKeyNavigation";
 import { createClient } from "@/utils/supabase/client";
-import { ArrowLeft, ArrowRight } from "lucide-react";
+import { Editor } from "@tiptap/react";
+import { ArrowLeft, ArrowRight, LoaderCircle, Save } from "lucide-react";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
-import { Suspense } from "react";
+import { Suspense, useRef } from "react";
 import { ErrorBoundary } from "react-error-boundary";
 import useSWR from "swr";
+import useSWRMutation from "swr/mutation";
 
 async function fetchEntry(entryId: string) {
   const supabase = createClient();
@@ -75,9 +77,10 @@ function EntrySkeleton() {
 function EntryContent() {
   const router = useRouter();
   const { entryId } = useParams<{ entryId: string }>();
+  const editorRef = useRef<Editor | null>(null);
 
-  const { data } = useSWR(entryId, fetchEntry, { suspense: true });
-
+  const { data, mutate } = useSWR(entryId, fetchEntry, { suspense: true });
+  const { trigger, isMutating } = useSWRMutation("entry_save", saveEntry);
   const { entry, prevEntryId, nextEntryId } = data;
 
   function goToPrevEntry() {
@@ -97,6 +100,26 @@ function EntryContent() {
     onRight: goToNextEntry
   });
 
+  async function saveEntry() {
+    const supabase = createClient();
+
+    const markdown = editorRef.current?.storage.markdown.getMarkdown();
+    if (!markdown) {
+      return;
+    }
+
+    const { error: entryError } = await supabase
+      .from("entry")
+      .update({ content: markdown })
+      .eq("id", entryId);
+
+    if (entryError) {
+      throw new Error("Failed to save entry");
+    }
+
+    mutate();
+  }
+
   return (
     <>
       <div className="flex items-center justify-between">
@@ -107,23 +130,42 @@ function EntryContent() {
         <div className="flex-1" />
       </div>
       <Separator />
-      <Editor content={entry.content} />
+      <EntryEditor content={entry.content} onCreate={(editor) => (editorRef.current = editor)} />
       <Separator />
       <div className="flex justify-between pt-4">
         <div>
           {prevEntryId && (
             <Button variant="outline" asChild>
               <Link href={`/entry/${prevEntryId}`} className="flex items-center gap-1">
-                <ArrowLeft className="h-4 w-4" /> Previous Entry
+                <ArrowLeft className="size-4" /> Previous Entry
               </Link>
             </Button>
           )}
         </div>
         <div>
+          <Button
+            className="flex items-center gap-1"
+            onClick={() => trigger()}
+            disabled={isMutating}
+          >
+            {isMutating ? (
+              <>
+                <LoaderCircle className="size-4 animate-spin" />
+                Saving...
+              </>
+            ) : (
+              <>
+                <Save className="size-4" />
+                Save
+              </>
+            )}
+          </Button>
+        </div>
+        <div>
           {nextEntryId && (
             <Button asChild>
               <Link href={`/entry/${nextEntryId}`} className="flex items-center gap-1">
-                Next Entry <ArrowRight className="h-4 w-4" />
+                Next Entry <ArrowRight className="size-4" />
               </Link>
             </Button>
           )}
