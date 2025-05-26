@@ -29,7 +29,6 @@ export async function GET(req: Request) {
     .select("id")
     .eq("id", journalId)
     .eq("author_id", user.id)
-    .is("deleted_at", null)
     .single();
 
   if (journalError || !journal) {
@@ -47,7 +46,6 @@ export async function GET(req: Request) {
     `
     )
     .eq("journal_id", journalId)
-    .is("deleted_at", null)
     .order("created_at", { ascending: false });
 
   if (error) {
@@ -152,7 +150,6 @@ export async function POST(req: Request) {
     .select("id")
     .eq("id", journalId)
     .eq("author_id", user.id)
-    .is("deleted_at", null)
     .single();
 
   if (journalError || !journal) {

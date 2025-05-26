@@ -28,7 +28,6 @@ export async function GET(req: Request) {
     .select("*")
     .eq("id", journalId)
     .eq("author_id", user.id)
-    .is("deleted_at", null)
     .single();
 
   if (error) {
@@ -38,12 +37,11 @@ export async function GET(req: Request) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 
-  // count entries where deleted_at is null
+  // count entries
   const entryCount = await supabase
     .from("entry")
     .select("id", { count: "exact" })
-    .eq("journal_id", journalId)
-    .is("deleted_at", null);
+    .eq("journal_id", journalId);
 
   if (entryCount.error) {
     return NextResponse.json({ error: entryCount.error.message }, { status: 500 });
