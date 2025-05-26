@@ -14,20 +14,6 @@ import { Suspense } from "react";
 import { ErrorBoundary } from "react-error-boundary";
 import useSWR from "swr";
 
-function EntrySkeleton() {
-  return (
-    <>
-      <Skeleton className="mx-auto h-8 w-1/2" />
-      <Separator />
-      <div className="space-y-4">
-        {Array.from({ length: 15 }).map((_, i) => (
-          <Skeleton key={i} className="h-4 w-full" />
-        ))}
-      </div>
-    </>
-  );
-}
-
 async function fetchEntry(entryId: string) {
   const supabase = createClient();
 
@@ -62,6 +48,28 @@ async function fetchEntry(entryId: string) {
     prevEntryId: prevData?.id || null,
     nextEntryId: nextData?.id || null
   };
+}
+
+function EntryErrorFallback({ error }: { error: Error }) {
+  return (
+    <div className="space-y-4 text-center">
+      <p className="text-red-500">{error.message || "Entry not found"}</p>
+    </div>
+  );
+}
+
+function EntrySkeleton() {
+  return (
+    <>
+      <Skeleton className="mx-auto h-8 w-1/2" />
+      <Separator />
+      <div className="space-y-4">
+        {Array.from({ length: 15 }).map((_, i) => (
+          <Skeleton key={i} className="h-4 w-full" />
+        ))}
+      </div>
+    </>
+  );
 }
 
 function EntryContent() {
@@ -125,14 +133,6 @@ function EntryContent() {
   );
 }
 
-function ErrorFallback({ error }: { error: Error }) {
-  return (
-    <div className="space-y-4 text-center">
-      <p className="text-red-500">{error.message || "Entry not found"}</p>
-    </div>
-  );
-}
-
 export default function EntryPage() {
   return (
     <div className="flex min-h-screen flex-col">
@@ -140,7 +140,7 @@ export default function EntryPage() {
         <div className="py-8">
           <div className="container mx-auto max-w-3xl px-4 sm:px-6 lg:px-8">
             <div className="space-y-6">
-              <ErrorBoundary FallbackComponent={ErrorFallback}>
+              <ErrorBoundary FallbackComponent={EntryErrorFallback}>
                 <Suspense fallback={<EntrySkeleton />}>
                   <EntryContent />
                 </Suspense>
