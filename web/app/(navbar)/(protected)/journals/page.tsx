@@ -15,13 +15,13 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Journal } from "@/types";
+import { JournalWithEntryCount } from "@/types";
 import axios from "axios";
 import { Plus } from "lucide-react";
 import { useEffect, useState } from "react";
 
 export default function JournalsPage() {
-  const [journals, setJournals] = useState<Journal[]>([]);
+  const [journals, setJournals] = useState<JournalWithEntryCount[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [title, setTitle] = useState("");
@@ -34,7 +34,7 @@ export default function JournalsPage() {
     axios
       .get("/api/journals")
       .then((res) => {
-        setJournals(res.data.journals || []);
+        setJournals(res.data || []);
         setLoading(false);
       })
       .catch((err) => {
@@ -63,7 +63,8 @@ export default function JournalsPage() {
           thumbnail_url: null,
           created_at: new Date().toISOString(),
           updated_at: new Date().toISOString(),
-          deleted_at: null
+          deleted_at: null,
+          entries: 0
         },
         ...prev
       ]);

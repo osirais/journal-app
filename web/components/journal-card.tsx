@@ -17,7 +17,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu";
-import type { Journal } from "@/types";
+import type { JournalWithEntryCount } from "@/types";
 import { formatDateAgo } from "@/utils/format-date-ago";
 import { CalendarIcon, Clock, Edit, FileEdit, MoreVertical, Trash2 } from "lucide-react";
 import Link from "next/link";
@@ -26,9 +26,9 @@ import type { FC } from "react";
 import { useState } from "react";
 
 type JournalCardProps = {
-  journal: Journal;
-  onEdit?: (journal: Journal) => void;
-  onDelete?: (journal: Journal) => void;
+  journal: JournalWithEntryCount;
+  onEdit?: (journal: JournalWithEntryCount) => void;
+  onDelete?: (journal: JournalWithEntryCount) => void;
 };
 
 export const JournalCard: FC<JournalCardProps> = ({ journal, onEdit, onDelete }) => {
@@ -76,6 +76,12 @@ export const JournalCard: FC<JournalCardProps> = ({ journal, onEdit, onDelete })
                 <div className="flex items-center gap-1">
                   <Clock className="h-3 w-3" />
                   <span>Updated {formatDateAgo(new Date(journal.updated_at))}</span>
+                </div>
+                <div className="flex items-center gap-1">
+                  <Clock className="h-3 w-3" />
+                  <span>
+                    {journal.entries} {journal.entries === 1 ? "entry" : "entries"}
+                  </span>
                 </div>
               </div>
             </div>
