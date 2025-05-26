@@ -72,9 +72,10 @@ export default function JournalsPage() {
       setDescription("");
       setDialogOpen(false);
 
-      axios.get("/api/journals").then((res) => {
-        setJournals(res.data.journals || []);
-      });
+      // don't uncomment it since, it makes the journals disappear
+      // axios.get("/api/journals").then((res) => {
+      //   setJournals(res.data.journals || []);
+      // });
     } catch (err: any) {
       setCreateError(err.response?.data?.error || "Failed to create journal");
     } finally {
@@ -154,17 +155,23 @@ export default function JournalsPage() {
         <SortDropdown onSortChange={() => {}} defaultSort="work-in-progress" />
       </div>
 
-      <div className="grid gap-3 md:grid-cols-2">
-        {loading ? (
-          Array.from({ length: 6 }).map((_, i) => <JournalCardSkeleton key={i} />)
-        ) : journals.length === 0 ? (
-          <div className="text-muted-foreground py-12 text-center">
-            No journals found. Create your first journal to get started.
-          </div>
-        ) : (
-          journals.map((journal) => <JournalCard key={journal.id} journal={journal} />)
-        )}
-      </div>
+      {loading ? (
+        <div className="grid gap-3 md:grid-cols-2">
+          {Array.from({ length: 6 }).map((_, i) => (
+            <JournalCardSkeleton key={i} />
+          ))}
+        </div>
+      ) : journals.length === 0 ? (
+        <div className="text-muted-foreground py-12 text-center">
+          No journals found. Create your first journal to get started.
+        </div>
+      ) : (
+        <div className="grid gap-3 md:grid-cols-2">
+          {journals.map((journal) => (
+            <JournalCard key={journal.id} journal={journal} />
+          ))}
+        </div>
+      )}
     </div>
   );
 }
