@@ -34,9 +34,11 @@
     "react": "19.1.0",
     "react-activity-calendar": "^2.7.12",
     "react-dom": "19.1.0",
+    "react-error-boundary": "^6.0.0",
     "react-markdown": "^10.1.0",
     "react-tag-input": "^6.10.6",
     "sonner": "^2.0.3",
+    "swr": "^2.3.3",
     "tiptap-markdown": "^0.8.10",
     "vaul": "^1.1.2"
   },
