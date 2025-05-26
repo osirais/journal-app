@@ -9,7 +9,7 @@ export type Journal = {
   deleted_at: string | null;
 };
 
-export type JournalWithEntries = Journal & {
+export type JournalWithEntryCount = Journal & {
   entries: number;
 };
 

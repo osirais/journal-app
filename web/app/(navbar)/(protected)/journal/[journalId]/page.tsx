@@ -17,7 +17,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
-import type { JournalWithEntries, TagType } from "@/types";
+import type { JournalWithEntryCount, TagType } from "@/types";
 import { formatDateAgo } from "@/utils/format-date-ago";
 import axios from "axios";
 import { CalendarIcon, FileText, Plus } from "lucide-react";
@@ -58,7 +58,7 @@ export default function EntriesPage() {
 
   const [tags, setTags] = useState<Tag[]>([]);
 
-  const [journalInfo, setJournalInfo] = useState<JournalWithEntries | null>(null);
+  const [journalInfo, setJournalInfo] = useState<JournalWithEntryCount | null>(null);
   const [journalLoading, setJournalLoading] = useState(true);
 
   const [dialogOpen, setDialogOpen] = useState(false);

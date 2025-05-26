@@ -1,4 +1,4 @@
-import { JournalWithEntries } from "@/types";
+import { JournalWithEntryCount } from "@/types";
 import { createClient } from "@/utils/supabase/server";
 import { NextResponse } from "next/server";
 
@@ -23,7 +23,6 @@ export async function GET(req: Request) {
     return NextResponse.json({ error: "Missing journal ID" }, { status: 400 });
   }
 
-  // select journal fields plus a count of entries (not deleted)
   const { data: journal, error } = await supabase
     .from("journal")
     .select("*")
@@ -53,5 +52,5 @@ export async function GET(req: Request) {
   return NextResponse.json({
     ...journal,
     entries: entryCount.count || 0
-  } satisfies JournalWithEntries);
+  } satisfies JournalWithEntryCount);
 }
