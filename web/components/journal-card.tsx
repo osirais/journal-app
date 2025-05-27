@@ -1,15 +1,9 @@
 "use client";
 
+import { DeleteJournalDialog } from "@/components/dialogs/delete-journal-dialog";
+import { EditJournalDialog } from "@/components/dialogs/edit-journal-dialog";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle
-} from "@/components/ui/dialog";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -32,18 +26,21 @@ type JournalCardProps = {
 };
 
 export const JournalCard: FC<JournalCardProps> = ({ journal, onEdit, onDelete }) => {
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
   const handleEdit = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    setIsDialogOpen(true);
+    setIsEditDialogOpen(true);
+    onEdit?.(journal);
   };
 
   const handleDelete = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    setIsDialogOpen(true);
+    setIsDeleteDialogOpen(true);
+    onDelete?.(journal);
   };
 
   return (
@@ -126,21 +123,16 @@ export const JournalCard: FC<JournalCardProps> = ({ journal, onEdit, onDelete })
           </div>
         </CardContent>
       </Card>
-      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Feature Work in Progress</DialogTitle>
-            <DialogDescription>
-              This feature is currently under development and will be available soon.
-            </DialogDescription>
-          </DialogHeader>
-          <DialogFooter>
-            <Button onClick={() => setIsDialogOpen(false)} className="cursor-pointer">
-              Got it
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      <EditJournalDialog
+        journal={journal}
+        open={isEditDialogOpen}
+        onOpenChange={setIsEditDialogOpen}
+      />
+      <DeleteJournalDialog
+        journal={journal}
+        open={isDeleteDialogOpen}
+        onOpenChange={setIsDeleteDialogOpen}
+      />
     </>
   );
 };
