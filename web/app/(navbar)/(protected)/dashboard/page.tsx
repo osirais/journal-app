@@ -1,6 +1,6 @@
 import { ActivityCalendarCard } from "@/components/dashboard/activity-calendar";
 import { JournalCard } from "@/components/dashboard/journal";
-import { MoodCard } from "@/components/dashboard/mood";
+import { MoodCardSSR } from "@/components/dashboard/mood-ssr";
 import { TasksCard } from "@/components/dashboard/tasks";
 
 const data = [
@@ -33,7 +33,7 @@ const Page = () => {
         <h1 className="text-2xl font-bold">Daily</h1>
         <div className="grid gap-6 md:grid-cols-2">
           <JournalCard />
-          <MoodCard />
+          <MoodCardSSR />
         </div>
         <TasksCard />
       </div>

@@ -80,7 +80,14 @@ LEFT JOIN user_balance b
     ON b.user_id = u.id
    AND b.currency = 'stamps';
 
-CREATE TYPE task_interval AS ENUM ('daily', 'weekly', 'monthly');
+DO $$ BEGIN
+  IF NOT EXISTS (
+    SELECT FROM pg_type WHERE typname = 'task_interval'
+  ) THEN
+    CREATE TYPE task_interval AS ENUM ('daily', 'weekly', 'monthly');
+  END IF;
+END $$;
+
 
 CREATE TABLE IF NOT EXISTS task (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v7(),
@@ -90,4 +97,13 @@ CREATE TABLE IF NOT EXISTS task (
     interval task_interval NOT NULL,
     created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE TABLE IF NOT EXISTS mood_entry (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v7(),
+    user_id UUID NOT NULL REFERENCES users(id),
+    scale INT NOT NULL CHECK (scale BETWEEN 1 AND 5),
+    created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+    deleted_at TIMESTAMPTZ
 );
