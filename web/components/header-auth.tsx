@@ -1,4 +1,4 @@
-import { StampCount } from "@/components/stamp-count";
+import StampCountSSR from "@/components/stamp-count-ssr-wrapper";
 import { UserActionsDropdown } from "@/components/user-actions-dropdown";
 import { hasEnvVars } from "@/utils/supabase/check-env-vars";
 import { createClient } from "@/utils/supabase/server";
@@ -48,7 +48,7 @@ export default async function AuthButton() {
     <div className="flex items-center gap-3">
       <div className="grid grid-cols-[repeat(3,max-content)] place-items-center gap-2">
         <UserActionsDropdown username={data.username} />
-        <StampCount userId={user.id} />
+        <StampCountSSR userId={user.id} />
       </div>
     </div>
   );
