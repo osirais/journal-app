@@ -45,7 +45,7 @@ export function DeleteJournalDialog({ journal, open, onOpenChange }: DeleteJourn
           <DialogDescription>
             Are you sure you want to delete "{journal.title}"? This action cannot be undone.
             {journal.entries > 0 && (
-              <span className="mt-2 block font-medium text-red-600">
+              <span className="mt-2 block font-medium text-red-500">
                 This journal contains {journal.entries}{" "}
                 {journal.entries === 1 ? "entry" : "entries"} that will also be affected.
               </span>
