@@ -1,5 +1,6 @@
 import { ActivityCalendarCard } from "@/components/dashboard/activity-calendar";
 import { JournalCard } from "@/components/dashboard/journal";
+import { MoodCard } from "@/components/dashboard/mood";
 import { TasksCard } from "@/components/dashboard/tasks";
 
 const data = [
@@ -27,12 +28,19 @@ const data = [
 
 const Page = () => {
   return (
-    <div className="container mx-auto grid max-w-3xl grid-flow-row gap-6 py-8">
-      <div className="grid gap-6 md:grid-cols-2">
-        <JournalCard />
+    <div className="ovreflow-hidden container mx-auto grid max-w-3xl grid-flow-row gap-8 py-8">
+      <div className="grid gap-4">
+        <h1 className="text-2xl font-bold">Daily</h1>
+        <div className="grid gap-6 md:grid-cols-2">
+          <JournalCard />
+          <MoodCard />
+        </div>
         <TasksCard />
       </div>
-      <ActivityCalendarCard data={data} />
+      <div className="grid w-full gap-4 overflow-hidden">
+        <h1 className="text-2xl font-bold">Stats</h1>
+        <ActivityCalendarCard data={data} />
+      </div>
     </div>
   );
 };

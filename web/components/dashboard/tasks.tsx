@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { Checkbox } from "@/components/ui/checkbox";
 import { createClient } from "@/utils/supabase/server";
 import Link from "next/link";
 import type { FC } from "react";
@@ -19,33 +20,45 @@ export const TasksCard: FC = async () => {
     .eq("user_id", user!.id);
 
   return (
-    <Card className="p-6">
-      <h3 className="mb-4 text-lg font-semibold">Tasks</h3>
-      <div className="grid gap-6">
-        <Link href="/tasks">
-          <Button variant="outline" className="w-full cursor-pointer">
-            View All Tasks
-          </Button>
-        </Link>
-        {error || !tasks || tasks.length === 0 ? (
-          <p className="text-muted-foreground text-center text-sm">
-            {error ? "Error fetching tasks." : "No tasks found."}
-          </p>
-        ) : (
-          <ul className="space-y-4">
-            {tasks.map((task) => (
-              <li key={task.id} className="rounded-md border p-3 shadow-sm">
-                <div className="flex flex-col gap-1">
-                  <span className="font-medium">{task.name}</span>
-                  {task.description && (
-                    <span className="text-muted-foreground text-sm">{task.description}</span>
-                  )}
-                  <span className="text-muted-foreground text-xs">Interval: {task.interval}</span>
-                </div>
-              </li>
-            ))}
-          </ul>
-        )}
+    <Card className="w-full p-6">
+      <div className="grid grid-cols-2">
+        <div className="w-full sm:w-auto">
+          <h3 className="mb-4 text-lg font-semibold">Tasks</h3>
+          <div className="w-full space-y-4">
+            {error || !tasks || tasks.length === 0 ? (
+              <p className="text-muted-foreground text-sm">
+                {error ? "Error fetching tasks." : "No tasks found."}
+              </p>
+            ) : (
+              <div className="space-y-3">
+                {tasks.map((task) => (
+                  <div key={task.id} className="flex items-start space-x-3">
+                    <Checkbox id={`task-${task.id}`} />
+                    <div className="grid gap-1.5 leading-none">
+                      <label
+                        htmlFor={`task-${task.id}`}
+                        className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                      >
+                        {task.name}
+                      </label>
+                      {task.description && (
+                        <p className="text-muted-foreground text-sm">{task.description}</p>
+                      )}
+                      <p className="text-muted-foreground text-xs">Interval: {task.interval}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+        <div className="grid h-full place-items-center">
+          <Link href="/tasks">
+            <Button variant="outline" className="mt-auto cursor-pointer">
+              Manage Tasks
+            </Button>
+          </Link>
+        </div>
       </div>
     </Card>
   );
