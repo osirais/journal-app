@@ -2,12 +2,13 @@
 
 import EntryEditor from "@/components/editor";
 import { EntryDrawer } from "@/components/entry-drawer";
+import { Markdown } from "@/components/markdown";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
 import { createClient } from "@/utils/supabase/client";
 import { Editor } from "@tiptap/react";
-import { ArrowLeft, ArrowRight, Calendar, Clock, Edit3, LoaderCircle, Save } from "lucide-react";
+import { ArrowLeft, ArrowRight, Calendar, Clock, Edit3, LoaderCircle, Save, X } from "lucide-react";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { Suspense, useRef, useState } from "react";
@@ -125,7 +126,7 @@ function EntryContent() {
             )}
           </div>
           <div className="flex flex-1 justify-end">
-            {!isEditing && (
+            {!isEditing ? (
               <Button
                 variant="ghost"
                 size="icon"
@@ -134,6 +135,16 @@ function EntryContent() {
               >
                 <Edit3 className="h-4 w-4" />
                 <span className="sr-only">Edit Entry</span>
+              </Button>
+            ) : (
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => setIsEditing(false)}
+                className="mt-8 cursor-pointer"
+              >
+                <X className="h-4 w-4" />
+                <span className="sr-only">Cancel Edit</span>
               </Button>
             )}
           </div>
@@ -150,55 +161,60 @@ function EntryContent() {
               onCreate={(editor) => (editorRef.current = editor)}
             />
           </div>
-          <Separator className="my-6" />
-          <div className="flex justify-between pt-4">
-            <div>
-              {prevEntryId && (
-                <Button variant="outline" asChild>
-                  <Link href={`/entry/${prevEntryId}`} className="flex items-center gap-2">
-                    <ArrowLeft className="h-4 w-4" /> Previous Entry
-                  </Link>
-                </Button>
+          <div className="flex gap-2">
+            <Button
+              onClick={() => trigger()}
+              disabled={isMutating}
+              className="flex cursor-pointer items-center gap-2"
+            >
+              {isMutating ? (
+                <>
+                  <LoaderCircle className="h-4 w-4 animate-spin" />
+                  Saving...
+                </>
+              ) : (
+                <>
+                  <Save className="h-4 w-4" />
+                  Save
+                </>
               )}
-            </div>
-            <div className="flex gap-2">
-              <Button
-                onClick={() => trigger()}
-                disabled={isMutating}
-                className="flex items-center gap-2"
-              >
-                {isMutating ? (
-                  <>
-                    <LoaderCircle className="h-4 w-4 animate-spin" />
-                    Saving...
-                  </>
-                ) : (
-                  <>
-                    <Save className="h-4 w-4" />
-                    Save
-                  </>
-                )}
-              </Button>
-              <Button variant="outline" onClick={() => setIsEditing(false)} disabled={isMutating}>
-                Cancel
-              </Button>
-            </div>
-            <div>
-              {nextEntryId && (
-                <Button asChild>
-                  <Link href={`/entry/${nextEntryId}`} className="flex items-center gap-2">
-                    Next Entry <ArrowRight className="h-4 w-4" />
-                  </Link>
-                </Button>
-              )}
-            </div>
+            </Button>
+            <Button
+              variant="outline"
+              onClick={() => setIsEditing(false)}
+              disabled={isMutating}
+              className="cursor-pointer"
+            >
+              Cancel
+            </Button>
           </div>
+          <Separator className="my-6" />
         </>
       ) : (
         <div className="prose prose-neutral dark:prose-invert max-w-none">
-          <div className="whitespace-pre-wrap">{entry.content}</div>
+          <Markdown>{entry.content}</Markdown>
         </div>
       )}
+      <div className="flex justify-between pt-4">
+        <div>
+          {prevEntryId && (
+            <Button variant="outline" asChild>
+              <Link href={`/entry/${prevEntryId}`} className="flex items-center gap-2">
+                <ArrowLeft className="h-4 w-4" /> Previous Entry
+              </Link>
+            </Button>
+          )}
+        </div>
+        <div>
+          {nextEntryId && (
+            <Button asChild>
+              <Link href={`/entry/${nextEntryId}`} className="flex items-center gap-2">
+                Next Entry <ArrowRight className="h-4 w-4" />
+              </Link>
+            </Button>
+          )}
+        </div>
+      </div>
     </>
   );
 }
