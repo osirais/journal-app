@@ -170,7 +170,7 @@ export default function TasksPage() {
                           <DropdownMenuItem
                             key={interval}
                             onSelect={() => setNewTaskInterval(interval as TaskType["interval"])}
-                            className={newTaskInterval === interval ? "font-semibold" : ""}
+                            className={`${newTaskInterval === interval ? "font-semibold" : ""} cursor-pointer`}
                           >
                             {interval.charAt(0).toUpperCase() + interval.slice(1)}
                           </DropdownMenuItem>

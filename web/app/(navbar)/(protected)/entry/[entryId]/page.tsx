@@ -254,8 +254,7 @@ function EntryContent() {
       </div>
       <div className="grid w-full">
         <h1 className="wrap-anywhere text-center text-2xl font-bold">{entry.title}</h1>
-        <div className="grid grid-cols-[1fr_auto_1fr] items-center">
-          <div></div>
+        <div className="grid items-center">
           <div className="text-muted-foreground mt-2 flex items-center justify-center gap-4 text-sm">
             <div className="flex items-center gap-1">
               <Calendar className="h-3 w-3" />
@@ -266,29 +265,6 @@ function EntryContent() {
                 <Clock className="h-3 w-3" />
                 <span>Updated {new Date(entry.updated_at).toLocaleDateString()}</span>
               </div>
-            )}
-          </div>
-          <div className="flex flex-1 justify-end">
-            {!isEditing ? (
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => setIsEditing(true)}
-                className="mt-8 cursor-pointer"
-              >
-                <Edit3 className="h-4 w-4" />
-                <span className="sr-only">Edit Entry</span>
-              </Button>
-            ) : (
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => setIsEditing(false)}
-                className="mt-8 cursor-pointer"
-              >
-                <X className="h-4 w-4" />
-                <span className="sr-only">Cancel Edit</span>
-              </Button>
             )}
           </div>
         </div>
@@ -382,9 +358,32 @@ function EntryContent() {
       <Separator className="my-6" />
 
       <div className="space-y-4">
-        <div className="flex items-center gap-2">
-          <FileText className="h-4 w-4" />
-          <span className="text-lg font-semibold">Content</span>
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2 text-lg font-semibold">
+            <FileText className="h-4 w-4" />
+            <span>Content</span>
+          </div>
+          {!isEditing ? (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setIsEditing(true)}
+              className="cursor-pointer"
+            >
+              <Edit3 className="h-3 w-3" />
+              <span className="sr-only">Edit Content</span>
+            </Button>
+          ) : (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setIsEditing(false)}
+              className="cursor-pointer"
+            >
+              <X className="h-3 w-3" />
+              <span className="sr-only">Cancel Edit</span>
+            </Button>
+          )}
         </div>
 
         {isEditing ? (
