@@ -1,6 +1,6 @@
 "use client";
 
-import { Card } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { updateMood } from "@/lib/actions/mood-actions";
 import { useOptimistic, useTransition } from "react";
@@ -22,7 +22,6 @@ export function MoodCardCSR({ initialMood }: MoodCardCSRProps) {
   const [isPending, startTransition] = useTransition();
   const [optimisticMood, setOptimisticMood] = useOptimistic(initialMood);
 
-  // convert scale (1-5) to mood label for ToggleGroup
   const selectedMoodLabel = optimisticMood
     ? moods.find((mood) => mood.scale === optimisticMood)?.label
     : undefined;
@@ -48,10 +47,12 @@ export function MoodCardCSR({ initialMood }: MoodCardCSRProps) {
   };
 
   return (
-    <Card className="p-6">
-      <h3 className="mb-3 text-lg font-semibold">Mood</h3>
-      <p className="text-muted-foreground mb-6 text-center text-sm">Describe your mood today</p>
-      <div className="grid h-full place-items-center">
+    <Card>
+      <CardHeader>
+        <CardTitle>Mood</CardTitle>
+        <CardDescription>Describe your mood today</CardDescription>
+      </CardHeader>
+      <CardContent className="grid place-items-center">
         <ToggleGroup
           type="single"
           value={selectedMoodLabel}
@@ -70,7 +71,7 @@ export function MoodCardCSR({ initialMood }: MoodCardCSRProps) {
             </ToggleGroupItem>
           ))}
         </ToggleGroup>
-      </div>
+      </CardContent>
     </Card>
   );
 }

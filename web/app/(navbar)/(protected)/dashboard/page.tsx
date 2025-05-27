@@ -1,5 +1,6 @@
 import { ActivityCalendarCard } from "@/components/dashboard/activity-calendar";
 import { JournalCard } from "@/components/dashboard/journal";
+import { MoodChartSSR } from "@/components/dashboard/mood-chart-ssr";
 import { MoodCardSSR } from "@/components/dashboard/mood-ssr";
 import { TasksCard } from "@/components/dashboard/tasks";
 
@@ -40,6 +41,7 @@ const Page = () => {
       <div className="grid w-full gap-4 overflow-hidden">
         <h1 className="text-2xl font-bold">Stats</h1>
         <ActivityCalendarCard data={data} />
+        <MoodChartSSR />
       </div>
     </div>
   );

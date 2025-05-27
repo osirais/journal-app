@@ -79,3 +79,59 @@ export async function updateMood(scale: number) {
   revalidatePath("/dashboard");
   return { success: true, error: null };
 }
+
+export async function getMoodHistory() {
+  const supabase = await createClient();
+
+  const {
+    data: { user },
+    error: userError
+  } = await supabase.auth.getUser();
+
+  if (userError || !user) {
+    return { data: [], error: "User not authenticated" };
+  }
+
+  const thirtyDaysAgo = new Date();
+  thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+
+  const { data: moodEntries, error } = await supabase
+    .from("mood_entry")
+    .select("scale, created_at")
+    .eq("user_id", user.id)
+    .is("deleted_at", null)
+    .gte("created_at", thirtyDaysAgo.toISOString())
+    .order("created_at", { ascending: true });
+
+  if (error) {
+    return { data: [], error: error.message };
+  }
+
+  // group by date and get the latest mood for each day
+  const moodByDate = new Map<string, number>();
+
+  moodEntries?.forEach((entry) => {
+    const date = new Date(entry.created_at).toISOString().split("T")[0];
+    moodByDate.set(date, entry.scale);
+  });
+
+  // create array of all dates in the past 30 days with mood data
+  const chartData = [];
+  for (let i = 29; i >= 0; i--) {
+    const date = new Date();
+    date.setDate(date.getDate() - i);
+    const dateString = date.toISOString().split("T")[0];
+    const mood = moodByDate.get(dateString) || null;
+
+    chartData.push({
+      date: dateString,
+      mood: mood,
+      formattedDate: date.toLocaleDateString("en-US", {
+        month: "short",
+        day: "numeric"
+      })
+    });
+  }
+
+  return { data: chartData, error: null };
+}

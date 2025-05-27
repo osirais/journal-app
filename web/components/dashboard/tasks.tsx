@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { createClient } from "@/utils/supabase/server";
 import Link from "next/link";
@@ -20,11 +20,14 @@ export const TasksCard: FC = async () => {
     .eq("user_id", user!.id);
 
   return (
-    <Card className="w-full p-6">
-      <div className="grid grid-cols-2">
-        <div className="w-full sm:w-auto">
-          <h3 className="mb-4 text-lg font-semibold">Tasks</h3>
-          <div className="w-full space-y-4">
+    <Card className="w-full">
+      <CardHeader>
+        <CardTitle>Tasks</CardTitle>
+        <CardDescription>Your recurring or to-do tasks</CardDescription>
+      </CardHeader>
+      <CardContent>
+        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+          <div className="space-y-4">
             {error || !tasks || tasks.length === 0 ? (
               <p className="text-muted-foreground text-sm">
                 {error ? "Error fetching tasks." : "No tasks found."}
@@ -51,15 +54,15 @@ export const TasksCard: FC = async () => {
               </div>
             )}
           </div>
+          <div className="grid place-items-center">
+            <Link href="/tasks">
+              <Button variant="outline" className="mt-auto cursor-pointer">
+                Manage Tasks
+              </Button>
+            </Link>
+          </div>
         </div>
-        <div className="grid h-full place-items-center">
-          <Link href="/tasks">
-            <Button variant="outline" className="mt-auto cursor-pointer">
-              Manage Tasks
-            </Button>
-          </Link>
-        </div>
-      </div>
+      </CardContent>
     </Card>
   );
 };

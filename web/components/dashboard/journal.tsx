@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { createClient } from "@/utils/supabase/server";
 import Link from "next/link";
 import type { FC } from "react";
@@ -41,19 +41,21 @@ export const JournalCard: FC = async () => {
   }
 
   return (
-    <Card className="p-6">
-      <h3 className="mb-3 text-lg font-semibold">Journal</h3>
-      <div className="grid h-full place-items-center">
+    <Card>
+      <CardHeader>
+        <CardTitle>Journal</CardTitle>
+        <CardDescription>Record your thoughts and experiences</CardDescription>
+      </CardHeader>
+      <CardContent>
         <div className="grid place-items-center gap-6">
           <Link href="/journals">
-            <Button variant="outline" className="mt-auto cursor-pointer">
+            <Button variant="outline" className="cursor-pointer">
               Create Entry
             </Button>
           </Link>
-          <p className="mb-4 text-center text-sm">Record your thoughts and experiences</p>
           <p className="text-center text-sm font-medium">{message}</p>
         </div>
-      </div>
+      </CardContent>
     </Card>
   );
 };

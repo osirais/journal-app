@@ -37,6 +37,7 @@
     "react-error-boundary": "^6.0.0",
     "react-markdown": "^10.1.0",
     "react-tag-input": "^6.10.6",
+    "recharts": "^2.15.3",
     "sonner": "^2.0.3",
     "swr": "^2.3.3",
     "tiptap-markdown": "^0.8.10",
