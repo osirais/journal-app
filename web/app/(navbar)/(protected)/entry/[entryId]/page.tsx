@@ -93,7 +93,10 @@ function EntryContent() {
 
     const { error: entryError } = await supabase
       .from("entry")
-      .update({ content: markdown })
+      .update({
+        content: markdown,
+        updated_at: new Date().toISOString()
+      })
       .eq("id", entryId);
 
     if (entryError) {
