@@ -1,16 +1,8 @@
 "use server";
 
+import { Task } from "@/types";
 import { createClient } from "@/utils/supabase/server";
 import { revalidatePath } from "next/cache";
-
-export interface Task {
-  id: string;
-  name: string;
-  description: string | null;
-  interval: "daily" | "weekly" | "monthly";
-  created_at: string;
-  updated_at: string;
-}
 
 export async function getTasks(): Promise<Task[]> {
   const supabase = await createClient();

@@ -22,7 +22,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { createTask, deleteTask, getTasks } from "@/lib/actions/task-actions";
 import { Edit, LoaderCircle, MoreHorizontal, Plus, Search, Trash2 } from "lucide-react";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useTransition } from "react";
 import { toast } from "sonner";
 
 interface TaskType {
@@ -42,74 +42,114 @@ export default function TasksPage() {
   const [newTaskInterval, setNewTaskInterval] = useState<TaskType["interval"]>("daily");
   const [searchQuery, setSearchQuery] = useState("");
   const [isLoading, setIsLoading] = useState(true);
+
   const [isCreating, setIsCreating] = useState(false);
+  const [isPending, startTransition] = useTransition();
+
+  const [taskToDelete, setTaskToDelete] = useState<TaskType | null>(null);
 
   useEffect(() => {
     loadTasks();
   }, []);
 
-  const loadTasks = async () => {
+  async function loadTasks() {
     try {
-      const fetchedTasks = await getTasks();
-      setTasks(fetchedTasks);
+      const fetched = await getTasks();
+      setTasks(fetched);
     } catch {
       toast.error("Failed to load tasks");
     } finally {
       setIsLoading(false);
     }
-  };
+  }
 
-  const handleCreateTask = async (e: React.FormEvent) => {
+  function handleCreateTask(e: React.FormEvent) {
     e.preventDefault();
     if (!newTaskName.trim()) return;
 
     setIsCreating(true);
-    try {
-      const newTask = await createTask(
-        newTaskName.trim(),
-        newTaskDescription.trim(),
-        newTaskInterval
-      );
-      setTasks((prev) => [newTask, ...prev]);
-      setNewTaskName("");
-      setNewTaskDescription("");
-      setNewTaskInterval("daily");
-      setIsDialogOpen(false);
-      toast.success("Task created successfully");
-    } catch {
-      toast.error("Failed to create task.");
-    } finally {
-      setIsCreating(false);
-    }
-  };
+    startTransition(async () => {
+      try {
+        const created = await createTask(
+          newTaskName.trim(),
+          newTaskDescription.trim(),
+          newTaskInterval
+        );
+        setTasks((t) => [created, ...t]);
+        setNewTaskName("");
+        setNewTaskDescription("");
+        setNewTaskInterval("daily");
+        setIsDialogOpen(false);
+        toast.success("Task created successfully");
+      } catch {
+        toast.error("Failed to create task");
+      } finally {
+        setIsCreating(false);
+      }
+    });
+  }
 
-  const handleDeleteTask = async (taskId: string) => {
-    try {
-      await deleteTask(taskId);
-      setTasks((prev) => prev.filter((task) => task.id !== taskId));
-      toast.success("Task deleted successfully");
-    } catch {
-      toast.error("Failed to delete task");
-    }
-  };
+  function handleDeleteTask(id: string) {
+    startTransition(async () => {
+      try {
+        await deleteTask(id);
+        setTasks((t) => t.filter((x) => x.id !== id));
+        toast.success("Task deleted successfully");
+      } catch {
+        toast.error("Failed to delete task");
+      } finally {
+        setTaskToDelete(null);
+      }
+    });
+  }
 
-  const filteredTasks = tasks.filter((task) =>
-    task.name.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const filtered = tasks.filter((t) => t.name.toLowerCase().includes(searchQuery.toLowerCase()));
 
   if (isLoading) {
     return (
       <div className="flex min-h-screen flex-col items-center justify-center space-y-4 p-4">
         <LoaderCircle className="size-4 animate-spin" />
-        <p className="text-muted-foreground">Loading tasks...</p>
+        <p className="text-muted-foreground">Loading tasks</p>
       </div>
     );
   }
 
   return (
     <div className="container mx-auto max-w-4xl p-6">
+      <Dialog
+        open={!!taskToDelete}
+        onOpenChange={(o) => {
+          if (!o) setTaskToDelete(null);
+        }}
+      >
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Delete Task</DialogTitle>
+            <DialogDescription>
+              Are you sure you want to delete{" "}
+              <span className="font-semibold">{taskToDelete?.name}</span>?
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setTaskToDelete(null)}>
+              Cancel
+            </Button>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => taskToDelete && handleDeleteTask(taskToDelete.id)}
+              disabled={isPending}
+              className="cursor-pointer border-red-500 text-red-500 hover:bg-red-500 hover:text-white"
+            >
+              {isPending && <LoaderCircle className="mr-2 size-4 animate-spin" />}
+              Delete Task
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
       <div className="flex flex-col space-y-6">
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <header className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <h1 className="text-3xl font-bold tracking-tight">Tasks</h1>
             <p className="text-muted-foreground">Manage your recurring tasks</p>
@@ -126,7 +166,7 @@ export default function TasksPage() {
                 <DialogHeader>
                   <DialogTitle>Create New Task</DialogTitle>
                   <DialogDescription>
-                    Add a new recurring task. Task names must be unique.
+                    Add a new recurring task. Task names must be unique
                   </DialogDescription>
                 </DialogHeader>
                 <div className="grid gap-4 py-4">
@@ -134,7 +174,7 @@ export default function TasksPage() {
                     <Label htmlFor="task-name">Task Name</Label>
                     <Input
                       id="task-name"
-                      placeholder="Enter task name..."
+                      placeholder="Enter task name"
                       value={newTaskName}
                       onChange={(e) => setNewTaskName(e.target.value)}
                       maxLength={50}
@@ -145,7 +185,7 @@ export default function TasksPage() {
                     <Label htmlFor="task-description">Description (optional)</Label>
                     <Input
                       id="task-description"
-                      placeholder="Enter description..."
+                      placeholder="Enter description"
                       value={newTaskDescription}
                       onChange={(e) => setNewTaskDescription(e.target.value)}
                       maxLength={200}
@@ -166,13 +206,15 @@ export default function TasksPage() {
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent>
-                        {["daily", "weekly", "monthly"].map((interval) => (
+                        {["daily", "weekly", "monthly"].map((i) => (
                           <DropdownMenuItem
-                            key={interval}
-                            onSelect={() => setNewTaskInterval(interval as TaskType["interval"])}
-                            className={`${newTaskInterval === interval ? "font-semibold" : ""} cursor-pointer`}
+                            key={i}
+                            onSelect={() => setNewTaskInterval(i as TaskType["interval"])}
+                            className={`${
+                              newTaskInterval === i ? "font-semibold" : ""
+                            } cursor-pointer`}
                           >
-                            {interval.charAt(0).toUpperCase() + interval.slice(1)}
+                            {i.charAt(0).toUpperCase() + i.slice(1)}
                           </DropdownMenuItem>
                         ))}
                       </DropdownMenuContent>
@@ -193,23 +235,25 @@ export default function TasksPage() {
                     disabled={isCreating || !newTaskName.trim()}
                     className="cursor-pointer"
                   >
-                    {isCreating ? "Creating..." : "Create Task"}
+                    {isCreating ? "Creating…" : "Create Task"}
                   </Button>
                 </DialogFooter>
               </form>
             </DialogContent>
           </Dialog>
-        </div>
+        </header>
+
         <div className="relative">
           <Search className="text-muted-foreground absolute left-3 top-1/2 size-4 -translate-y-1/2 transform" />
           <Input
-            placeholder="Search tasks..."
+            placeholder="Search tasks"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="pl-10"
           />
         </div>
-        {filteredTasks.length === 0 ? (
+
+        {filtered.length === 0 ? (
           <Card>
             <CardContent className="flex flex-col items-center justify-center py-12">
               <CardTitle className="mb-2 text-xl">
@@ -218,7 +262,7 @@ export default function TasksPage() {
               <CardDescription className="max-w-sm text-center">
                 {searchQuery
                   ? "Try adjusting your search terms"
-                  : "Create your first task to start managing your recurring work"}
+                  : "Create your first task to start managing your work"}
               </CardDescription>
               {!searchQuery && (
                 <Button onClick={() => setIsDialogOpen(true)} className="mt-4 cursor-pointer gap-2">
@@ -230,13 +274,12 @@ export default function TasksPage() {
           </Card>
         ) : (
           <div className="grid gap-4">
-            <div className="flex items-center justify-between">
-              <p className="text-muted-foreground text-sm">
-                {filteredTasks.length} task{filteredTasks.length !== 1 ? "s" : ""} found
-              </p>
-            </div>
+            <p className="text-muted-foreground text-sm">
+              {filtered.length} task
+              {filtered.length !== 1 ? "s" : ""} found
+            </p>
             <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-              {filteredTasks.map((task) => (
+              {filtered.map((task) => (
                 <Card key={task.id} className="group relative transition-shadow hover:shadow-md">
                   <CardHeader className="flex items-center justify-between pb-3">
                     <h2 className="cursor-default text-lg font-semibold">{task.name}</h2>
@@ -259,7 +302,7 @@ export default function TasksPage() {
                         <DropdownMenuSeparator />
                         <DropdownMenuItem
                           className="cursor-pointer text-red-500"
-                          onSelect={() => handleDeleteTask(task.id)}
+                          onSelect={() => setTaskToDelete(task)}
                         >
                           <Trash2 className="mr-2 size-4" />
                           Delete

@@ -20,3 +20,12 @@ export type TagType = {
   updated_at?: string;
   deleted_at?: string | null;
 };
+
+export interface Task {
+  id: string;
+  name: string;
+  description: string | null;
+  interval: "daily" | "weekly" | "monthly";
+  created_at: string;
+  updated_at: string;
+}
