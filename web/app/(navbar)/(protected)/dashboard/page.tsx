@@ -1,6 +1,6 @@
 import { ActivityCalendarCard } from "@/components/dashboard/activity-calendar";
 import { JournalCard } from "@/components/dashboard/journal";
-import { TodoListCard } from "@/components/dashboard/todo-list";
+import { TasksCard } from "@/components/dashboard/tasks";
 
 const data = [
   {
@@ -30,7 +30,7 @@ const Page = () => {
     <div className="container mx-auto grid max-w-3xl grid-flow-row gap-6 py-8">
       <div className="grid gap-6 md:grid-cols-2">
         <JournalCard />
-        <TodoListCard />
+        <TasksCard />
       </div>
       <ActivityCalendarCard data={data} />
     </div>

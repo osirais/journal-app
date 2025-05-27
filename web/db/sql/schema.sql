@@ -79,3 +79,15 @@ FROM users u
 LEFT JOIN user_balance b
     ON b.user_id = u.id
    AND b.currency = 'stamps';
+
+CREATE TYPE task_interval AS ENUM ('daily', 'weekly', 'monthly');
+
+CREATE TABLE IF NOT EXISTS task (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v7(),
+    user_id UUID NOT NULL REFERENCES users(id),
+    name TEXT NOT NULL,
+    description TEXT,
+    interval task_interval NOT NULL,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
