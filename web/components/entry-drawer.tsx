@@ -100,7 +100,7 @@ export function EntryDrawer({
     <Drawer direction="left">
       <DrawerTrigger asChild>
         <Button variant="ghost" size="icon" className="relative cursor-pointer">
-          <List className="h-5 w-5" />
+          <List className="size-5" />
         </Button>
       </DrawerTrigger>
       <DrawerContent className="w-[300px] p-0 sm:w-[350px]">
@@ -110,7 +110,7 @@ export function EntryDrawer({
 
         <div className="border-b p-4">
           <div className="relative">
-            <Search className="text-muted-foreground absolute left-2.5 top-3 h-4 w-4" />
+            <Search className="text-muted-foreground absolute left-2.5 top-3 size-4" />
             <Input
               type="search"
               placeholder="Search entries..."
@@ -124,13 +124,13 @@ export function EntryDrawer({
                   <Button
                     variant="ghost"
                     size="icon"
-                    className="absolute right-1 top-1 h-8 w-8"
+                    className="absolute right-1 top-1 size-8"
                     onClick={toggleSortOrder}
                   >
                     {sortAscending ? (
-                      <SortAsc className="h-4 w-4" />
+                      <SortAsc className="size-4" />
                     ) : (
-                      <SortDesc className="h-4 w-4" />
+                      <SortDesc className="size-4" />
                     )}
                   </Button>
                 </TooltipTrigger>
@@ -175,7 +175,7 @@ export function EntryDrawer({
                           </div>
                         )}
                       </div>
-                      <ChevronRight className="text-muted-foreground h-4 w-4" />
+                      <ChevronRight className="text-muted-foreground size-4" />
                     </button>
                   ))
                 ) : (

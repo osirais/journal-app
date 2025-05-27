@@ -257,12 +257,12 @@ function EntryContent() {
         <div className="grid items-center">
           <div className="text-muted-foreground mt-2 flex items-center justify-center gap-4 text-sm">
             <div className="flex items-center gap-1">
-              <Calendar className="h-3 w-3" />
+              <Calendar className="size-3" />
               <span>Created {new Date(entry.created_at).toLocaleDateString()}</span>
             </div>
             {entry.updated_at && entry.updated_at !== entry.created_at && (
               <div className="flex items-center gap-1">
-                <Clock className="h-3 w-3" />
+                <Clock className="size-3" />
                 <span>Updated {new Date(entry.updated_at).toLocaleDateString()}</span>
               </div>
             )}
@@ -275,12 +275,12 @@ function EntryContent() {
       <div className="space-y-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <TagIcon className="h-4 w-4" />
+            <TagIcon className="size-4" />
             <span className="text-lg font-semibold">Tags</span>
           </div>
           {!isEditingTags && (
             <Button variant="ghost" size="sm" onClick={handleEditTags} className="cursor-pointer">
-              <Edit3 className="h-3 w-3" />
+              <Edit3 className="size-3" />
               <span className="sr-only">Edit Tags</span>
             </Button>
           )}
@@ -318,12 +318,12 @@ function EntryContent() {
               >
                 {isSavingTags ? (
                   <>
-                    <LoaderCircle className="h-4 w-4 animate-spin" />
+                    <LoaderCircle className="size-4 animate-spin" />
                     Saving...
                   </>
                 ) : (
                   <>
-                    <Save className="h-4 w-4" />
+                    <Save className="size-4" />
                     Save Tags
                   </>
                 )}
@@ -360,7 +360,7 @@ function EntryContent() {
       <div className="space-y-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2 text-lg font-semibold">
-            <FileText className="h-4 w-4" />
+            <FileText className="size-4" />
             <span>Content</span>
           </div>
           {!isEditing ? (
@@ -370,7 +370,7 @@ function EntryContent() {
               onClick={() => setIsEditing(true)}
               className="cursor-pointer"
             >
-              <Edit3 className="h-3 w-3" />
+              <Edit3 className="size-3" />
               <span className="sr-only">Edit Content</span>
             </Button>
           ) : (
@@ -380,7 +380,7 @@ function EntryContent() {
               onClick={() => setIsEditing(false)}
               className="cursor-pointer"
             >
-              <X className="h-3 w-3" />
+              <X className="size-3" />
               <span className="sr-only">Cancel Edit</span>
             </Button>
           )}
@@ -402,12 +402,12 @@ function EntryContent() {
               >
                 {isSavingEntry ? (
                   <>
-                    <LoaderCircle className="h-4 w-4 animate-spin" />
+                    <LoaderCircle className="size-4 animate-spin" />
                     Saving...
                   </>
                 ) : (
                   <>
-                    <Save className="h-4 w-4" />
+                    <Save className="size-4" />
                     Save
                   </>
                 )}
@@ -436,7 +436,7 @@ function EntryContent() {
           {prevEntryId && (
             <Button variant="outline" asChild>
               <Link href={`/entry/${prevEntryId}`} className="flex items-center gap-2">
-                <ArrowLeft className="h-4 w-4" /> Previous Entry
+                <ArrowLeft className="size-4" /> Previous Entry
               </Link>
             </Button>
           )}
@@ -445,7 +445,7 @@ function EntryContent() {
           {nextEntryId && (
             <Button asChild>
               <Link href={`/entry/${nextEntryId}`} className="flex items-center gap-2">
-                Next Entry <ArrowRight className="h-4 w-4" />
+                Next Entry <ArrowRight className="size-4" />
               </Link>
             </Button>
           )}

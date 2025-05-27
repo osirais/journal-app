@@ -20,7 +20,7 @@ const achievements: Achievement[] = [
     id: "1",
     title: "Getting Started",
     description: "Complete your first task",
-    icon: <Target className="h-6 w-6" />,
+    icon: <Target className="size-6" />,
     status: "completed",
     position: { x: 50, y: 10 }
   },
@@ -28,7 +28,7 @@ const achievements: Achievement[] = [
     id: "2",
     title: "First Milestone",
     description: "Reach your first goal",
-    icon: <Star className="h-6 w-6" />,
+    icon: <Star className="size-6" />,
     status: "available",
     progress: 60,
     position: { x: 20, y: 25 }
@@ -37,7 +37,7 @@ const achievements: Achievement[] = [
     id: "3",
     title: "Speed Demon",
     description: "Complete tasks quickly",
-    icon: <Zap className="h-6 w-6" />,
+    icon: <Zap className="size-6" />,
     status: "locked",
     position: { x: 70, y: 40 }
   },
@@ -45,7 +45,7 @@ const achievements: Achievement[] = [
     id: "4",
     title: "Perfectionist",
     description: "Achieve perfect scores",
-    icon: <Award className="h-6 w-6" />,
+    icon: <Award className="size-6" />,
     status: "locked",
     position: { x: 30, y: 55 }
   },
@@ -53,7 +53,7 @@ const achievements: Achievement[] = [
     id: "5",
     title: "Champion",
     description: "Master all challenges",
-    icon: <Trophy className="h-6 w-6" />,
+    icon: <Trophy className="size-6" />,
     status: "locked",
     position: { x: 60, y: 70 }
   },
@@ -61,7 +61,7 @@ const achievements: Achievement[] = [
     id: "6",
     title: "Legend",
     description: "Ultimate achievement",
-    icon: <Trophy className="h-6 w-6" />,
+    icon: <Trophy className="size-6" />,
     status: "locked",
     position: { x: 40, y: 85 }
   }
@@ -103,10 +103,10 @@ function AchievementNode({ achievement }: { achievement: Achievement }) {
       }}
     >
       <Card
-        className={`flex h-16 w-16 items-center justify-center border-2 backdrop-blur-sm transition-all duration-200 ${getNodeStyles()}`}
+        className={`flex size-16 items-center justify-center border-2 backdrop-blur-sm transition-all duration-200 ${getNodeStyles()}`}
       >
         {achievement.status === "locked" ? (
-          <Lock className="h-5 w-5" />
+          <Lock className="size-5" />
         ) : (
           <div className={getIconColor()}>{achievement.icon}</div>
         )}
@@ -159,19 +159,19 @@ export const AchievementsMap: FC = () => {
               variant="secondary"
               className="border-green-500/20 bg-green-500/10 text-green-600 dark:text-green-400"
             >
-              <Star className="mr-1 h-3 w-3" />2 Completed
+              <Star className="mr-1 size-3" />2 Completed
             </Badge>
             <Badge
               variant="secondary"
               className="border-blue-500/20 bg-blue-500/10 text-blue-600 dark:text-blue-400"
             >
-              <Target className="mr-1 h-3 w-3" />1 In Progress
+              <Target className="mr-1 size-3" />1 In Progress
             </Badge>
             <Badge
               variant="secondary"
               className="bg-muted/50 text-muted-foreground border-muted-foreground/20"
             >
-              <Lock className="mr-1 h-3 w-3" />3 Locked
+              <Lock className="mr-1 size-3" />3 Locked
             </Badge>
           </div>
         </div>
@@ -192,15 +192,15 @@ export const AchievementsMap: FC = () => {
           <div className="text-muted-foreground absolute right-4 top-4">
             <div className="flex items-center gap-4 text-xs">
               <div className="flex items-center gap-1.5">
-                <div className="h-2 w-2 rounded-full bg-green-500/40"></div>
+                <div className="size-2 rounded-full bg-green-500/40"></div>
                 <span>Completed</span>
               </div>
               <div className="flex items-center gap-1.5">
-                <div className="h-2 w-2 rounded-full bg-blue-500/40"></div>
+                <div className="size-2 rounded-full bg-blue-500/40"></div>
                 <span>Available</span>
               </div>
               <div className="flex items-center gap-1.5">
-                <div className="bg-muted-foreground/40 h-2 w-2 rounded-full"></div>
+                <div className="bg-muted-foreground/40 size-2 rounded-full"></div>
                 <span>Locked</span>
               </div>
             </div>

@@ -100,7 +100,7 @@ export default function TasksPage() {
   if (isLoading) {
     return (
       <div className="flex min-h-screen flex-col items-center justify-center space-y-4 p-4">
-        <LoaderCircle className="h-4 w-4 animate-spin" />
+        <LoaderCircle className="size-4 animate-spin" />
         <p className="text-muted-foreground">Loading tasks...</p>
       </div>
     );
@@ -117,7 +117,7 @@ export default function TasksPage() {
           <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
             <DialogTrigger asChild>
               <Button className="cursor-pointer gap-2">
-                <Plus className="h-4 w-4" />
+                <Plus className="size-4" />
                 Create Task
               </Button>
             </DialogTrigger>
@@ -201,7 +201,7 @@ export default function TasksPage() {
           </Dialog>
         </div>
         <div className="relative">
-          <Search className="text-muted-foreground absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 transform" />
+          <Search className="text-muted-foreground absolute left-3 top-1/2 size-4 -translate-y-1/2 transform" />
           <Input
             placeholder="Search tasks..."
             value={searchQuery}
@@ -222,7 +222,7 @@ export default function TasksPage() {
               </CardDescription>
               {!searchQuery && (
                 <Button onClick={() => setIsDialogOpen(true)} className="mt-4 cursor-pointer gap-2">
-                  <Plus className="h-4 w-4" />
+                  <Plus className="size-4" />
                   Create Your First Task
                 </Button>
               )}
@@ -245,15 +245,15 @@ export default function TasksPage() {
                         <Button
                           variant="ghost"
                           size="sm"
-                          className="h-8 w-8 cursor-pointer p-0"
+                          className="size-8 cursor-pointer p-0"
                           aria-label="Task options"
                         >
-                          <MoreHorizontal className="h-5 w-5" />
+                          <MoreHorizontal className="size-5" />
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end" className="w-32">
                         <DropdownMenuItem className="cursor-pointer">
-                          <Edit className="mr-2 h-4 w-4" />
+                          <Edit className="mr-2 size-4" />
                           Edit (WIP)
                         </DropdownMenuItem>
                         <DropdownMenuSeparator />
@@ -261,7 +261,7 @@ export default function TasksPage() {
                           className="cursor-pointer text-red-500"
                           onSelect={() => handleDeleteTask(task.id)}
                         >
-                          <Trash2 className="mr-2 h-4 w-4" />
+                          <Trash2 className="mr-2 size-4" />
                           Delete
                         </DropdownMenuItem>
                       </DropdownMenuContent>

@@ -13,7 +13,7 @@ export const Navbar: FC = () => {
             href="/"
             className="flex items-center gap-2 text-lg font-bold tracking-tight transition-opacity hover:opacity-80"
           >
-            <NotebookPen className="h-6 w-6" />
+            <NotebookPen className="size-6" />
             <span className="font-mono">logal</span>
           </Link>
         </div>

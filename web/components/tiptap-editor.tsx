@@ -144,14 +144,14 @@ export const TiptapEditor: FC<TiptapEditorProps> = ({
             aria-label="Toggle bold"
             onClick={() => editor.chain().focus().toggleBold().run()}
           >
-            <Bold className="h-4 w-4" />
+            <Bold className="size-4" />
           </ToggleGroupItem>
           <ToggleGroupItem
             value="italic"
             aria-label="Toggle italic"
             onClick={() => editor.chain().focus().toggleItalic().run()}
           >
-            <Italic className="h-4 w-4" />
+            <Italic className="size-4" />
           </ToggleGroupItem>
         </ToggleGroup>
 
@@ -176,13 +176,13 @@ export const TiptapEditor: FC<TiptapEditorProps> = ({
           }}
         >
           <ToggleGroupItem value="paragraph" aria-label="Paragraph">
-            <Pilcrow className="h-4 w-4" />
+            <Pilcrow className="size-4" />
           </ToggleGroupItem>
           <ToggleGroupItem value="heading1" aria-label="Heading 1">
-            <Heading1 className="h-4 w-4" />
+            <Heading1 className="size-4" />
           </ToggleGroupItem>
           <ToggleGroupItem value="heading2" aria-label="Heading 2">
-            <Heading2 className="h-4 w-4" />
+            <Heading2 className="size-4" />
           </ToggleGroupItem>
         </ToggleGroup>
 
@@ -216,13 +216,13 @@ export const TiptapEditor: FC<TiptapEditorProps> = ({
           }}
         >
           <ToggleGroupItem value="bulletList" aria-label="Bullet list" className="cursor-pointer">
-            <List className="h-4 w-4" />
+            <List className="size-4" />
           </ToggleGroupItem>
           <ToggleGroupItem value="orderedList" aria-label="Ordered list" className="cursor-pointer">
-            <ListOrdered className="h-4 w-4" />
+            <ListOrdered className="size-4" />
           </ToggleGroupItem>
           <ToggleGroupItem value="blockquote" aria-label="Blockquote" className="cursor-pointer">
-            <Quote className="h-4 w-4" />
+            <Quote className="size-4" />
           </ToggleGroupItem>
         </ToggleGroup>
 
@@ -234,7 +234,7 @@ export const TiptapEditor: FC<TiptapEditorProps> = ({
             onClick={() => editor.chain().focus().undo().run()}
             disabled={!editor.can().undo()}
           >
-            <Undo className="h-4 w-4" />
+            <Undo className="size-4" />
           </Button>
 
           <Button
@@ -244,7 +244,7 @@ export const TiptapEditor: FC<TiptapEditorProps> = ({
             onClick={() => editor.chain().focus().redo().run()}
             disabled={!editor.can().redo()}
           >
-            <Redo className="h-4 w-4" />
+            <Redo className="size-4" />
           </Button>
         </div>
       </div>
@@ -260,7 +260,7 @@ export const TiptapEditor: FC<TiptapEditorProps> = ({
           className={cn("px-2", editor.isActive("bold") && "bg-accent")}
           onClick={() => editor.chain().focus().toggleBold().run()}
         >
-          <Bold className="h-4 w-4" />
+          <Bold className="size-4" />
         </Button>
         <Button
           variant="ghost"
@@ -268,7 +268,7 @@ export const TiptapEditor: FC<TiptapEditorProps> = ({
           className={cn("px-2", editor.isActive("italic") && "bg-accent")}
           onClick={() => editor.chain().focus().toggleItalic().run()}
         >
-          <Italic className="h-4 w-4" />
+          <Italic className="size-4" />
         </Button>
       </BubbleMenu>
 

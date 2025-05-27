@@ -49,7 +49,7 @@ export const JournalCard: FC<JournalCardProps> = ({ journal, onEdit, onDelete })
         <CardContent className="flex h-full flex-col p-4">
           <div className="flex items-start gap-4">
             {journal.thumbnail_url ? (
-              <div className="bg-muted h-20 w-20 flex-shrink-0 overflow-hidden rounded-lg border">
+              <div className="bg-muted size-20 flex-shrink-0 overflow-hidden rounded-lg border">
                 <img
                   src={journal.thumbnail_url || "/placeholder.svg"}
                   alt={journal.title}
@@ -57,8 +57,8 @@ export const JournalCard: FC<JournalCardProps> = ({ journal, onEdit, onDelete })
                 />
               </div>
             ) : (
-              <div className="bg-muted flex h-20 w-20 flex-shrink-0 items-center justify-center rounded-lg border">
-                <FileEdit className="text-muted-foreground h-8 w-8" />
+              <div className="bg-muted flex size-20 flex-shrink-0 items-center justify-center rounded-lg border">
+                <FileEdit className="text-muted-foreground size-8" />
               </div>
             )}
             <div className="flex flex-1 flex-col overflow-hidden">
@@ -67,15 +67,15 @@ export const JournalCard: FC<JournalCardProps> = ({ journal, onEdit, onDelete })
               </h3>
               <div className="text-muted-foreground mt-2 grid items-center gap-2 text-xs">
                 <div className="flex items-center gap-1">
-                  <CalendarIcon className="h-3 w-3" />
+                  <CalendarIcon className="size-3" />
                   <span>Created {formatDateAgo(new Date(journal.created_at))}</span>
                 </div>
                 <div className="flex items-center gap-1">
-                  <Clock className="h-3 w-3" />
+                  <Clock className="size-3" />
                   <span>Updated {formatDateAgo(new Date(journal.updated_at))}</span>
                 </div>
                 <div className="flex items-center gap-1">
-                  <Clock className="h-3 w-3" />
+                  <Clock className="size-3" />
                   <span>
                     {journal.entries} {journal.entries === 1 ? "entry" : "entries"}
                   </span>
@@ -103,18 +103,18 @@ export const JournalCard: FC<JournalCardProps> = ({ journal, onEdit, onDelete })
                     className="aspect-square h-full cursor-pointer p-0"
                     onClick={(e) => e.stopPropagation()}
                   >
-                    <MoreVertical className="h-4 w-4" />
+                    <MoreVertical className="size-4" />
                     <span className="sr-only">Open menu</span>
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-40">
                   <DropdownMenuItem onClick={handleEdit} className="cursor-pointer">
-                    <Edit className="mr-2 h-4 w-4" />
+                    <Edit className="mr-2 size-4" />
                     Edit
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem onClick={handleDelete} className="cursor-pointer text-red-500">
-                    <Trash2 className="mr-2 h-4 w-4" />
+                    <Trash2 className="mr-2 size-4" />
                     Delete
                   </DropdownMenuItem>
                 </DropdownMenuContent>

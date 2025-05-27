@@ -22,7 +22,7 @@ const Page = () => {
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <User className="h-5 w-5" />
+                <User className="size-5" />
                 Profile Information
               </CardTitle>
               <CardDescription>Update your personal information</CardDescription>
@@ -45,7 +45,7 @@ const Page = () => {
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <Lock className="h-5 w-5" />
+                <Lock className="size-5" />
                 Security
               </CardTitle>
               <CardDescription>Manage your password and security preferences</CardDescription>
@@ -74,7 +74,7 @@ const Page = () => {
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <Calendar className="h-5 w-5" />
+                <Calendar className="size-5" />
                 Account Information
               </CardTitle>
               <CardDescription>View your account details</CardDescription>

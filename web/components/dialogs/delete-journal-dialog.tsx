@@ -69,7 +69,7 @@ export function DeleteJournalDialog({ journal, open, onOpenChange }: DeleteJourn
             disabled={isPending}
             className="cursor-pointer border-red-500 text-red-500 hover:bg-red-500 hover:text-white"
           >
-            {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+            {isPending && <Loader2 className="mr-2 size-4 animate-spin" />}
             Delete Journal
           </Button>
         </DialogFooter>

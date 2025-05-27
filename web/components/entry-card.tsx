@@ -46,11 +46,11 @@ export const EntryCard: FC<EntryCardProps> = ({
             )}
             <div className="text-muted-foreground mt-2 flex items-center gap-4 text-xs">
               <div className="flex items-center">
-                <CalendarIcon className="mr-1 h-3 w-3" />
+                <CalendarIcon className="mr-1 size-3" />
                 <span>Created {formatDateAgo(new Date(created_at))}</span>
               </div>
               <div className="flex items-center">
-                <Clock className="mr-1 h-3 w-3" />
+                <Clock className="mr-1 size-3" />
                 <span>Updated {formatDateAgo(new Date(updated_at))}</span>
               </div>
             </div>

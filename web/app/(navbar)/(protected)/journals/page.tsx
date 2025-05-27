@@ -100,10 +100,10 @@ export default function JournalsPage() {
           <DialogTrigger asChild>
             <Button
               size="sm"
-              className="h-9 w-9 cursor-pointer rounded-full p-0"
+              className="size-9 cursor-pointer rounded-full p-0"
               onClick={() => setDialogOpen(true)}
             >
-              <Plus className="h-4 w-4" />
+              <Plus className="size-4" />
               <span className="sr-only">Open create journal dialog</span>
             </Button>
           </DialogTrigger>

@@ -38,7 +38,7 @@ const Page = async () => {
             <Link href={signedIn ? "/dashboard" : "/login"}>
               <Button size="lg" className="group flex cursor-pointer items-center px-8 text-lg">
                 {signedIn ? "To Dashboard" : "Get Started"}
-                <ArrowRight className="ml-2 h-5 w-5 transform transition-transform duration-200 group-hover:translate-x-1" />
+                <ArrowRight className="ml-2 size-5 transform transition-transform duration-200 group-hover:translate-x-1" />
               </Button>
             </Link>
           </div>
@@ -47,8 +47,8 @@ const Page = async () => {
         <div className="mx-auto mt-24 grid max-w-6xl gap-6 md:grid-cols-3">
           <Card className="text-center">
             <CardContent className="pt-6">
-              <div className="bg-primary/10 mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-lg">
-                <BookOpen className="text-primary h-6 w-6" />
+              <div className="bg-primary/10 mx-auto mb-4 flex size-12 items-center justify-center rounded-lg">
+                <BookOpen className="text-primary size-6" />
               </div>
               <h3 className="mb-2 text-lg font-semibold">Daily Journaling</h3>
               <p className="text-muted-foreground text-sm">
@@ -59,8 +59,8 @@ const Page = async () => {
           </Card>
           <Card className="text-center">
             <CardContent className="pt-6">
-              <div className="bg-primary/10 mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-lg">
-                <TrendingUp className="text-primary h-6 w-6" />
+              <div className="bg-primary/10 mx-auto mb-4 flex size-12 items-center justify-center rounded-lg">
+                <TrendingUp className="text-primary size-6" />
               </div>
               <h3 className="mb-2 text-lg font-semibold">Track Progress</h3>
               <p className="text-muted-foreground text-sm">
@@ -71,8 +71,8 @@ const Page = async () => {
           </Card>
           <Card className="text-center">
             <CardContent className="pt-6">
-              <div className="bg-primary/10 mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-lg">
-                <Heart className="text-primary h-6 w-6" />
+              <div className="bg-primary/10 mx-auto mb-4 flex size-12 items-center justify-center rounded-lg">
+                <Heart className="text-primary size-6" />
               </div>
               <h3 className="mb-2 text-lg font-semibold">Self-Discovery</h3>
               <p className="text-muted-foreground text-sm">

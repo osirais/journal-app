@@ -110,11 +110,11 @@ function RegisterCardContent() {
                   {username && (
                     <div className="absolute right-3 top-1/2 -translate-y-1/2 transform">
                       {isCheckingUsername ? (
-                        <LoaderCircle className="text-muted-foreground h-4 w-4 animate-spin" />
+                        <LoaderCircle className="text-muted-foreground size-4 animate-spin" />
                       ) : isUsernameAvailable === true ? (
-                        <Check className="h-4 w-4 text-green-500" />
+                        <Check className="size-4 text-green-500" />
                       ) : isUsernameAvailable === false ? (
-                        <X className="h-4 w-4 text-red-500" />
+                        <X className="size-4 text-red-500" />
                       ) : null}
                     </div>
                   )}

@@ -202,11 +202,11 @@ export default function EntriesPage() {
             <p className="text-muted-foreground">{journalInfo.description}</p>
             <div className="text-muted-foreground flex items-center gap-4 text-sm">
               <div className="flex items-center gap-1">
-                <CalendarIcon className="h-3 w-3" />
+                <CalendarIcon className="size-3" />
                 <span>Created {formatDateAgo(new Date(journalInfo.created_at))}</span>
               </div>
               <div className="flex items-center gap-1">
-                <FileText className="h-3 w-3" />
+                <FileText className="size-3" />
                 <span>{journalInfo.entries} entries</span>
               </div>
             </div>
@@ -218,8 +218,8 @@ export default function EntriesPage() {
         <h2 className="text-lg font-semibold">Create New Entry</h2>
         <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
           <DialogTrigger asChild>
-            <Button size="sm" className="h-9 w-9 cursor-pointer rounded-full p-0">
-              <Plus className="h-4 w-4" />
+            <Button size="sm" className="size-9 cursor-pointer rounded-full p-0">
+              <Plus className="size-4" />
               <span className="sr-only">Create entry</span>
             </Button>
           </DialogTrigger>
@@ -291,7 +291,7 @@ export default function EntriesPage() {
             <Card key={i} className="flex min-h-[80px] items-center overflow-hidden">
               <CardContent className="w-full p-0">
                 <div className="flex items-center gap-4 p-4">
-                  <Skeleton className="h-16 w-16 rounded" />
+                  <Skeleton className="size-16 rounded" />
                   <div className="flex-1 space-y-2">
                     <Skeleton className="h-4 w-3/4" />
                     <Skeleton className="h-3 w-1/2" />
@@ -303,7 +303,7 @@ export default function EntriesPage() {
           ))
         ) : entries.length === 0 ? (
           <div className="text-muted-foreground py-12 text-center">
-            <FileText className="mx-auto mb-2 h-8 w-8" />
+            <FileText className="mx-auto mb-2 size-8" />
             No entries found. Create your first entry to get started.
           </div>
         ) : (

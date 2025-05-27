@@ -44,7 +44,7 @@ export const SortDropdown: FC<SortDropdownProps> = ({
         <DropdownMenuTrigger asChild>
           <Button variant="outline" size="sm" className="h-8 cursor-pointer gap-1">
             <span className="text-xs">{selectedOption?.label}</span>
-            <ChevronDown className="h-3 w-3" />
+            <ChevronDown className="size-3" />
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="w-48">
