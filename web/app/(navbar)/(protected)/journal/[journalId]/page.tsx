@@ -19,12 +19,12 @@ import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
 import type { JournalWithEntryCount, TagType } from "@/types";
 import { formatDateAgo } from "@/utils/format-date-ago";
+import { receiveStamps } from "@/utils/receive-stamps";
 import axios from "axios";
 import { CalendarIcon, FileText, Plus } from "lucide-react";
 import { useParams, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { WithContext as ReactTags, SEPARATORS, type Tag } from "react-tag-input";
-import { toast } from "sonner";
 
 type Entry = {
   id: string;
@@ -129,7 +129,7 @@ export default function EntriesPage() {
       const { reward } = response.data;
 
       if (reward) {
-        toast.success("Daily entry reward: +5 stamps!");
+        receiveStamps(`Daily entry reward: +5 stamps!`);
       }
 
       setEntries((prev) => [
