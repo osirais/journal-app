@@ -24,7 +24,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
-import { Suspense, useRef, useState } from "react";
+import { Suspense, useEffect, useRef, useState } from "react";
 import { ErrorBoundary } from "react-error-boundary";
 import { WithContext as ReactTags } from "react-tag-input";
 import useSWR from "swr";
@@ -456,6 +456,12 @@ function EntryContent() {
 }
 
 export default function EntryPage() {
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   return (
     <div className="flex min-h-screen flex-col">
       <main className="flex-1">
@@ -463,9 +469,13 @@ export default function EntryPage() {
           <div className="container mx-auto max-w-3xl px-4 sm:px-6 lg:px-8">
             <div className="space-y-6">
               <ErrorBoundary FallbackComponent={EntryErrorFallback}>
-                <Suspense fallback={<EntrySkeleton />}>
-                  <EntryContent />
-                </Suspense>
+                {mounted ? (
+                  <Suspense fallback={<EntrySkeleton />}>
+                    <EntryContent />
+                  </Suspense>
+                ) : (
+                  <EntrySkeleton />
+                )}
               </ErrorBoundary>
             </div>
           </div>
