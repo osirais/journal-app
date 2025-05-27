@@ -5,13 +5,12 @@ import { EntryDrawer } from "@/components/entry-drawer";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useArrowKeyNavigation } from "@/hooks/useArrowKeyNavigation";
 import { createClient } from "@/utils/supabase/client";
 import { Editor } from "@tiptap/react";
-import { ArrowLeft, ArrowRight, LoaderCircle, Save } from "lucide-react";
+import { ArrowLeft, ArrowRight, Calendar, Clock, Edit3, LoaderCircle, Save } from "lucide-react";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
-import { Suspense, useRef } from "react";
+import { Suspense, useRef, useState } from "react";
 import { ErrorBoundary } from "react-error-boundary";
 import useSWR from "swr";
 import useSWRMutation from "swr/mutation";
@@ -21,7 +20,7 @@ async function fetchEntry(entryId: string) {
 
   const { data: entryData, error: entryError } = await supabase
     .from("entry")
-    .select("journal_id, title, content, created_at")
+    .select("journal_id, title, content, created_at, updated_at")
     .eq("id", entryId)
     .single();
 
@@ -75,30 +74,13 @@ function EntrySkeleton() {
 }
 
 function EntryContent() {
-  const router = useRouter();
   const { entryId } = useParams<{ entryId: string }>();
   const editorRef = useRef<Editor | null>(null);
+  const [isEditing, setIsEditing] = useState(false);
 
   const { data, mutate } = useSWR(entryId, fetchEntry, { suspense: true });
   const { trigger, isMutating } = useSWRMutation("entry_save", saveEntry);
   const { entry, prevEntryId, nextEntryId } = data;
-
-  function goToPrevEntry() {
-    if (prevEntryId) {
-      router.push(`/entry/${prevEntryId}`);
-    }
-  }
-
-  function goToNextEntry() {
-    if (nextEntryId) {
-      router.push(`/entry/${nextEntryId}`);
-    }
-  }
-
-  useArrowKeyNavigation({
-    onLeft: goToPrevEntry,
-    onRight: goToNextEntry
-  });
 
   async function saveEntry() {
     const supabase = createClient();
@@ -117,60 +99,106 @@ function EntryContent() {
       throw new Error("Failed to save entry");
     }
 
+    setIsEditing(false);
     mutate();
   }
 
   return (
     <>
-      <div className="flex items-center justify-between">
-        <div className="flex-1">
-          <EntryDrawer journalId={entry.journal_id} currentEntryId={entryId} />
-        </div>
-        <h1 className="wrap-anywhere flex-5 text-center text-2xl font-bold">{entry.title}</h1>
-        <div className="flex-1" />
+      <div className="fixed left-2 top-20 z-10">
+        <EntryDrawer journalId={entry.journal_id} currentEntryId={entryId} />
       </div>
-      <Separator />
-      <EntryEditor content={entry.content} onCreate={(editor) => (editorRef.current = editor)} />
-      <Separator />
-      <div className="flex justify-between pt-4">
-        <div>
-          {prevEntryId && (
-            <Button variant="outline" asChild>
-              <Link href={`/entry/${prevEntryId}`} className="flex items-center gap-1">
-                <ArrowLeft className="size-4" /> Previous Entry
-              </Link>
-            </Button>
-          )}
-        </div>
-        <div>
-          <Button
-            className="flex items-center gap-1"
-            onClick={() => trigger()}
-            disabled={isMutating}
-          >
-            {isMutating ? (
-              <>
-                <LoaderCircle className="size-4 animate-spin" />
-                Saving...
-              </>
-            ) : (
-              <>
-                <Save className="size-4" />
-                Save
-              </>
+      <div className="grid w-full">
+        <h1 className="wrap-anywhere text-center text-2xl font-bold">{entry.title}</h1>
+        <div className="grid grid-cols-[1fr_auto_1fr] items-center">
+          <div></div>
+          <div className="text-muted-foreground mt-2 flex items-center justify-center gap-4 text-sm">
+            <div className="flex items-center gap-1">
+              <Calendar className="h-3 w-3" />
+              <span>Created {new Date(entry.created_at).toLocaleDateString()}</span>
+            </div>
+            {entry.updated_at && entry.updated_at !== entry.created_at && (
+              <div className="flex items-center gap-1">
+                <Clock className="h-3 w-3" />
+                <span>Updated {new Date(entry.updated_at).toLocaleDateString()}</span>
+              </div>
             )}
-          </Button>
-        </div>
-        <div>
-          {nextEntryId && (
-            <Button asChild>
-              <Link href={`/entry/${nextEntryId}`} className="flex items-center gap-1">
-                Next Entry <ArrowRight className="size-4" />
-              </Link>
-            </Button>
-          )}
+          </div>
+          <div className="flex flex-1 justify-end">
+            {!isEditing && (
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => setIsEditing(true)}
+                className="mt-8 cursor-pointer"
+              >
+                <Edit3 className="h-4 w-4" />
+                <span className="sr-only">Edit Entry</span>
+              </Button>
+            )}
+          </div>
         </div>
       </div>
+
+      <Separator className="my-6" />
+
+      {isEditing ? (
+        <>
+          <div className="border-input bg-background rounded-md border p-4">
+            <EntryEditor
+              content={entry.content}
+              onCreate={(editor) => (editorRef.current = editor)}
+            />
+          </div>
+          <Separator className="my-6" />
+          <div className="flex justify-between pt-4">
+            <div>
+              {prevEntryId && (
+                <Button variant="outline" asChild>
+                  <Link href={`/entry/${prevEntryId}`} className="flex items-center gap-2">
+                    <ArrowLeft className="h-4 w-4" /> Previous Entry
+                  </Link>
+                </Button>
+              )}
+            </div>
+            <div className="flex gap-2">
+              <Button
+                onClick={() => trigger()}
+                disabled={isMutating}
+                className="flex items-center gap-2"
+              >
+                {isMutating ? (
+                  <>
+                    <LoaderCircle className="h-4 w-4 animate-spin" />
+                    Saving...
+                  </>
+                ) : (
+                  <>
+                    <Save className="h-4 w-4" />
+                    Save
+                  </>
+                )}
+              </Button>
+              <Button variant="outline" onClick={() => setIsEditing(false)} disabled={isMutating}>
+                Cancel
+              </Button>
+            </div>
+            <div>
+              {nextEntryId && (
+                <Button asChild>
+                  <Link href={`/entry/${nextEntryId}`} className="flex items-center gap-2">
+                    Next Entry <ArrowRight className="h-4 w-4" />
+                  </Link>
+                </Button>
+              )}
+            </div>
+          </div>
+        </>
+      ) : (
+        <div className="prose prose-neutral dark:prose-invert max-w-none">
+          <div className="whitespace-pre-wrap">{entry.content}</div>
+        </div>
+      )}
     </>
   );
 }
