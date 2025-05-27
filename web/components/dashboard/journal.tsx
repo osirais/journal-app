@@ -50,9 +50,7 @@ export const JournalCard: FC = async () => {
               Create Entry
             </Button>
           </Link>
-          <p className="mb-4 text-center text-sm text-gray-500">
-            Record your thoughts and experiences
-          </p>
+          <p className="mb-4 text-center text-sm">Record your thoughts and experiences</p>
           <p className="text-center text-sm font-medium">{message}</p>
         </div>
       </div>
