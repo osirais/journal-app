@@ -53,34 +53,21 @@ export default function JournalsPage() {
     setCreateError(null);
 
     try {
-      await axios.post("/api/journals", { title, description });
-      setJournals((prev) => [
-        {
-          id: "temp_" + Math.random(),
-          author_id: "temp",
-          title,
-          description,
-          thumbnail_url: null,
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString(),
-          deleted_at: null,
-          entries: 0
-        },
-        ...prev
-      ]);
+      const res = await axios.post("/api/journals", { title, description });
+
+      setJournals((prev) => [res.data.journal, ...prev]);
       setTitle("");
       setDescription("");
       setDialogOpen(false);
-
-      // don't uncomment it since, it makes the journals disappear
-      // axios.get("/api/journals").then((res) => {
-      //   setJournals(res.data.journals || []);
-      // });
     } catch (err: any) {
       setCreateError(err.response?.data?.error || "Failed to create journal");
     } finally {
       setCreating(false);
     }
+  };
+
+  const handleJournalDeleted = (journal: JournalWithEntryCount) => {
+    setJournals((prev) => prev.filter((j) => j.id !== journal.id));
   };
 
   return (
@@ -168,7 +155,7 @@ export default function JournalsPage() {
       ) : (
         <div className="grid gap-3 md:grid-cols-2">
           {journals.map((journal) => (
-            <JournalCard key={journal.id} journal={journal} />
+            <JournalCard key={journal.id} journal={journal} onDelete={handleJournalDeleted} />
           ))}
         </div>
       )}

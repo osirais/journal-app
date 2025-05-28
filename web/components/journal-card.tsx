@@ -40,7 +40,6 @@ export const JournalCard: FC<JournalCardProps> = ({ journal, onEdit, onDelete })
     e.preventDefault();
     e.stopPropagation();
     setIsDeleteDialogOpen(true);
-    onDelete?.(journal);
   };
 
   return (
@@ -132,6 +131,7 @@ export const JournalCard: FC<JournalCardProps> = ({ journal, onEdit, onDelete })
         journal={journal}
         open={isDeleteDialogOpen}
         onOpenChange={setIsDeleteDialogOpen}
+        onDeleted={() => onDelete?.(journal)}
       />
     </>
   );

@@ -19,9 +19,15 @@ type DeleteJournalDialogProps = {
   journal: JournalWithEntryCount;
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  onDeleted: (id: string) => void;
 };
 
-export function DeleteJournalDialog({ journal, open, onOpenChange }: DeleteJournalDialogProps) {
+export function DeleteJournalDialog({
+  journal,
+  open,
+  onOpenChange,
+  onDeleted
+}: DeleteJournalDialogProps) {
   const [isPending, startTransition] = useTransition();
 
   const handleDelete = () => {
@@ -33,6 +39,7 @@ export function DeleteJournalDialog({ journal, open, onOpenChange }: DeleteJourn
       } else {
         toast.success("Journal deleted successfully");
         onOpenChange(false);
+        onDeleted(journal.id);
       }
     });
   };
