@@ -38,10 +38,7 @@ export const StampCountCSR: FC<StampCountCSRProps> = ({ userId, initialStamps })
   if (stamps === null) return null;
 
   return (
-    <div
-      className="mt-1 grid grid-cols-[max-content_max-content] items-center gap-2"
-      title="Stamps"
-    >
+    <div className="grid grid-cols-[max-content_max-content] items-center gap-2" title="Stamps">
       <span>{loading ? "..." : stamps}</span>
       <Ticket size={16} />
     </div>

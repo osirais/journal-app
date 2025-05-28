@@ -47,7 +47,7 @@ export const TasksCard: FC = async () => {
                       {task.description && (
                         <p className="text-muted-foreground text-sm">{task.description}</p>
                       )}
-                      <p className="text-muted-foreground text-xs">Interval: {task.interval}</p>
+                      {/* <p className="text-muted-foreground text-xs">Interval: {task.interval}</p> */}
                     </div>
                   </div>
                 ))}
