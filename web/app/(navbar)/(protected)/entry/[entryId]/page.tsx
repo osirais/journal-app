@@ -423,7 +423,7 @@ function EntryContent() {
             </div>
           </>
         ) : (
-          <div className="prose prose-neutral dark:prose-invert max-w-none">
+          <div className="prose prose-current dark:prose-invert max-w-none">
             <Markdown>{entry.content}</Markdown>
           </div>
         )}
