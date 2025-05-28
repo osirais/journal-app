@@ -39,9 +39,9 @@ export function PaletteSelector() {
   }, [searchQuery, palettes]);
 
   return (
-    <div className="space-y-4">
-      <div className="relative p-4 pb-0">
-        <Search className="text-muted-foreground absolute left-7 top-1/2 h-4 w-4 -translate-y-1/2 transform" />
+    <div>
+      <div className="relative flex items-center p-4">
+        <Search className="text-muted-foreground absolute left-7 size-4" />
         <Input
           type="search"
           placeholder="Search palettes..."
@@ -50,55 +50,58 @@ export function PaletteSelector() {
           onChange={(e) => setSearchQuery(e.target.value)}
         />
       </div>
-      <ScrollArea className="min-h-0 flex-1">
-        <div className="space-y-4 p-4 pt-0">
-          <div className="grid grid-cols-2 gap-2">
-            {filteredPalettes.map((palette) => (
-              <button
-                key={palette.name}
-                className={`rounded-md border p-3 transition-colors ${
-                  currentTheme.palette.name === palette.name ? "ring-primary ring-2" : ""
-                }`}
-                style={{
-                  backgroundColor: palette.colors.bg,
-                  color: palette.colors.main,
-                  borderColor: palette.colors.subAlt
-                }}
-                onClick={() => setPaletteName(palette.name)}
-              >
-                <span className="block truncate text-sm font-medium">
-                  {formatPaletteName(palette.name)}
-                </span>
-              </button>
-            ))}
-          </div>
 
-          {filteredPalettes.length === 0 && (
-            <div className="text-muted-foreground py-8 text-center">
-              No palettes found matching "{searchQuery}"
-            </div>
-          )}
+      <div className="space-y-4 p-4 pt-0">
+        <div className="grid grid-cols-2 gap-2">
+          {filteredPalettes.map((palette) => (
+            <button
+              key={palette.name}
+              className={`rounded-md border p-3 transition-colors ${
+                currentTheme.palette.name === palette.name ? "ring-primary ring-2" : ""
+              }`}
+              style={{
+                backgroundColor: palette.colors.bg,
+                color: palette.colors.main,
+                borderColor: palette.colors.subAlt
+              }}
+              onClick={() => setPaletteName(palette.name)}
+            >
+              <span className="block truncate text-sm font-medium">
+                {formatPaletteName(palette.name)}
+              </span>
+            </button>
+          ))}
         </div>
-      </ScrollArea>
+
+        {filteredPalettes.length === 0 && (
+          <div className="text-muted-foreground py-8 text-center">
+            No palettes found matching "{searchQuery}"
+          </div>
+        )}
+      </div>
     </div>
   );
 }
 
-export function ThemeDrawer() {
+export function ThemeDrawer({
+  trigger,
+  open,
+  onOpenChange
+}: {
+  trigger?: React.ReactNode;
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
+}) {
   return (
-    <Drawer direction="right">
-      <DrawerTrigger asChild>
-        <Button variant="ghost" size="icon" className="relative cursor-pointer">
-          <Palette className="size-4" />
-        </Button>
-      </DrawerTrigger>
+    <Drawer direction="right" open={open} onOpenChange={onOpenChange}>
+      {trigger && <DrawerTrigger asChild>{trigger}</DrawerTrigger>}
       <DrawerContent className="w-[300px] p-0 sm:w-[350px]">
         <DrawerHeader className="border-b p-4">
           <DrawerTitle className="text-left">Theme</DrawerTitle>
         </DrawerHeader>
-        <div className="flex min-h-0 flex-1 flex-col">
+        <ScrollArea className="min-h-0 flex-1">
           <PaletteSelector />
-        </div>
+        </ScrollArea>
       </DrawerContent>
     </Drawer>
   );
