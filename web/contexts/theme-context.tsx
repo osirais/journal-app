@@ -15,11 +15,25 @@ const defaultTheme: Theme = {
   palette: { name: "" }
 };
 
-const ThemeContext = createContext<{ theme: Theme } | undefined>(undefined);
+const ThemeContext = createContext<
+  { theme: Theme; setPaletteName: (name: string) => Promise<void> } | undefined
+>(undefined);
 
 async function fetchThemeOverrides(): Promise<ThemeOverrides> {
   const supabase = createClient();
-  const { data } = await supabase.from("user_settings").select("theme").single();
+  const {
+    data: { user }
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    return {};
+  }
+
+  const { data } = await supabase
+    .from("user_settings")
+    .select("theme")
+    .eq("user_id", user.id)
+    .single();
 
   return data?.theme ?? {};
 }
@@ -31,9 +45,40 @@ function resolveTheme(overrides: ThemeOverrides): Theme {
 }
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  const { data: overrides = {} } = useSWR("theme", fetchThemeOverrides);
+  const { data: overrides = {}, mutate } = useSWR("theme", fetchThemeOverrides);
 
   const theme = useMemo(() => resolveTheme(overrides), [overrides]);
+
+  async function setPaletteName(name: string) {
+    mutate(
+      (current: ThemeOverrides = {}) => ({
+        ...current,
+        palette: { name }
+      }),
+      false
+    );
+
+    const supabase = createClient();
+    const {
+      data: { user }
+    } = await supabase.auth.getUser();
+
+    if (!user) {
+      return;
+    }
+
+    const { error } = await supabase
+      .from("user_settings")
+      .update({ theme: { palette: { name } } })
+      .eq("user_id", user.id)
+      .single();
+
+    if (error) {
+      console.error("Error updating theme:", error);
+    }
+
+    mutate();
+  }
 
   useEffect(() => {
     const palette = getPalette(theme.palette.name);
@@ -92,7 +137,9 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     }
   }, [theme.palette.name]);
 
-  return <ThemeContext.Provider value={{ theme }}>{children}</ThemeContext.Provider>;
+  return (
+    <ThemeContext.Provider value={{ theme, setPaletteName }}>{children}</ThemeContext.Provider>
+  );
 }
 
 export function useTheme() {
