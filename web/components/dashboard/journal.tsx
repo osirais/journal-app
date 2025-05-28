@@ -40,6 +40,10 @@ export const JournalCard: FC = async () => {
     }
   }
 
+  // placeholder streak data
+  const streakDays = 5;
+  const streakPercent = Math.min((streakDays / 7) * 100, 100); // 7 days for full bar
+
   return (
     <Card>
       <CardHeader>
@@ -47,13 +51,23 @@ export const JournalCard: FC = async () => {
         <CardDescription>Record your thoughts and experiences</CardDescription>
       </CardHeader>
       <CardContent>
-        <div className="grid place-items-center gap-6">
-          <Link href="/journals">
-            <Button variant="outline" className="cursor-pointer">
+        <div className="grid w-full max-w-xs place-items-center gap-6">
+          <Link href="/journals" className="w-full">
+            <Button variant="outline" className="w-full">
               Create Entry
             </Button>
           </Link>
           <p className="text-center text-sm font-medium">{message}</p>
+          <p className="text-muted-foreground text-center text-xs font-semibold">
+            Current streak: {streakDays} day{streakDays > 1 ? "s" : ""} (placeholder)
+          </p>
+          <div className="bg-muted relative h-2 w-full overflow-hidden rounded-full">
+            <div
+              className="bg-primary absolute left-0 top-0 h-2 rounded-full transition-all duration-300"
+              style={{ width: `${streakPercent}%` }}
+              aria-label={`Streak progress: ${streakPercent}%`}
+            />
+          </div>
         </div>
       </CardContent>
     </Card>

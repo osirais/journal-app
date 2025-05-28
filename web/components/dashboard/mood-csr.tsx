@@ -50,7 +50,11 @@ export function MoodCardCSR({ initialMood, eligible }: MoodCardCSRProps) {
 
   const message = eligible
     ? "✅ You can claim your daily +1 stamp"
-    : "🕒 You have already logged your mood today";
+    : "🕒 You've already claimed your reward today";
+
+  // placeholder streak data
+  const streakDays = 5;
+  const streakPercent = Math.min((streakDays / 7) * 100, 100); // 7 days for full bar
 
   return (
     <Card>
@@ -77,7 +81,19 @@ export function MoodCardCSR({ initialMood, eligible }: MoodCardCSRProps) {
             </ToggleGroupItem>
           ))}
         </ToggleGroup>
-        <p className="text-center text-sm font-medium">{message}</p>
+        <div className="grid w-full max-w-xs place-items-center gap-6">
+          <p className="text-center text-sm font-medium">{message}</p>
+          <p className="text-muted-foreground text-center text-xs font-semibold">
+            Current streak: {streakDays} day{streakDays > 1 ? "s" : ""} (placeholder)
+          </p>
+          <div className="bg-muted relative h-2 w-full overflow-hidden rounded-full">
+            <div
+              className="bg-primary absolute left-0 top-0 h-2 rounded-full transition-all duration-300"
+              style={{ width: `${streakPercent}%` }}
+              aria-label={`Streak progress: ${streakPercent}%`}
+            />
+          </div>
+        </div>
       </CardContent>
     </Card>
   );
