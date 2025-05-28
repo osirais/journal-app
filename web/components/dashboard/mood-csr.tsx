@@ -18,9 +18,10 @@ const moods = [
 interface MoodCardCSRProps {
   initialMood: number | null;
   eligible: boolean;
+  streak: number;
 }
 
-export function MoodCardCSR({ initialMood, eligible }: MoodCardCSRProps) {
+export function MoodCardCSR({ initialMood, eligible, streak }: MoodCardCSRProps) {
   const [isPending, startTransition] = useTransition();
   const [optimisticMood, setOptimisticMood] = useOptimistic(initialMood);
 
@@ -52,9 +53,7 @@ export function MoodCardCSR({ initialMood, eligible }: MoodCardCSRProps) {
     ? "✅ You can claim your daily +1 stamp"
     : "🕒 You've already claimed your reward today";
 
-  // placeholder streak data
-  const streakDays = 5;
-  const streakPercent = Math.min((streakDays / 7) * 100, 100); // 7 days for full bar
+  const streakPercent = Math.min((streak / 7) * 100, 100); // 7-day goal
 
   return (
     <Card>
@@ -84,7 +83,7 @@ export function MoodCardCSR({ initialMood, eligible }: MoodCardCSRProps) {
         <div className="grid w-full max-w-xs place-items-center gap-6">
           <p className="text-center text-sm font-medium">{message}</p>
           <p className="text-muted-foreground text-center text-xs font-semibold">
-            Current streak: {streakDays} day{streakDays > 1 ? "s" : ""} (placeholder)
+            Current streak: {streak} day{streak !== 1 ? "s" : ""}
           </p>
           <div className="bg-muted relative h-2 w-full overflow-hidden rounded-full">
             <div

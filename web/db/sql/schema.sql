@@ -114,3 +114,24 @@ CREATE TABLE IF NOT EXISTS user_settings (
     updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
     deleted_at TIMESTAMPTZ
 );
+
+DO $$ BEGIN
+  IF NOT EXISTS (
+    SELECT FROM pg_type WHERE typname = 'streak_category'
+  ) THEN
+    CREATE TYPE streak_category AS ENUM ('journal_entries', 'mood_entries');
+  END IF;
+END $$;
+
+CREATE TABLE IF NOT EXISTS streak (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v7(),
+    user_id UUID NOT NULL REFERENCES users(id),
+    category streak_category NOT NULL,
+    current_streak INT NOT NULL DEFAULT 0,
+    longest_streak INT NOT NULL DEFAULT 0,
+    last_completed_date DATE,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+    deleted_at TIMESTAMPTZ,
+    CONSTRAINT user_category_unique UNIQUE(user_id, category)
+);

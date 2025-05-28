@@ -10,19 +10,33 @@ export async function MoodCardSSR() {
   } = await supabase.auth.getUser();
 
   let eligible = false;
+  let streak = 0;
 
   if (user && !userError) {
-    const { data: lastTransaction, error } = await supabase
+    const userId = user.id;
+
+    const { data: lastTransaction, error: txError } = await supabase
       .from("balance_transaction")
       .select("id")
-      .eq("user_id", user.id)
+      .eq("user_id", userId)
       .eq("currency", "stamps")
       .eq("reason", "daily_mood_entry")
       .gt("created_at", new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString())
       .limit(1)
       .maybeSingle();
 
-    eligible = !lastTransaction && !error;
+    eligible = !lastTransaction && !txError;
+
+    const { data: streakData, error: streakError } = await supabase
+      .from("streak")
+      .select("current_streak")
+      .eq("user_id", userId)
+      .eq("category", "mood_entries")
+      .maybeSingle();
+
+    if (streakData && !streakError) {
+      streak = streakData.current_streak ?? 0;
+    }
   }
 
   const { data: moodData } = await supabase
@@ -35,5 +49,5 @@ export async function MoodCardSSR() {
 
   const currentMood = moodData?.scale ?? null;
 
-  return <MoodCardCSR initialMood={currentMood} eligible={eligible} />;
+  return <MoodCardCSR initialMood={currentMood} eligible={eligible} streak={streak} />;
 }

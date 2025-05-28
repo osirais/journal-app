@@ -1,5 +1,6 @@
 "use server";
 
+import { DAILY_MOOD_ENTRY_REWARD } from "@/constants/rewards";
 import { createClient } from "@/utils/supabase/server";
 import { revalidatePath } from "next/cache";
 
@@ -78,15 +79,16 @@ export async function updateMood(scale: number) {
     return { success: false, error: result.error.message };
   }
 
-  const reward = await handleDailyMoodEntryReward(supabase, user.id);
+  const { reward, streak } = await handleDailyMoodEntryReward(supabase, user.id);
 
   revalidatePath("/dashboard");
-  return { success: true, reward, error: null };
+  return { success: true, reward, streak, error: null };
 }
 
-const DAILY_MOOD_ENTRY_REWARD = 1;
-
-async function handleDailyMoodEntryReward(supabase: any, userId: string): Promise<number> {
+async function handleDailyMoodEntryReward(
+  supabase: any,
+  userId: string
+): Promise<{ reward: number; streak: number }> {
   const { data: lastTransaction, error: transactionError } = await supabase
     .from("balance_transaction")
     .select("id")
@@ -98,21 +100,23 @@ async function handleDailyMoodEntryReward(supabase: any, userId: string): Promis
     .maybeSingle();
 
   if (lastTransaction || transactionError) {
-    return 0;
+    const { data: streak } = await supabase
+      .from("streak")
+      .select("current_streak")
+      .eq("user_id", userId)
+      .eq("category", "mood_entries")
+      .maybeSingle();
+    return { reward: 0, streak: streak?.current_streak || 0 };
   }
 
-  const { data: userBalance, error: userBalanceError } = await supabase
+  const { data: userBalance } = await supabase
     .from("user_balance")
     .select("balance")
     .eq("user_id", userId)
     .eq("currency", "stamps")
     .single();
 
-  if (!userBalance || userBalanceError) {
-    return 0;
-  }
-
-  const { error: insertTransactionError } = await supabase.from("balance_transaction").insert([
+  await supabase.from("balance_transaction").insert([
     {
       user_id: userId,
       currency: "stamps",
@@ -121,21 +125,59 @@ async function handleDailyMoodEntryReward(supabase: any, userId: string): Promis
     }
   ]);
 
-  if (insertTransactionError) {
-    return 0;
-  }
-
-  const { error: updateBalanceError } = await supabase
+  await supabase
     .from("user_balance")
     .update({ balance: userBalance.balance + DAILY_MOOD_ENTRY_REWARD })
     .eq("user_id", userId)
     .eq("currency", "stamps");
 
-  if (updateBalanceError) {
-    return 0;
+  const today = new Date().toISOString().slice(0, 10);
+
+  const { data: streak, error: streakError } = await supabase
+    .from("streak")
+    .select("id, current_streak, longest_streak, last_completed_date")
+    .eq("user_id", userId)
+    .eq("category", "mood_entries")
+    .maybeSingle();
+
+  let currentStreak = 1;
+
+  if (!streak || streakError) {
+    await supabase.from("streak").insert([
+      {
+        user_id: userId,
+        category: "mood_entries",
+        current_streak: 1,
+        longest_streak: 1,
+        last_completed_date: today
+      }
+    ]);
+  } else {
+    const lastDate = streak.last_completed_date ? new Date(streak.last_completed_date) : null;
+
+    const yesterday = new Date();
+    yesterday.setDate(yesterday.getDate() - 1);
+
+    const lastDateStr = lastDate ? lastDate.toISOString().slice(0, 10) : null;
+
+    if (lastDateStr === yesterday.toISOString().slice(0, 10)) {
+      currentStreak = streak.current_streak + 1;
+    }
+
+    const longest = Math.max(currentStreak, streak.longest_streak);
+
+    await supabase
+      .from("streak")
+      .update({
+        current_streak: currentStreak,
+        longest_streak: longest,
+        last_completed_date: today
+      })
+      .eq("user_id", userId)
+      .eq("category", "mood_entries");
   }
 
-  return DAILY_MOOD_ENTRY_REWARD;
+  return { reward: DAILY_MOOD_ENTRY_REWARD, streak: currentStreak };
 }
 
 export async function getMoodHistory() {

@@ -1,3 +1,4 @@
+import { DAILY_ENTRY_REWARD } from "@/constants/rewards";
 import { TagType } from "@/types";
 import { createClient } from "@/utils/supabase/server";
 import { NextResponse } from "next/server";
@@ -62,57 +63,6 @@ export async function GET(req: Request) {
     : transformedEntries;
 
   return NextResponse.json({ entries: filteredEntries });
-}
-
-const DAILY_ENTRY_REWARD = 5;
-
-async function handleDailyEntryReward(supabase: any, userId: string): Promise<number> {
-  const { data: lastTransaction, error: transactionError } = await supabase
-    .from("balance_transaction")
-    .select("id")
-    .eq("user_id", userId)
-    .eq("currency", "stamps")
-    .eq("reason", "daily_entry")
-    .gt("created_at", new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString())
-    .limit(1)
-    .maybeSingle();
-
-  if (lastTransaction || transactionError) {
-    return 0;
-  }
-
-  const { data: userBalance, error: userBalanceError } = await supabase
-    .from("user_balance")
-    .select("balance")
-    .eq("user_id", userId)
-    .eq("currency", "stamps")
-    .single();
-
-  if (!userBalance || userBalanceError) {
-    return 0;
-  }
-
-  const { error: insertTransactionError } = await supabase
-    .from("balance_transaction")
-    .insert([
-      { user_id: userId, currency: "stamps", amount: DAILY_ENTRY_REWARD, reason: "daily_entry" }
-    ]);
-
-  if (insertTransactionError) {
-    return 0;
-  }
-
-  const { error: updateBalanceError } = await supabase
-    .from("user_balance")
-    .update({ balance: userBalance.balance + DAILY_ENTRY_REWARD })
-    .eq("user_id", userId)
-    .eq("currency", "stamps");
-
-  if (updateBalanceError) {
-    return 0;
-  }
-
-  return DAILY_ENTRY_REWARD;
 }
 
 export async function POST(req: Request) {
@@ -218,7 +168,93 @@ export async function POST(req: Request) {
     }
   }
 
-  const reward = await handleDailyEntryReward(supabase, user.id);
+  const { reward, streak } = await handleDailyEntryReward(supabase, user.id);
 
-  return NextResponse.json({ entry, reward }, { status: 201 });
+  return NextResponse.json({ entry, reward, streak }, { status: 201 });
+}
+
+async function handleDailyEntryReward(
+  supabase: any,
+  userId: string
+): Promise<{ reward: number; streak: number }> {
+  const { data: lastTransaction, error: transactionError } = await supabase
+    .from("balance_transaction")
+    .select("id")
+    .eq("user_id", userId)
+    .eq("currency", "stamps")
+    .eq("reason", "daily_entry")
+    .gt("created_at", new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString())
+    .limit(1)
+    .maybeSingle();
+
+  let reward = 0;
+  if (!lastTransaction && !transactionError) {
+    const { data: userBalance } = await supabase
+      .from("user_balance")
+      .select("balance")
+      .eq("user_id", userId)
+      .eq("currency", "stamps")
+      .single();
+
+    if (userBalance) {
+      await supabase
+        .from("balance_transaction")
+        .insert([
+          { user_id: userId, currency: "stamps", amount: DAILY_ENTRY_REWARD, reason: "daily_entry" }
+        ]);
+
+      await supabase
+        .from("user_balance")
+        .update({ balance: userBalance.balance + DAILY_ENTRY_REWARD })
+        .eq("user_id", userId)
+        .eq("currency", "stamps");
+
+      reward = DAILY_ENTRY_REWARD;
+    }
+  }
+
+  const { data: streakData } = await supabase
+    .from("streak")
+    .select("id, current_streak, longest_streak, last_completed_date")
+    .eq("user_id", userId)
+    .eq("category", "journal_entries")
+    .maybeSingle();
+
+  const today = new Date().toISOString().slice(0, 10);
+  let currentStreak = 1;
+
+  if (!streakData) {
+    await supabase.from("streak").insert([
+      {
+        user_id: userId,
+        category: "journal_entries",
+        current_streak: 1,
+        longest_streak: 1,
+        last_completed_date: today
+      }
+    ]);
+  } else {
+    const lastDateStr = streakData.last_completed_date?.toISOString().slice(0, 10);
+    const yesterdayStr = new Date(Date.now() - 86400000).toISOString().slice(0, 10);
+
+    if (lastDateStr === today) {
+      currentStreak = streakData.current_streak;
+    } else if (lastDateStr === yesterdayStr) {
+      currentStreak = streakData.current_streak + 1;
+    }
+
+    const longest = Math.max(currentStreak, streakData.longest_streak);
+
+    await supabase
+      .from("streak")
+      .update({
+        current_streak: currentStreak,
+        longest_streak: longest,
+        last_completed_date: today
+      })
+      .eq("user_id", userId)
+      .eq("category", "journal_entries");
+  }
+
+  return { reward, streak: currentStreak };
 }
