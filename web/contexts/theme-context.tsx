@@ -16,7 +16,12 @@ const defaultTheme: Theme = {
 };
 
 const ThemeContext = createContext<
-  { theme: Theme; setPaletteName: (name: string) => Promise<void> } | undefined
+  | {
+      theme: Theme;
+      setPaletteName: (name: string) => Promise<void>;
+      clearTheme: () => Promise<void>;
+    }
+  | undefined
 >(undefined);
 
 async function fetchThemeOverrides(): Promise<ThemeOverrides> {
@@ -80,6 +85,75 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     mutate();
   }
 
+  async function clearTheme() {
+    mutate(
+      (current: ThemeOverrides = {}) => ({
+        ...current,
+        palette: { name: "" }
+      }),
+      false
+    );
+
+    const supabase = createClient();
+    const {
+      data: { user }
+    } = await supabase.auth.getUser();
+
+    if (!user) {
+      return;
+    }
+
+    const { error } = await supabase
+      .from("user_settings")
+      .update({ theme: { palette: { name: "" } } })
+      .eq("user_id", user.id)
+      .single();
+
+    if (error) {
+      console.error("Error clearing theme:", error);
+    }
+
+    // clear css variables
+    const cssVars = [
+      "--color-bg",
+      "--color-main",
+      "--color-caret",
+      "--color-sub",
+      "--color-sub-alt",
+      "--color-text",
+      "--color-error",
+      "--color-error-extra",
+      "--color-colorful-error",
+      "--color-colorful-error-extra",
+      "--color-background",
+      "--color-foreground",
+      "--color-card",
+      "--color-card-foreground",
+      "--color-popover",
+      "--color-popover-foreground",
+      "--color-primary",
+      "--color-primary-foreground",
+      "--color-secondary",
+      "--color-secondary-foreground",
+      "--color-muted",
+      "--color-muted-foreground",
+      "--color-accent",
+      "--color-accent-foreground",
+      "--color-destructive",
+      "--color-destructive-foreground",
+      "--color-border",
+      "--color-input",
+      "--color-ring",
+      "--color-hover"
+    ];
+
+    cssVars.forEach((variable) => {
+      document.documentElement.style.removeProperty(variable);
+    });
+
+    mutate();
+  }
+
   useEffect(() => {
     const palette = getPalette(theme.palette.name);
     if (!palette) return;
@@ -138,7 +212,9 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   }, [theme.palette.name]);
 
   return (
-    <ThemeContext.Provider value={{ theme, setPaletteName }}>{children}</ThemeContext.Provider>
+    <ThemeContext.Provider value={{ theme, setPaletteName, clearTheme }}>
+      {children}
+    </ThemeContext.Provider>
   );
 }
 
