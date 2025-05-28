@@ -70,3 +70,13 @@ ALTER TABLE balance_transaction ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "Users can access their own balance transactions"
   ON balance_transaction FOR ALL
   USING (user_id = auth.uid());
+
+ALTER TABLE user_settings ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Users can access their settings"
+  ON user_settings FOR ALL
+  USING (user_id = auth.uid());
+
+CREATE POLICY "Only allow access to non-deleted rows"
+  ON user_settings FOR ALL
+  USING (deleted_at IS NULL);
