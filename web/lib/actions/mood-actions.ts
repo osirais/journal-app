@@ -154,14 +154,16 @@ async function handleDailyMoodEntryReward(
     ]);
   } else {
     const lastDate = streak.last_completed_date ? new Date(streak.last_completed_date) : null;
-
-    const yesterday = new Date();
-    yesterday.setDate(yesterday.getDate() - 1);
-
     const lastDateStr = lastDate ? lastDate.toISOString().slice(0, 10) : null;
 
-    if (lastDateStr === yesterday.toISOString().slice(0, 10)) {
+    const yesterdayStr = new Date(Date.now() - 86400000).toISOString().slice(0, 10);
+
+    if (lastDateStr === today) {
+      currentStreak = streak.current_streak;
+    } else if (lastDateStr === yesterdayStr) {
       currentStreak = streak.current_streak + 1;
+    } else {
+      currentStreak = 1;
     }
 
     const longest = Math.max(currentStreak, streak.longest_streak);

@@ -1,31 +1,8 @@
-import { ActivityCalendarCard } from "@/components/dashboard/activity-calendar";
+import { ActivityCalendarSSR } from "@/components/dashboard/activity-calendar-ssr";
 import { JournalCard } from "@/components/dashboard/journal";
 import { MoodChartSSR } from "@/components/dashboard/mood-chart-ssr";
 import { MoodCardSSR } from "@/components/dashboard/mood-ssr";
 import { TasksCard } from "@/components/dashboard/tasks";
-
-const data = [
-  {
-    date: "2024-01-01",
-    count: 2,
-    level: 1
-  },
-  {
-    date: "2024-06-23",
-    count: 2,
-    level: 1
-  },
-  {
-    date: "2024-08-02",
-    count: 16,
-    level: 4
-  },
-  {
-    date: "2024-12-31",
-    count: 11,
-    level: 3
-  }
-];
 
 const Page = () => {
   return (
@@ -40,7 +17,7 @@ const Page = () => {
       </div>
       <div className="grid w-full gap-4 overflow-hidden">
         <h1 className="text-2xl font-bold">Stats</h1>
-        <ActivityCalendarCard data={data} />
+        <ActivityCalendarSSR />
         <MoodChartSSR />
       </div>
     </div>

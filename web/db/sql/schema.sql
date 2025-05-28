@@ -135,3 +135,32 @@ CREATE TABLE IF NOT EXISTS streak (
     deleted_at TIMESTAMPTZ,
     CONSTRAINT user_category_unique UNIQUE(user_id, category)
 );
+
+CREATE TABLE IF NOT EXISTS user_activity_summary (
+  user_id UUID NOT NULL,
+  date DATE NOT NULL,
+  entries_created INTEGER NOT NULL DEFAULT 0,
+  PRIMARY KEY (user_id, date)
+);
+
+CREATE OR REPLACE FUNCTION increment_user_entry_activity()
+RETURNS TRIGGER AS $$
+BEGIN
+  INSERT INTO user_activity_summary (user_id, date, entries_created)
+  VALUES (
+    (SELECT j.author_id FROM journal j WHERE j.id = NEW.journal_id),
+    DATE(NEW.created_at),
+    1
+  )
+  ON CONFLICT (user_id, date)
+  DO UPDATE SET entries_created = user_activity_summary.entries_created + 1;
+
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER trigger_increment_user_entry_activity
+AFTER INSERT ON entry
+FOR EACH ROW
+WHEN (NEW.deleted_at IS NULL)
+EXECUTE FUNCTION increment_user_entry_activity();

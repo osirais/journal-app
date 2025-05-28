@@ -234,13 +234,18 @@ async function handleDailyEntryReward(
       }
     ]);
   } else {
-    const lastDateStr = streakData.last_completed_date?.toISOString().slice(0, 10);
+    const lastDateStr = streakData.last_completed_date
+      ? new Date(streakData.last_completed_date).toISOString().slice(0, 10)
+      : null;
     const yesterdayStr = new Date(Date.now() - 86400000).toISOString().slice(0, 10);
 
     if (lastDateStr === today) {
       currentStreak = streakData.current_streak;
     } else if (lastDateStr === yesterdayStr) {
       currentStreak = streakData.current_streak + 1;
+    } else {
+      // if lastDateStr is null or older than yesterday, reset streak to 1
+      currentStreak = 1;
     }
 
     const longest = Math.max(currentStreak, streakData.longest_streak);

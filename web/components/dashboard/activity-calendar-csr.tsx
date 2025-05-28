@@ -1,5 +1,6 @@
+"use client";
+
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import React from "react";
 import { ActivityCalendar } from "react-activity-calendar";
 
 interface ActivityData {
@@ -8,20 +9,29 @@ interface ActivityData {
   level: number;
 }
 
-interface ActivityCalendarCardProps {
+interface ActivityCalendarCSRProps {
   data: ActivityData[];
 }
 
-export const ActivityCalendarCard: React.FC<ActivityCalendarCardProps> = ({ data }) => {
+export function ActivityCalendarCSR({ data }: ActivityCalendarCSRProps) {
+  // filter data to only include the last 6 months
+  const sixMonthsAgo = new Date();
+  sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6);
+
+  const filteredData = data.filter((activity) => {
+    const activityDate = new Date(activity.date);
+    return activityDate >= sixMonthsAgo;
+  });
+
   return (
     <Card className="w-full overflow-hidden">
       <CardHeader>
-        <CardTitle>Activity Calendar (WIP)</CardTitle>
+        <CardTitle>Activity Calendar</CardTitle>
       </CardHeader>
       <CardContent>
         <div className="overflow-x-auto py-2">
           <ActivityCalendar
-            data={data}
+            data={filteredData}
             labels={{
               legend: {
                 less: "Less",
@@ -42,7 +52,7 @@ export const ActivityCalendarCard: React.FC<ActivityCalendarCardProps> = ({ data
                 "Dec"
               ],
               weekdays: ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
-              totalCount: "{{count}} activities in {{year}}"
+              totalCount: "{{count}} entries in {{year}}"
             }}
             hideColorLegend={false}
             hideMonthLabels={false}
@@ -57,4 +67,4 @@ export const ActivityCalendarCard: React.FC<ActivityCalendarCardProps> = ({ data
       </CardContent>
     </Card>
   );
-};
+}
