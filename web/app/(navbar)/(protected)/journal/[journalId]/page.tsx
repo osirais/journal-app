@@ -129,7 +129,7 @@ export default function EntriesPage() {
       const { reward } = response.data;
 
       if (reward) {
-        receiveStamps(`Daily entry reward: +5 stamps!`);
+        receiveStamps(`Daily journal entry reward: +${reward} stamps!`);
       }
 
       setEntries((prev) => [

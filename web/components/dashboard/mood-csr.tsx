@@ -3,6 +3,7 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { updateMood } from "@/lib/actions/mood-actions";
+import { receiveStamps } from "@/utils/receive-stamps";
 import { useOptimistic, useTransition } from "react";
 import { toast } from "sonner";
 
@@ -16,9 +17,10 @@ const moods = [
 
 interface MoodCardCSRProps {
   initialMood: number | null;
+  eligible: boolean;
 }
 
-export function MoodCardCSR({ initialMood }: MoodCardCSRProps) {
+export function MoodCardCSR({ initialMood, eligible }: MoodCardCSRProps) {
   const [isPending, startTransition] = useTransition();
   const [optimisticMood, setOptimisticMood] = useOptimistic(initialMood);
 
@@ -40,11 +42,15 @@ export function MoodCardCSR({ initialMood }: MoodCardCSRProps) {
       if (!result.success) {
         setOptimisticMood(initialMood);
         toast.error(result.error || "Failed to update mood");
-      } else {
-        toast.info(`Your mood has been set to ${selectedMood.label}`);
+      } else if (result.reward) {
+        receiveStamps(`Daily mood entry reward: +${result.reward} stamps!`);
       }
     });
   };
+
+  const message = eligible
+    ? "✅ You can claim your daily +1 stamp"
+    : "🕒 You have already logged your mood today";
 
   return (
     <Card>
@@ -52,7 +58,7 @@ export function MoodCardCSR({ initialMood }: MoodCardCSRProps) {
         <CardTitle>Mood</CardTitle>
         <CardDescription>Describe your mood today</CardDescription>
       </CardHeader>
-      <CardContent className="grid place-items-center">
+      <CardContent className="grid place-items-center gap-4">
         <ToggleGroup
           type="single"
           value={selectedMoodLabel}
@@ -71,6 +77,7 @@ export function MoodCardCSR({ initialMood }: MoodCardCSRProps) {
             </ToggleGroupItem>
           ))}
         </ToggleGroup>
+        <p className="text-center text-sm font-medium">{message}</p>
       </CardContent>
     </Card>
   );

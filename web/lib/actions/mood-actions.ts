@@ -44,16 +44,18 @@ export async function updateMood(scale: number) {
     return { success: false, error: "User not authenticated" };
   }
 
-  // check if user already has a mood entry today
   const today = new Date().toISOString().split("T")[0];
+  const startOfDay = `${today}T00:00:00.000Z`;
+  const endOfDay = `${today}T23:59:59.999Z`;
+
   const { data: existingEntry } = await supabase
     .from("mood_entry")
     .select("id")
     .eq("user_id", user.id)
-    .gte("created_at", `${today}T00:00:00.000Z`)
-    .lt("created_at", `${today}T23:59:59.999Z`)
+    .gte("created_at", startOfDay)
+    .lt("created_at", endOfDay)
     .is("deleted_at", null)
-    .single();
+    .maybeSingle();
 
   let result;
 
@@ -76,8 +78,64 @@ export async function updateMood(scale: number) {
     return { success: false, error: result.error.message };
   }
 
+  const reward = await handleDailyMoodEntryReward(supabase, user.id);
+
   revalidatePath("/dashboard");
-  return { success: true, error: null };
+  return { success: true, reward, error: null };
+}
+
+const DAILY_MOOD_ENTRY_REWARD = 1;
+
+async function handleDailyMoodEntryReward(supabase: any, userId: string): Promise<number> {
+  const { data: lastTransaction, error: transactionError } = await supabase
+    .from("balance_transaction")
+    .select("id")
+    .eq("user_id", userId)
+    .eq("currency", "stamps")
+    .eq("reason", "daily_mood_entry")
+    .gt("created_at", new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString())
+    .limit(1)
+    .maybeSingle();
+
+  if (lastTransaction || transactionError) {
+    return 0;
+  }
+
+  const { data: userBalance, error: userBalanceError } = await supabase
+    .from("user_balance")
+    .select("balance")
+    .eq("user_id", userId)
+    .eq("currency", "stamps")
+    .single();
+
+  if (!userBalance || userBalanceError) {
+    return 0;
+  }
+
+  const { error: insertTransactionError } = await supabase.from("balance_transaction").insert([
+    {
+      user_id: userId,
+      currency: "stamps",
+      amount: DAILY_MOOD_ENTRY_REWARD,
+      reason: "daily_mood_entry"
+    }
+  ]);
+
+  if (insertTransactionError) {
+    return 0;
+  }
+
+  const { error: updateBalanceError } = await supabase
+    .from("user_balance")
+    .update({ balance: userBalance.balance + DAILY_MOOD_ENTRY_REWARD })
+    .eq("user_id", userId)
+    .eq("currency", "stamps");
+
+  if (updateBalanceError) {
+    return 0;
+  }
+
+  return DAILY_MOOD_ENTRY_REWARD;
 }
 
 export async function getMoodHistory() {
