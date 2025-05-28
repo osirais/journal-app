@@ -3,6 +3,7 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { updateMood } from "@/lib/actions/mood-actions";
+import { receiveReward } from "@/utils/receive-reward";
 import { receiveStamps } from "@/utils/receive-stamps";
 import { useOptimistic, useTransition } from "react";
 import { toast } from "sonner";
@@ -44,7 +45,7 @@ export function MoodCardCSR({ initialMood, eligible, streak }: MoodCardCSRProps)
         setOptimisticMood(initialMood);
         toast.error(result.error || "Failed to update mood");
       } else if (result.reward) {
-        receiveStamps(`Daily mood entry reward: +${result.reward} stamps!`);
+        receiveReward(`Daily mood entry reward: +${result.reward} stamps!`, result.streak);
       }
     });
   };

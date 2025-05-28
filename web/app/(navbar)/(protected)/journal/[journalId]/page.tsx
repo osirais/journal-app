@@ -19,7 +19,7 @@ import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
 import type { JournalWithEntryCount, TagType } from "@/types";
 import { formatDateAgo } from "@/utils/format-date-ago";
-import { receiveStamps } from "@/utils/receive-stamps";
+import { receiveReward } from "@/utils/receive-reward";
 import axios from "axios";
 import { CalendarIcon, FileText, Plus } from "lucide-react";
 import { useParams, useSearchParams } from "next/navigation";
@@ -126,10 +126,10 @@ export default function EntriesPage() {
         tags: tags.map((tag) => tag.text.toLowerCase())
       });
 
-      const { reward } = response.data;
+      const { reward, streak } = response.data;
 
       if (reward) {
-        receiveStamps(`Daily journal entry reward: +${reward} stamps!`);
+        receiveReward(`Daily journal entry reward: +${reward} stamps!`, streak);
       }
 
       setEntries((prev) => [
