@@ -1,48 +1,41 @@
 ALTER TABLE users ENABLE ROW LEVEL SECURITY;
-
-CREATE POLICY "Users can access their own user row"
-  ON users FOR ALL
-  USING (id = auth.uid());
-
-CREATE POLICY "Only allow access to non-deleted rows"
-  ON users FOR ALL
-  USING (deleted_at IS NULL);
-
 ALTER TABLE journal ENABLE ROW LEVEL SECURITY;
-
-CREATE POLICY "Users can access their own journals"
-  ON journal FOR ALL
-  USING (author_id = auth.uid());
-
-CREATE POLICY "Only allow access to non-deleted rows"
-  ON journal FOR ALL
-  USING (deleted_at IS NULL);
-
 ALTER TABLE entry ENABLE ROW LEVEL SECURITY;
+ALTER TABLE tag ENABLE ROW LEVEL SECURITY;
+ALTER TABLE entry_tag ENABLE ROW LEVEL SECURITY;
+ALTER TABLE user_balance ENABLE ROW LEVEL SECURITY;
+ALTER TABLE balance_transaction ENABLE ROW LEVEL SECURITY;
+ALTER TABLE user_settings ENABLE ROW LEVEL SECURITY;
 
-CREATE POLICY "Users can access entries of their journals"
+CREATE POLICY "Users can access their own non-deleted user row"
+  ON users FOR ALL
+  USING (
+    id = (SELECT auth.uid())
+    AND deleted_at IS NULL
+  );
+
+CREATE POLICY "Users can access their own non-deleted journals"
+  ON journal FOR ALL
+  USING (
+    author_id = (SELECT auth.uid())
+    AND deleted_at IS NULL
+  );
+
+CREATE POLICY "Users can access their own non-deleted entries"
   ON entry FOR ALL
   USING (
     journal_id IN (
-      SELECT id FROM journal WHERE author_id = auth.uid()
+      SELECT id FROM journal WHERE author_id = (SELECT auth.uid())
     )
+    AND deleted_at IS NULL
   );
 
-CREATE POLICY "Only allow access to non-deleted rows"
-  ON entry FOR ALL
-  USING (deleted_at IS NULL);
-
-ALTER TABLE tag ENABLE ROW LEVEL SECURITY;
-
-CREATE POLICY "Users can access their own tags"
+CREATE POLICY "Users can access their own non-deleted tags"
   ON tag FOR ALL
-  USING (user_id = auth.uid());
-
-CREATE POLICY "Only allow access to non-deleted rows"
-  ON tag FOR ALL
-  USING (deleted_at IS NULL);
-
-ALTER TABLE entry_tag ENABLE ROW LEVEL SECURITY;
+  USING (
+    user_id = (SELECT auth.uid())
+    AND deleted_at IS NULL
+  );
 
 CREATE POLICY "Users can access entry_tag of their own entries"
   ON entry_tag FOR ALL
@@ -51,32 +44,24 @@ CREATE POLICY "Users can access entry_tag of their own entries"
       SELECT e.id
       FROM entry e
       JOIN journal j ON e.journal_id = j.id
-      WHERE j.author_id = auth.uid()
+      WHERE j.author_id = (SELECT auth.uid())
     )
   );
 
-ALTER TABLE user_balance ENABLE ROW LEVEL SECURITY;
-
-CREATE POLICY "Users can access their own balance"
+CREATE POLICY "Users can access their own non-deleted balances"
   ON user_balance FOR ALL
-  USING (user_id = auth.uid());
-
-CREATE POLICY "Only allow access to non-deleted rows"
-  ON user_balance FOR ALL
-  USING (deleted_at IS NULL);
-
-ALTER TABLE balance_transaction ENABLE ROW LEVEL SECURITY;
+  USING (
+    user_id = (SELECT auth.uid())
+    AND deleted_at IS NULL
+  );
 
 CREATE POLICY "Users can access their own balance transactions"
   ON balance_transaction FOR ALL
-  USING (user_id = auth.uid());
+  USING (user_id = (SELECT auth.uid()));
 
-ALTER TABLE user_settings ENABLE ROW LEVEL SECURITY;
-
-CREATE POLICY "Users can access their settings"
+CREATE POLICY "Users can access their own non-deleted settings"
   ON user_settings FOR ALL
-  USING (user_id = auth.uid());
-
-CREATE POLICY "Only allow access to non-deleted rows"
-  ON user_settings FOR ALL
-  USING (deleted_at IS NULL);
+  USING (
+    user_id = (SELECT auth.uid())
+    AND deleted_at IS NULL
+  );
