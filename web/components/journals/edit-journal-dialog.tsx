@@ -23,14 +23,20 @@ type EditJournalDialogProps = {
   journal: JournalWithEntryCount;
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  onJournalUpdated?: (updatedJournal: JournalWithEntryCount) => void;
 };
 
-export function EditJournalDialog({ journal, open, onOpenChange }: EditJournalDialogProps) {
+export function EditJournalDialog({
+  journal,
+  open,
+  onOpenChange,
+  onJournalUpdated
+}: EditJournalDialogProps) {
   const [isPending, startTransition] = useTransition();
   const [title, setTitle] = useState(journal.title);
   const [description, setDescription] = useState(journal.description || "");
 
-  // Reset form when dialog opens
+  // reset form when dialog opens
   useEffect(() => {
     if (open) {
       setTitle(journal.title);
@@ -57,6 +63,19 @@ export function EditJournalDialog({ journal, open, onOpenChange }: EditJournalDi
         toast.error(result.error);
       } else {
         toast.success("Journal updated successfully");
+
+        const updatedJournal: JournalWithEntryCount = {
+          ...journal,
+          title: title.trim(),
+          description: description.trim(),
+          updated_at: new Date().toISOString() // Update the timestamp
+        };
+
+        // notify parent component about the update
+        if (onJournalUpdated) {
+          onJournalUpdated(updatedJournal);
+        }
+
         onOpenChange(false);
       }
     });

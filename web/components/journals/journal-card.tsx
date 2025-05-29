@@ -25,9 +25,15 @@ type JournalCardProps = {
   onDelete?: (journal: JournalWithEntryCount) => void;
 };
 
-export const JournalCard: FC<JournalCardProps> = ({ journal, onEdit, onDelete }) => {
+export const JournalCard: FC<JournalCardProps> = ({
+  journal: initialJournal,
+  onEdit,
+  onDelete
+}) => {
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  // keep a local state of the journal to update it in real-time
+  const [journal, setJournal] = useState<JournalWithEntryCount>(initialJournal);
 
   const handleEdit = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -40,6 +46,11 @@ export const JournalCard: FC<JournalCardProps> = ({ journal, onEdit, onDelete })
     e.preventDefault();
     e.stopPropagation();
     setIsDeleteDialogOpen(true);
+  };
+
+  const handleJournalUpdated = (updatedJournal: JournalWithEntryCount) => {
+    setJournal(updatedJournal);
+    onEdit?.(updatedJournal);
   };
 
   return (
@@ -126,6 +137,7 @@ export const JournalCard: FC<JournalCardProps> = ({ journal, onEdit, onDelete })
         journal={journal}
         open={isEditDialogOpen}
         onOpenChange={setIsEditDialogOpen}
+        onJournalUpdated={handleJournalUpdated}
       />
       <DeleteJournalDialog
         journal={journal}
