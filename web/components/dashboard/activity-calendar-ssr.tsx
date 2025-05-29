@@ -20,14 +20,16 @@ export async function ActivityCalendarSSR() {
     data: { user }
   } = await supabase.auth.getUser();
 
-  const oneYearAgo = new Date();
-  oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1);
+  const startOfYear = new Date();
+  startOfYear.setMonth(0);
+  startOfYear.setDate(1);
+  startOfYear.setHours(0, 0, 0, 0);
 
   const { data, error } = await supabase
     .from("user_activity_summary")
     .select("date, entries_created")
     .eq("user_id", user!.id)
-    .gte("date", oneYearAgo.toISOString().split("T")[0])
+    .gte("date", startOfYear.toISOString().split("T")[0])
     .order("date", { ascending: true });
 
   if (error) {
@@ -42,7 +44,7 @@ export async function ActivityCalendarSSR() {
   });
 
   const activityData: ActivityData[] = [];
-  const currentDate = new Date(oneYearAgo);
+  const currentDate = new Date(startOfYear);
   const today = new Date();
 
   while (currentDate <= today) {
