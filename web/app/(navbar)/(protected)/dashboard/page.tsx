@@ -7,7 +7,7 @@ import { TreehouseCard } from "@/components/dashboard/treehouse-card";
 
 const Page = () => {
   return (
-    <div className="hide-scrollbar h-screen snap-y snap-mandatory overflow-y-scroll scroll-smooth">
+    <div className="hide-scrollbar h-screen snap-y snap-mandatory overflow-y-scroll">
       <section className="flex min-h-screen snap-start snap-always justify-center pt-6">
         <div className="container mx-auto max-w-3xl">
           <div className="space-y-6">
