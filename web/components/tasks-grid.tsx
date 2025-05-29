@@ -1,17 +1,11 @@
 "use client";
 
+import { CreateTaskDialog } from "@/components/dialogs/create-task-dialog";
+import { DeleteTaskDialog } from "@/components/dialogs/delete-task-dialog";
+import { EditTaskDialog } from "@/components/dialogs/edit-task-dialog";
 import { TaskSkeleton } from "@/components/task-skeleton";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger
-} from "@/components/ui/dialog";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -20,35 +14,24 @@ import {
   DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { createTask, deleteTask, getTasks } from "@/lib/actions/task-actions";
+import { Switch } from "@/components/ui/switch";
+import { getTasks, toggleTaskActive } from "@/lib/actions/task-actions";
+import { cn } from "@/lib/utils";
+import { Task } from "@/types";
 import { Edit, LoaderCircle, MoreHorizontal, Plus, Search, Trash2 } from "lucide-react";
-import type React from "react";
 import { useEffect, useState, useTransition } from "react";
 import { toast } from "sonner";
 
-interface TaskType {
-  id: string;
-  name: string;
-  description: string | null;
-  interval: "daily" | "weekly" | "monthly";
-  created_at: string;
-  updated_at: string;
-}
-
 export function TasksGrid() {
-  const [tasks, setTasks] = useState<TaskType[]>([]);
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [newTaskName, setNewTaskName] = useState("");
-  const [newTaskDescription, setNewTaskDescription] = useState("");
-  const [newTaskInterval, setNewTaskInterval] = useState<TaskType["interval"]>("daily");
+  const [tasks, setTasks] = useState<Task[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [isLoading, setIsLoading] = useState(true);
-
-  const [isCreating, setIsCreating] = useState(false);
   const [isPending, startTransition] = useTransition();
 
-  const [taskToDelete, setTaskToDelete] = useState<TaskType | null>(null);
+  const [taskToDelete, setTaskToDelete] = useState<Task | null>(null);
+  const [taskToEdit, setTaskToEdit] = useState<Task | null>(null);
+
+  const [togglingTaskId, setTogglingTaskId] = useState<string | null>(null);
 
   useEffect(() => {
     loadTasks();
@@ -65,42 +48,29 @@ export function TasksGrid() {
     }
   }
 
-  function handleCreateTask(e: React.FormEvent) {
-    e.preventDefault();
-    if (!newTaskName.trim()) return;
-
-    setIsCreating(true);
-    startTransition(async () => {
-      try {
-        const created = await createTask(
-          newTaskName.trim(),
-          newTaskDescription.trim(),
-          newTaskInterval
-        );
-        setTasks((t) => [created, ...t]);
-        setNewTaskName("");
-        setNewTaskDescription("");
-        setNewTaskInterval("daily");
-        setIsDialogOpen(false);
-        toast.success("Task created successfully");
-      } catch {
-        toast.error("Failed to create task");
-      } finally {
-        setIsCreating(false);
-      }
-    });
+  function handleTaskCreated(task: Task) {
+    setTasks((prev) => [task, ...prev]);
   }
 
-  function handleDeleteTask(id: string) {
+  function handleTaskDeleted(id: string) {
+    setTasks((prev) => prev.filter((task) => task.id !== id));
+  }
+
+  function handleTaskUpdated(updatedTask: Task) {
+    setTasks((prev) => prev.map((task) => (task.id === updatedTask.id ? updatedTask : task)));
+  }
+
+  function handleToggleActive(taskId: string) {
+    setTogglingTaskId(taskId);
+
     startTransition(async () => {
       try {
-        await deleteTask(id);
-        setTasks((t) => t.filter((x) => x.id !== id));
-        toast.success("Task deleted successfully");
+        const updatedTask = await toggleTaskActive(taskId);
+        setTasks((prev) => prev.map((task) => (task.id === taskId ? updatedTask : task)));
       } catch {
-        toast.error("Failed to delete task");
+        toast.error("Failed to update task status");
       } finally {
-        setTaskToDelete(null);
+        setTogglingTaskId(null);
       }
     });
   }
@@ -109,131 +79,30 @@ export function TasksGrid() {
 
   return (
     <div className="container mx-auto max-w-4xl p-6">
-      <Dialog
-        open={!!taskToDelete}
-        onOpenChange={(o) => {
-          if (!o) setTaskToDelete(null);
+      <EditTaskDialog
+        task={taskToEdit}
+        open={!!taskToEdit}
+        onOpenChange={(open) => {
+          if (!open) setTaskToEdit(null);
         }}
-      >
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Delete Task</DialogTitle>
-            <DialogDescription>
-              Are you sure you want to delete{" "}
-              <span className="font-semibold">{taskToDelete?.name}</span>?
-            </DialogDescription>
-          </DialogHeader>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setTaskToDelete(null)}>
-              Cancel
-            </Button>
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => taskToDelete && handleDeleteTask(taskToDelete.id)}
-              disabled={isPending}
-              className="cursor-pointer border-red-500 text-red-500 hover:bg-red-500 hover:text-white"
-            >
-              {isPending && <LoaderCircle className="mr-2 size-4 animate-spin" />}
-              Delete Task
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-
+        onTaskUpdated={handleTaskUpdated}
+      />
+      <DeleteTaskDialog
+        task={taskToDelete}
+        open={!!taskToDelete}
+        onOpenChange={(open) => {
+          if (!open) setTaskToDelete(null);
+        }}
+        onTaskDeleted={handleTaskDeleted}
+      />
       <div className="flex flex-col space-y-6">
         <header className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <h1 className="text-3xl font-bold tracking-tight">Tasks</h1>
             <p className="text-muted-foreground">Manage your recurring tasks</p>
           </div>
-          <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-            <DialogTrigger asChild>
-              <Button className="cursor-pointer gap-2">
-                <Plus className="size-4" />
-                Create Task
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="sm:max-w-[425px]">
-              <form onSubmit={handleCreateTask}>
-                <DialogHeader>
-                  <DialogTitle>Create New Task</DialogTitle>
-                  <DialogDescription>
-                    Add a new recurring task. Task names must be unique
-                  </DialogDescription>
-                </DialogHeader>
-                <div className="grid gap-4 py-4">
-                  <div className="grid gap-2">
-                    <Label htmlFor="task-name">Task Name</Label>
-                    <Input
-                      id="task-name"
-                      placeholder="Enter task name"
-                      value={newTaskName}
-                      onChange={(e) => setNewTaskName(e.target.value)}
-                      maxLength={50}
-                      required
-                    />
-                  </div>
-                  <div className="grid gap-2">
-                    <Label htmlFor="task-description">Description (optional)</Label>
-                    <Input
-                      id="task-description"
-                      placeholder="Enter description"
-                      value={newTaskDescription}
-                      onChange={(e) => setNewTaskDescription(e.target.value)}
-                      maxLength={200}
-                    />
-                  </div>
-                  <div className="grid gap-2">
-                    <Label htmlFor="task-interval">Interval</Label>
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button
-                          id="task-interval"
-                          variant="outline"
-                          role="combobox"
-                          aria-expanded="false"
-                          className="w-max cursor-pointer justify-between"
-                        >
-                          {newTaskInterval.charAt(0).toUpperCase() + newTaskInterval.slice(1)}
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent>
-                        {["daily", "weekly", "monthly"].map((i) => (
-                          <DropdownMenuItem
-                            key={i}
-                            onSelect={() => setNewTaskInterval(i as TaskType["interval"])}
-                            className={`${newTaskInterval === i ? "font-semibold" : ""} cursor-pointer`}
-                          >
-                            {i.charAt(0).toUpperCase() + i.slice(1)}
-                          </DropdownMenuItem>
-                        ))}
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </div>
-                </div>
-                <DialogFooter>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={() => setIsDialogOpen(false)}
-                    className="cursor-pointer"
-                  >
-                    Cancel
-                  </Button>
-                  <Button
-                    type="submit"
-                    disabled={isCreating || !newTaskName.trim()}
-                    className="cursor-pointer"
-                  >
-                    {isCreating ? "Creating…" : "Create Task"}
-                  </Button>
-                </DialogFooter>
-              </form>
-            </DialogContent>
-          </Dialog>
+          <CreateTaskDialog onTaskCreated={handleTaskCreated} />
         </header>
-
         <div className="relative">
           <Search className="text-muted-foreground absolute left-3 top-1/2 size-4 -translate-y-1/2 transform" />
           <Input
@@ -243,7 +112,6 @@ export function TasksGrid() {
             className="pl-10"
           />
         </div>
-
         {isLoading ? (
           <div className="grid gap-4">
             <div className="bg-muted h-4 w-24 animate-pulse rounded" />
@@ -265,10 +133,15 @@ export function TasksGrid() {
                   : "Create your first task to start managing your work"}
               </CardDescription>
               {!searchQuery && (
-                <Button onClick={() => setIsDialogOpen(true)} className="mt-4 cursor-pointer gap-2">
-                  <Plus className="size-4" />
-                  Create Your First Task
-                </Button>
+                <CreateTaskDialog
+                  onTaskCreated={handleTaskCreated}
+                  triggerButton={
+                    <Button className="mt-4 cursor-pointer gap-2">
+                      <Plus className="size-4" />
+                      Create Your First Task
+                    </Button>
+                  }
+                />
               )}
             </CardContent>
           </Card>
@@ -280,46 +153,83 @@ export function TasksGrid() {
             </p>
             <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
               {filtered.map((task) => (
-                <Card key={task.id} className="group relative transition-shadow hover:shadow-md">
+                <Card
+                  key={task.id}
+                  className={cn(
+                    "group relative transition-all duration-200 duration-300 hover:-translate-y-1 hover:shadow-lg hover:shadow-black/5",
+                    !task.active && "opacity-75"
+                  )}
+                >
                   <CardHeader className="flex items-center justify-between pb-3">
-                    <h2 className="cursor-default text-lg font-semibold">{task.name}</h2>
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          className="size-8 cursor-pointer p-0"
-                          aria-label="Task options"
-                        >
-                          <MoreHorizontal className="size-5" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end" className="w-32">
-                        <DropdownMenuItem className="cursor-pointer">
-                          <Edit className="mr-2 size-4" />
-                          Edit (WIP)
-                        </DropdownMenuItem>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem
-                          className="cursor-pointer text-red-500"
-                          onSelect={() => setTaskToDelete(task)}
-                        >
-                          <Trash2 className="mr-2 size-4" />
-                          Delete
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
+                    <div className="flex w-full items-start justify-between gap-2">
+                      <h2
+                        className={cn(
+                          "cursor-default text-lg font-semibold transition-colors",
+                          !task.active && "text-muted-foreground"
+                        )}
+                      >
+                        {task.name}
+                      </h2>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="size-8 cursor-pointer p-0"
+                            aria-label="Task options"
+                          >
+                            <MoreHorizontal className="size-5" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end" className="w-32">
+                          <DropdownMenuItem
+                            className="cursor-pointer"
+                            onSelect={() => setTaskToEdit(task)}
+                          >
+                            <Edit className="mr-2 size-4" />
+                            Edit
+                          </DropdownMenuItem>
+                          <DropdownMenuSeparator />
+                          <DropdownMenuItem
+                            className="cursor-pointer text-red-500"
+                            onSelect={() => setTaskToDelete(task)}
+                          >
+                            <Trash2 className="mr-2 size-4" />
+                            Delete
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </div>
                   </CardHeader>
                   <CardContent className="pt-0">
                     {task.description && (
-                      <p className="text-muted-foreground mb-1 text-sm">{task.description}</p>
+                      <p
+                        className={cn(
+                          "mb-3 text-sm",
+                          task.active ? "text-muted-foreground" : "text-muted-foreground/70"
+                        )}
+                      >
+                        {task.description}
+                      </p>
                     )}
-                    <p className="text-muted-foreground text-xs">
-                      Interval: {task.interval.charAt(0).toUpperCase() + task.interval.slice(1)}
-                    </p>
-                    <p className="text-muted-foreground text-xs">
-                      Created {new Date(task.created_at).toLocaleDateString()}
-                    </p>
+                    <div className="flex flex-col space-y-2">
+                      <p className="text-muted-foreground text-xs">
+                        Interval: {task.interval.charAt(0).toUpperCase() + task.interval.slice(1)}
+                      </p>
+                      <p className="text-muted-foreground text-xs">
+                        Created {new Date(task.created_at).toLocaleDateString()}
+                      </p>
+                      <div className="mt-2 flex items-center justify-between border-t pt-2">
+                        <span
+                          className={cn(
+                            "text-xs font-medium",
+                            task.active ? "text-green-500" : "text-muted-foreground"
+                          )}
+                        >
+                          {task.active ? "Active" : "Inactive"}
+                        </span>
+                      </div>
+                    </div>
                   </CardContent>
                 </Card>
               ))}

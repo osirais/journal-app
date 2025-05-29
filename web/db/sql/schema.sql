@@ -18,6 +18,7 @@ CREATE TABLE IF NOT EXISTS journal (
     title TEXT NOT NULL,
     description TEXT,
     thumbnail_url TEXT,
+    color_hex CHAR(7),
     created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
     deleted_at TIMESTAMPTZ
@@ -93,7 +94,9 @@ CREATE TABLE IF NOT EXISTS task (
     user_id UUID NOT NULL REFERENCES users(id),
     name TEXT NOT NULL,
     description TEXT,
+    color_hex CHAR(7),
     interval task_interval NOT NULL,
+    active BOOLEAN NOT NULL DEFAULT TRUE,
     created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
@@ -159,8 +162,17 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE TRIGGER trigger_increment_user_entry_activity
-AFTER INSERT ON entry
-FOR EACH ROW
-WHEN (NEW.deleted_at IS NULL)
-EXECUTE FUNCTION increment_user_entry_activity();
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1
+    FROM pg_trigger
+    WHERE tgname = 'trigger_increment_user_entry_activity'
+  ) THEN
+    CREATE TRIGGER trigger_increment_user_entry_activity
+    AFTER INSERT ON entry
+    FOR EACH ROW
+    WHEN (NEW.deleted_at IS NULL)
+    EXECUTE FUNCTION increment_user_entry_activity();
+  END IF;
+END $$;

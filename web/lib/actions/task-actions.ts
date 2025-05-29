@@ -2,21 +2,27 @@
 
 import { Task } from "@/types";
 import { createClient } from "@/utils/supabase/server";
-import { revalidatePath } from "next/cache";
+
+async function getUserOrThrow(supabase: any) {
+  const {
+    data: { user },
+    error: userError
+  } = await supabase.auth.getUser();
+
+  if (userError || !user) {
+    throw new Error("Unauthorized");
+  }
+
+  return user;
+}
 
 export async function getTasks(): Promise<Task[]> {
   const supabase = await createClient();
-
-  const {
-    data: { user }
-  } = await supabase.auth.getUser();
-  if (!user) {
-    throw new Error("User not authenticated");
-  }
+  const user = await getUserOrThrow(supabase);
 
   const { data, error } = await supabase
     .from("task")
-    .select("id, name, description, interval, created_at, updated_at")
+    .select("*")
     .eq("user_id", user.id)
     .order("created_at", { ascending: false });
 
@@ -24,109 +30,115 @@ export async function getTasks(): Promise<Task[]> {
     throw new Error(`Failed to fetch tasks: ${error.message}`);
   }
 
-  return data || [];
+  return data;
 }
 
 export async function createTask(
   name: string,
-  description: string | null,
-  interval: "daily" | "weekly" | "monthly"
+  description: string,
+  interval: Task["interval"],
+  active: boolean = true
 ): Promise<Task> {
-  const supabase = await createClient();
-
-  const {
-    data: { user }
-  } = await supabase.auth.getUser();
-  if (!user) {
-    throw new Error("User not authenticated");
-  }
-
   if (!name.trim() || name.length > 100) {
     throw new Error("Task name must be between 1 and 100 characters");
   }
 
-  if (!["daily", "weekly", "monthly"].includes(interval)) {
-    throw new Error("Invalid task interval");
-  }
+  const supabase = await createClient();
+  const user = await getUserOrThrow(supabase);
 
   const { data, error } = await supabase
     .from("task")
     .insert({
-      user_id: user.id,
       name: name.trim(),
-      description,
-      interval
+      description: description || null,
+      interval,
+      active,
+      user_id: user.id
     })
-    .select("id, name, description, interval, created_at, updated_at")
+    .select()
     .single();
 
   if (error) {
     throw new Error(`Failed to create task: ${error.message}`);
   }
 
-  revalidatePath("/tasks");
   return data;
 }
 
-export async function deleteTask(taskId: string): Promise<void> {
-  const supabase = await createClient();
-
-  const {
-    data: { user }
-  } = await supabase.auth.getUser();
-  if (!user) {
-    throw new Error("User not authenticated");
-  }
-
-  const { error } = await supabase.from("task").delete().eq("id", taskId).eq("user_id", user.id);
-
-  if (error) {
-    throw new Error(`Failed to delete task: ${error.message}`);
-  }
-
-  revalidatePath("/tasks");
-}
-
 export async function updateTask(
-  taskId: string,
-  name: string,
-  description: string | null,
-  interval: "daily" | "weekly" | "monthly"
-): Promise<Task> {
-  const supabase = await createClient();
-
-  const {
-    data: { user }
-  } = await supabase.auth.getUser();
-  if (!user) {
-    throw new Error("User not authenticated");
+  id: string,
+  updates: {
+    name: string;
+    description: string | null;
+    interval: Task["interval"];
+    active: boolean;
   }
-
-  if (!name.trim() || name.length > 100) {
+): Promise<Task> {
+  if (!updates.name.trim() || updates.name.length > 100) {
     throw new Error("Task name must be between 1 and 100 characters");
   }
 
-  if (!["daily", "weekly", "monthly"].includes(interval)) {
-    throw new Error("Invalid task interval");
-  }
+  const supabase = await createClient();
+  const user = await getUserOrThrow(supabase);
 
   const { data, error } = await supabase
     .from("task")
     .update({
-      name: name.trim(),
-      description,
-      interval,
+      ...updates,
       updated_at: new Date().toISOString()
     })
-    .eq("id", taskId)
+    .eq("id", id)
     .eq("user_id", user.id)
-    .select("id, name, description, interval, created_at, updated_at")
+    .select()
     .single();
 
   if (error) {
     throw new Error(`Failed to update task: ${error.message}`);
   }
 
-  revalidatePath("/tasks");
   return data;
+}
+
+export async function toggleTaskActive(id: string): Promise<Task> {
+  const supabase = await createClient();
+  const user = await getUserOrThrow(supabase);
+
+  const { data: currentTask, error: fetchError } = await supabase
+    .from("task")
+    .select("active")
+    .eq("id", id)
+    .eq("user_id", user.id)
+    .single();
+
+  if (fetchError) {
+    throw new Error(`Failed to fetch task: ${fetchError.message}`);
+  }
+
+  const { data, error } = await supabase
+    .from("task")
+    .update({
+      active: !currentTask.active,
+      updated_at: new Date().toISOString()
+    })
+    .eq("id", id)
+    .eq("user_id", user.id)
+    .select()
+    .single();
+
+  if (error) {
+    throw new Error(`Failed to toggle task status: ${error.message}`);
+  }
+
+  return data;
+}
+
+export async function deleteTask(id: string): Promise<void> {
+  const supabase = await createClient();
+  const user = await getUserOrThrow(supabase);
+
+  const { error } = await supabase.from("task").delete().eq("id", id).eq("user_id", user.id);
+
+  if (error) {
+    throw new Error(`Failed to delete task: ${error.message}`);
+  }
 }

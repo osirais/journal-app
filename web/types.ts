@@ -21,11 +21,12 @@ export type TagType = {
   deleted_at?: string | null;
 };
 
-export interface Task {
+export type Task = {
   id: string;
   name: string;
   description: string | null;
   interval: "daily" | "weekly" | "monthly";
+  active: boolean;
   created_at: string;
   updated_at: string;
-}
+};
