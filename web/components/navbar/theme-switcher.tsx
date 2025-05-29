@@ -22,61 +22,49 @@ export const ThemeSwitcher = () => {
     setMounted(true);
   }, []);
 
-  const handleCustomThemeSelect = () => {
-    setTimeout(() => setIsDrawerOpen(true), 100);
-  };
-
-  const handleStandardThemeSelect = (newTheme: string) => {
-    setPaletteName(newTheme);
-  };
-
-  const getThemeIcon = () => {
+  function getThemeIcon() {
     switch (paletteName) {
       case "light":
-        return <Sun key="light" className="text-muted-foreground size-4" />;
+        return <Sun className="size-4" />;
       case "dark":
-        return <Moon key="dark" className="text-muted-foreground size-4" />;
+        return <Moon className="size-4" />;
       case "system":
-        return <Laptop key="system" className="text-muted-foreground size-4" />;
+        return <Laptop className="size-4" />;
       default:
-        return <Palette key="default" className="text-muted-foreground size-4" />;
+        return <Palette className="size-4" />;
     }
-  };
+  }
 
   return (
     <>
       <DropdownMenu>
         <DropdownMenuTrigger asChild className="cursor-pointer">
           <Button variant="ghost" size="sm">
-            {mounted ? (
-              getThemeIcon()
-            ) : (
-              <LoaderCircle className="text-muted-foreground size-4 animate-spin" />
-            )}
+            {mounted ? getThemeIcon() : <LoaderCircle className="size-4 animate-spin" />}
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent className="w-content" align="start">
           <DropdownMenuRadioGroup
             value={paletteName}
             onValueChange={(value) => {
-              if (value === "custom") handleCustomThemeSelect();
-              else handleStandardThemeSelect(value);
+              if (value === "custom") setIsDrawerOpen(true);
+              else setPaletteName(value);
             }}
           >
             <DropdownMenuRadioItem className="flex cursor-pointer gap-2" value="light">
-              <Sun className="text-muted-foreground size-4" />
+              <Sun className="size-4" />
               <span>Light</span>
             </DropdownMenuRadioItem>
             <DropdownMenuRadioItem className="flex cursor-pointer gap-2" value="dark">
-              <Moon className="text-muted-foreground size-4" />
+              <Moon className="size-4" />
               <span>Dark</span>
             </DropdownMenuRadioItem>
             <DropdownMenuRadioItem className="flex cursor-pointer gap-2" value="system">
-              <Laptop className="text-muted-foreground size-4" />
+              <Laptop className="size-4" />
               <span>System</span>
             </DropdownMenuRadioItem>
             <DropdownMenuRadioItem className="flex cursor-pointer gap-2" value="custom">
-              <Palette className="text-muted-foreground size-4" />
+              <Palette className="size-4" />
               <span>Custom</span>
             </DropdownMenuRadioItem>
           </DropdownMenuRadioGroup>
