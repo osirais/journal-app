@@ -1,5 +1,6 @@
 import { DAILY_ENTRY_REWARD } from "@/constants/rewards";
 import { TagType } from "@/types";
+import { getUserOrThrow } from "@/utils/get-user-throw";
 import { createClient } from "@/utils/supabase/server";
 import { NextResponse } from "next/server";
 
@@ -12,14 +13,7 @@ export async function GET(req: Request) {
   const tagId = searchParams.get("tag");
   const journalId = searchParams.get("journalId");
 
-  const {
-    data: { user },
-    error: userError
-  } = await supabase.auth.getUser();
-
-  if (userError || !user) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
+  const user = await getUserOrThrow(supabase);
 
   if (!journalId) {
     return NextResponse.json({ error: "journalId query parameter required" }, { status: 400 });
@@ -68,14 +62,7 @@ export async function GET(req: Request) {
 export async function POST(req: Request) {
   const supabase = await createClient();
 
-  const {
-    data: { user },
-    error: userError
-  } = await supabase.auth.getUser();
-
-  if (userError || !user) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
+  const user = await getUserOrThrow(supabase);
 
   const body = await req.json();
   const { journalId, title, content, tags } = body;

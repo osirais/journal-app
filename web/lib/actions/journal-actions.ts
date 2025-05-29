@@ -1,5 +1,6 @@
 "use server";
 
+import { getUserOrThrow } from "@/utils/get-user-throw";
 import { createClient } from "@/utils/supabase/server";
 import { revalidatePath } from "next/cache";
 
@@ -14,13 +15,7 @@ export async function updateJournal(journalId: string, formData: FormData) {
   }
 
   try {
-    const {
-      data: { user }
-    } = await supabase.auth.getUser();
-
-    if (!user) {
-      return { error: "Unauthorized" };
-    }
+    const user = await getUserOrThrow(supabase);
 
     const { error } = await supabase
       .from("journal")
@@ -52,13 +47,7 @@ export async function deleteJournal(journalId: string) {
   const supabase = await createClient();
 
   try {
-    const {
-      data: { user }
-    } = await supabase.auth.getUser();
-
-    if (!user) {
-      return { error: "Unauthorized" };
-    }
+    const user = await getUserOrThrow(supabase);
 
     // Soft delete the journal
     const { error } = await supabase

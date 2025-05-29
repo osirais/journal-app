@@ -1,4 +1,5 @@
 import { JournalWithEntryCount } from "@/types";
+import { getUserOrThrow } from "@/utils/get-user-throw";
 import { createClient } from "@/utils/supabase/server";
 import { NextResponse } from "next/server";
 
@@ -7,14 +8,7 @@ export const dynamic = "force-dynamic";
 export async function GET(req: Request) {
   const supabase = await createClient();
 
-  const {
-    data: { user },
-    error: userError
-  } = await supabase.auth.getUser();
-
-  if (userError || !user) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
+  const user = await getUserOrThrow(supabase);
 
   const searchParams = new URL(req.url).searchParams;
   const journalId = searchParams.get("id");

@@ -2,7 +2,7 @@
 
 import { DAILY_TASKS_COMPLETION_REWARD } from "@/constants/rewards";
 import { Task } from "@/types";
-import { getUserOrThrow } from "@/utils/get-user";
+import { getUserOrThrow } from "@/utils/get-user-throw";
 import { createClient } from "@/utils/supabase/server";
 
 export async function getTasks(): Promise<Task[]> {

@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
+import { getUserOrThrow } from "@/utils/get-user-throw";
 import { createClient } from "@/utils/supabase/client";
 import type { Editor } from "@tiptap/react";
 import {
@@ -74,9 +75,7 @@ async function fetchEntry(entryId: string) {
     .limit(1)
     .single();
 
-  const {
-    data: { user }
-  } = await supabase.auth.getUser();
+  const user = await getUserOrThrow(supabase);
 
   return {
     entry: entryData,

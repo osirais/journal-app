@@ -1,20 +1,14 @@
 "use server";
 
 import { DAILY_MOOD_ENTRY_REWARD } from "@/constants/rewards";
+import { getUserOrThrow } from "@/utils/get-user-throw";
 import { createClient } from "@/utils/supabase/server";
 import { revalidatePath } from "next/cache";
 
 export async function getCurrentMood() {
   const supabase = await createClient();
 
-  const {
-    data: { user },
-    error: userError
-  } = await supabase.auth.getUser();
-
-  if (userError || !user) {
-    return { mood: null, error: "User not authenticated" };
-  }
+  const user = await getUserOrThrow(supabase);
 
   const { data: moodEntry, error } = await supabase
     .from("mood_entry")
@@ -36,14 +30,7 @@ export async function getCurrentMood() {
 export async function updateMood(scale: number) {
   const supabase = await createClient();
 
-  const {
-    data: { user },
-    error: userError
-  } = await supabase.auth.getUser();
-
-  if (userError || !user) {
-    return { success: false, error: "User not authenticated" };
-  }
+  const user = await getUserOrThrow(supabase);
 
   const today = new Date().toISOString().split("T")[0];
   const startOfDay = `${today}T00:00:00.000Z`;
@@ -185,14 +172,7 @@ async function handleDailyMoodEntryReward(
 export async function getMoodHistory() {
   const supabase = await createClient();
 
-  const {
-    data: { user },
-    error: userError
-  } = await supabase.auth.getUser();
-
-  if (userError || !user) {
-    return { data: [], error: "User not authenticated" };
-  }
+  const user = await getUserOrThrow(supabase);
 
   const thirtyDaysAgo = new Date();
   thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
