@@ -1,9 +1,9 @@
 "use client";
 
-import { CreateTaskDialog } from "@/components/dialogs/tasks/create-task-dialog";
-import { DeleteTaskDialog } from "@/components/dialogs/tasks/delete-task-dialog";
-import { EditTaskDialog } from "@/components/dialogs/tasks/edit-task-dialog";
-import { TaskSkeleton } from "@/components/task-skeleton";
+import { CreateTaskDialog } from "@/components/tasks/create-task-dialog";
+import { DeleteTaskDialog } from "@/components/tasks/delete-task-dialog";
+import { EditTaskDialog } from "@/components/tasks/edit-task-dialog";
+import { TaskSkeleton } from "@/components/tasks/task-skeleton";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import {

@@ -1,5 +1,5 @@
-import HeaderAuth from "@/components/header-auth";
-import { ThemeSwitcher } from "@/components/theme-switcher";
+import HeaderAuth from "@/components/navbar/header-auth";
+import { ThemeSwitcher } from "@/components/navbar/theme-switcher";
 import { ThemeProvider } from "@/contexts/theme-context";
 import { NotebookPen } from "lucide-react";
 import Link from "next/link";

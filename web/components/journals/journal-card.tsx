@@ -1,7 +1,7 @@
 "use client";
 
-import { DeleteJournalDialog } from "@/components/dialogs/journals/delete-journal-dialog";
-import { EditJournalDialog } from "@/components/dialogs/journals/edit-journal-dialog";
+import { DeleteJournalDialog } from "@/components/journals/delete-journal-dialog";
+import { EditJournalDialog } from "@/components/journals/edit-journal-dialog";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import {

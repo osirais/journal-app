@@ -1,7 +1,7 @@
 "use client";
 
-import EntryEditor from "@/components/editor";
-import { EntryDrawer } from "@/components/entry-drawer";
+import EntryEditor from "@/components/entries/editor";
+import { EntryDrawer } from "@/components/entries/entry-drawer";
 import { Markdown } from "@/components/markdown";
 import { TagComponent } from "@/components/tag-component";
 import { Button } from "@/components/ui/button";

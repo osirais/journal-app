@@ -1,6 +1,6 @@
 "use client";
 
-import { ThemeDrawer } from "@/components/theme-drawer";
+import { ThemeDrawer } from "@/components/navbar/theme-drawer";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,

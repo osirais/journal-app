@@ -1,4 +1,4 @@
-import { StampCountCSR } from "@/components/stamp-count-csr";
+import { StampCountCSR } from "@/components/navbar/stamp-count-csr";
 import { createClient } from "@/utils/supabase/server";
 
 interface StampCountSSRProps {

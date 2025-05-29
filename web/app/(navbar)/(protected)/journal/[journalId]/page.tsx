@@ -1,9 +1,9 @@
 "use client";
 
-import { EntryCard } from "@/components/entry-card";
+import { EntryCard } from "@/components/entries/entry-card";
+import { TiptapEditor } from "@/components/entries/tiptap-editor";
 import { SortDropdown } from "@/components/sort-dropdown";
 import { TagComponent } from "@/components/tag-component";
-import { TiptapEditor } from "@/components/tiptap-editor";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import {

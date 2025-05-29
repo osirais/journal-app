@@ -1,10 +1,10 @@
-import StampCountSSR from "@/components/stamp-count-ssr-wrapper";
-import { UserActionsDropdown } from "@/components/user-actions-dropdown";
+import StampCountSSR from "@/components/navbar/stamp-count-ssr-wrapper";
+import { UserActionsDropdown } from "@/components/navbar/user-actions-dropdown";
+import { Button } from "@/components/ui/button";
 import { hasEnvVars } from "@/utils/supabase/check-env-vars";
 import { createClient } from "@/utils/supabase/server";
+import { Badge } from "lucide-react";
 import Link from "next/link";
-import { Badge } from "./ui/badge";
-import { Button } from "./ui/button";
 
 export default async function AuthButton() {
   const supabase = await createClient();
@@ -16,7 +16,7 @@ export default async function AuthButton() {
   if (!hasEnvVars) {
     return (
       <div className="flex items-center gap-4">
-        <Badge variant="default" className="pointer-events-none font-normal">
+        <Badge className="pointer-events-none font-normal">
           Please update .env.local file with anon key and url
         </Badge>
       </div>

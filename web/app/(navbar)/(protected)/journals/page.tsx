@@ -1,8 +1,8 @@
 "use client";
 
-import { CreateJournalDialog } from "@/components/dialogs/journals/create-journal-dialog";
-import { JournalCard } from "@/components/journal-card";
-import { JournalCardSkeleton } from "@/components/journal-card-skeleton";
+import { CreateJournalDialog } from "@/components/journals/create-journal-dialog";
+import { JournalCard } from "@/components/journals/journal-card";
+import { JournalCardSkeleton } from "@/components/journals/journal-card-skeleton";
 import { SortDropdown } from "@/components/sort-dropdown";
 import type { JournalWithEntryCount } from "@/types";
 import axios from "axios";
