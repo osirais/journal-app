@@ -499,21 +499,21 @@ export const palettes: Palette[] = [
       colorfulErrorExtra: "oklch(56.2% 0.203 26.8)"
     }
   },
-  {
-    name: "dark",
-    colors: {
-      bg: "oklch(17.8% 0 0)",
-      main: "oklch(94.9% 0 0)",
-      caret: "oklch(94.9% 0 0)",
-      sub: "oklch(38.7% 0 0)",
-      subAlt: "oklch(21.3% 0 0)",
-      text: "oklch(94.9% 0 0)",
-      error: "oklch(58.4% 0.203 26.2)",
-      errorExtra: "oklch(37.8% 0.133 26.3)",
-      colorfulError: "oklch(58.4% 0.203 26.2)",
-      colorfulErrorExtra: "oklch(37.8% 0.133 26.3)"
-    }
-  },
+  // {
+  //   name: "dark",
+  //   colors: {
+  //     bg: "oklch(17.8% 0 0)",
+  //     main: "oklch(94.9% 0 0)",
+  //     caret: "oklch(94.9% 0 0)",
+  //     sub: "oklch(38.7% 0 0)",
+  //     subAlt: "oklch(21.3% 0 0)",
+  //     text: "oklch(94.9% 0 0)",
+  //     error: "oklch(58.4% 0.203 26.2)",
+  //     errorExtra: "oklch(37.8% 0.133 26.3)",
+  //     colorfulError: "oklch(58.4% 0.203 26.2)",
+  //     colorfulErrorExtra: "oklch(37.8% 0.133 26.3)"
+  //   }
+  // },
   {
     name: "dark_magic_girl",
     colors: {

@@ -1,6 +1,5 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
 import {
   Drawer,
   DrawerContent,
@@ -12,11 +11,11 @@ import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useTheme } from "@/contexts/theme-context";
 import { palettes } from "@/lib/theme-palettes";
-import { Palette, Search } from "lucide-react";
+import { Search } from "lucide-react";
 import { useEffect, useState } from "react";
 
 export function PaletteSelector() {
-  const { theme: currentTheme, setPaletteName } = useTheme();
+  const { paletteName, setPaletteName } = useTheme();
 
   const [searchQuery, setSearchQuery] = useState("");
   const [filteredPalettes, setFilteredPalettes] = useState(palettes);
@@ -57,7 +56,7 @@ export function PaletteSelector() {
             <button
               key={palette.name}
               className={`rounded-md border p-3 transition-colors ${
-                currentTheme.palette.name === palette.name ? "ring-primary ring-2" : ""
+                paletteName === palette.name ? "ring-primary ring-2" : ""
               }`}
               style={{
                 backgroundColor: palette.colors.bg,
