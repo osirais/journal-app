@@ -6,7 +6,7 @@ import { TasksCard } from "@/components/dashboard/tasks";
 
 const Page = () => {
   return (
-    <div className="ovreflow-hidden container mx-auto grid max-w-3xl grid-flow-row gap-8 py-8">
+    <div className="container mx-auto grid max-w-3xl grid-flow-row gap-8 overflow-hidden py-8">
       <div className="grid gap-4">
         <h1 className="text-2xl font-bold">Daily</h1>
         <div className="grid gap-6 md:grid-cols-2">

@@ -68,7 +68,7 @@ export function EditJournalDialog({
           ...journal,
           title: title.trim(),
           description: description.trim(),
-          updated_at: new Date().toISOString() // Update the timestamp
+          updated_at: new Date().toISOString()
         };
 
         // notify parent component about the update
