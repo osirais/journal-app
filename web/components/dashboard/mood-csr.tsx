@@ -4,7 +4,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { updateMood } from "@/lib/actions/mood-actions";
 import { receiveReward } from "@/utils/receive-reward";
-import { receiveStamps } from "@/utils/receive-stamps";
 import { useOptimistic, useTransition } from "react";
 import { toast } from "sonner";
 
