@@ -105,22 +105,22 @@ export const MoodChartCSR = ({ data }: MoodChartCSRProps) => {
       </CardHeader>
       <CardContent>
         {nonNullData.length === 0 ? (
-          <div className="flex h-[300px] items-center justify-center">
+          <div className="flex h-[200px] w-full items-center justify-center">
             <p className="text-muted-foreground">No mood data available for {currentMonth}</p>
           </div>
         ) : (
-          <ChartContainer config={chartConfig}>
+          <ChartContainer config={chartConfig} className="h-[200px] w-full">
             <AreaChart
               accessibilityLayer
               data={chartData}
-              margin={{ left: 12, right: 12, top: 12, bottom: 12 }}
+              margin={{ left: 8, right: 8, top: 8, bottom: 8 }}
             >
               <CartesianGrid vertical={false} />
               <XAxis
                 dataKey="formattedDate"
                 tickLine={false}
                 axisLine={false}
-                tickMargin={8}
+                tickMargin={4}
                 interval="preserveStartEnd"
                 tick={{ fontSize: 12 }}
               />
@@ -128,9 +128,10 @@ export const MoodChartCSR = ({ data }: MoodChartCSRProps) => {
                 domain={[1, 5]}
                 tickLine={false}
                 axisLine={false}
-                tickMargin={8}
+                tickMargin={4}
                 tick={{ fontSize: 12 }}
                 tickFormatter={(value) => moodEmojis[value as keyof typeof moodEmojis]}
+                height={120}
               />
               <ChartTooltip cursor={false} content={<CustomTooltip />} />
               <Area
