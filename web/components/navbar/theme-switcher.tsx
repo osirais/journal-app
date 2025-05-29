@@ -10,7 +10,7 @@ import {
   DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu";
 import { useTheme } from "@/contexts/theme-context";
-import { Laptop, Moon, Palette, Sun } from "lucide-react";
+import { Laptop, LoaderCircle, Moon, Palette, Sun } from "lucide-react";
 import { useEffect, useState } from "react";
 
 export const ThemeSwitcher = () => {
@@ -21,10 +21,6 @@ export const ThemeSwitcher = () => {
   useEffect(() => {
     setMounted(true);
   }, []);
-
-  if (!mounted) {
-    return null;
-  }
 
   const handleCustomThemeSelect = () => {
     setTimeout(() => setIsDrawerOpen(true), 100);
@@ -47,21 +43,21 @@ export const ThemeSwitcher = () => {
     }
   };
 
-  const getCurrentThemeValue = () => {
-    return paletteName;
-  };
-
   return (
     <>
       <DropdownMenu>
         <DropdownMenuTrigger asChild className="cursor-pointer">
           <Button variant="ghost" size="sm">
-            {getThemeIcon()}
+            {mounted ? (
+              getThemeIcon()
+            ) : (
+              <LoaderCircle className="text-muted-foreground size-4 animate-spin" />
+            )}
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent className="w-content" align="start">
           <DropdownMenuRadioGroup
-            value={getCurrentThemeValue()}
+            value={paletteName}
             onValueChange={(value) => {
               if (value === "custom") handleCustomThemeSelect();
               else handleStandardThemeSelect(value);
