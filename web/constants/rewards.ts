@@ -1,2 +1,3 @@
 export const DAILY_ENTRY_REWARD = 5;
 export const DAILY_MOOD_ENTRY_REWARD = 1;
+export const DAILY_TASKS_COMPLETION_REWARD = 5;

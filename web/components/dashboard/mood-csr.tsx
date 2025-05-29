@@ -2,8 +2,10 @@
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
+import { DAILY_MOOD_ENTRY_REWARD } from "@/constants/rewards";
 import { updateMood } from "@/lib/actions/mood-actions";
 import { receiveReward } from "@/utils/receive-reward";
+import { FlameIcon as FireIcon } from "lucide-react";
 import { useOptimistic, useTransition } from "react";
 import { toast } from "sonner";
 
@@ -50,18 +52,26 @@ export function MoodCardCSR({ initialMood, eligible, streak }: MoodCardCSRProps)
   };
 
   const message = eligible
-    ? "✅ You can claim your daily +1 stamp"
+    ? `✅ You can claim your daily +${DAILY_MOOD_ENTRY_REWARD} stamp`
     : "🕒 You've already claimed your reward today";
-
-  const streakPercent = Math.min((streak / 7) * 100, 100); // 7-day goal
 
   return (
     <Card>
-      <CardHeader>
-        <CardTitle>Mood</CardTitle>
-        <CardDescription>Describe your mood today</CardDescription>
+      <CardHeader className="flex flex-row items-center justify-between">
+        <div>
+          <CardTitle>Mood</CardTitle>
+          <CardDescription>Describe your mood today</CardDescription>
+        </div>
       </CardHeader>
       <CardContent className="grid place-items-center gap-4">
+        <div className="mr-auto w-max">
+          {streak > 0 && (
+            <div className="flex items-center gap-1 rounded-md bg-amber-100 px-2 py-1 text-amber-600 dark:bg-amber-950/30 dark:text-amber-400">
+              <FireIcon className="h-4 w-4" />
+              <span className="text-sm font-medium">{streak} day streak</span>
+            </div>
+          )}
+        </div>
         <ToggleGroup
           type="single"
           value={selectedMoodLabel}
@@ -80,19 +90,7 @@ export function MoodCardCSR({ initialMood, eligible, streak }: MoodCardCSRProps)
             </ToggleGroupItem>
           ))}
         </ToggleGroup>
-        <div className="grid w-full max-w-xs place-items-center gap-6">
-          <p className="text-center text-sm font-medium">{message}</p>
-          <p className="text-muted-foreground text-center text-xs font-semibold">
-            Current streak: {streak} day{streak !== 1 ? "s" : ""}
-          </p>
-          <div className="bg-muted relative h-2 w-full overflow-hidden rounded-full">
-            <div
-              className="bg-primary absolute left-0 top-0 h-2 rounded-full transition-all duration-300"
-              style={{ width: `${streakPercent}%` }}
-              aria-label={`Streak progress: ${streakPercent}%`}
-            />
-          </div>
-        </div>
+        <p className="text-center text-sm font-medium">{message}</p>
       </CardContent>
     </Card>
   );

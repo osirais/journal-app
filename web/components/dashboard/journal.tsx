@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { createClient } from "@/utils/supabase/server";
+import { FlameIcon as FireIcon } from "lucide-react";
 import Link from "next/link";
 import type { FC } from "react";
 
@@ -19,7 +20,7 @@ export const JournalCard: FC = async () => {
   let streakDays = 0;
 
   if (!user || userError) {
-    message = "You must be signed in to claim daily reward.";
+    message = "You must be signed in to claim daily reward";
   } else {
     const userId = user.id;
 
@@ -34,12 +35,12 @@ export const JournalCard: FC = async () => {
       .maybeSingle();
 
     if (txError) {
-      message = "Error checking eligibility.";
+      message = "Error checking eligibility";
     } else {
       eligible = !lastTransaction;
       message = eligible
-        ? "✅ You can claim your daily +5 stamps"
-        : "🕒 You've already claimed your reward today";
+        ? "✅ You can claim your daily plus five stamps"
+        : "🕒 You have already claimed your reward today";
     }
 
     const { data: streakData, error: streakError } = await supabase
@@ -54,32 +55,30 @@ export const JournalCard: FC = async () => {
     }
   }
 
-  const streakPercent = Math.min((streakDays / 7) * 100, 100); // 7 days for full bar
-
   return (
     <Card>
-      <CardHeader>
-        <CardTitle>Journal</CardTitle>
-        <CardDescription>Record your thoughts and experiences</CardDescription>
+      <CardHeader className="flex flex-row items-center justify-between">
+        <div>
+          <CardTitle>Journal</CardTitle>
+          <CardDescription>Record your thoughts and experiences</CardDescription>
+        </div>
       </CardHeader>
       <CardContent>
         <div className="grid w-full max-w-xs place-items-center gap-6">
+          <div className="mr-auto w-max">
+            {streakDays > 0 && (
+              <div className="flex items-center gap-1 rounded-md bg-amber-100 px-2 py-1 text-amber-600 dark:bg-amber-950/30 dark:text-amber-400">
+                <FireIcon className="h-4 w-4" />
+                <span className="text-sm font-medium">{streakDays} day streak</span>
+              </div>
+            )}
+          </div>
           <Link href="/journals" className="w-full">
             <Button variant="outline" className="w-full cursor-pointer">
               Create Entry
             </Button>
           </Link>
           <p className="text-center text-sm font-medium">{message}</p>
-          <p className="text-muted-foreground text-center text-xs font-semibold">
-            Current streak: {streakDays} day{streakDays !== 1 ? "s" : ""}
-          </p>
-          <div className="bg-muted relative h-2 w-full overflow-hidden rounded-full">
-            <div
-              className="bg-primary absolute left-0 top-0 h-2 rounded-full transition-all duration-300"
-              style={{ width: `${streakPercent}%` }}
-              aria-label={`Streak progress: ${streakPercent}%`}
-            />
-          </div>
         </div>
       </CardContent>
     </Card>

@@ -2,7 +2,7 @@ import { ActivityCalendarSSR } from "@/components/dashboard/activity-calendar-ss
 import { JournalCard } from "@/components/dashboard/journal";
 import { MoodChartSSR } from "@/components/dashboard/mood-chart-ssr";
 import { MoodCardSSR } from "@/components/dashboard/mood-ssr";
-import { TasksCard } from "@/components/dashboard/tasks";
+import { TasksCardSSR } from "@/components/dashboard/tasks-ssr";
 import { TreehouseCard } from "@/components/dashboard/treehouse-card";
 
 const Page = () => {
@@ -24,7 +24,7 @@ const Page = () => {
               <JournalCard />
               <MoodCardSSR />
             </div>
-            <TasksCard />
+            <TasksCardSSR />
           </div>
         </div>
       </section>

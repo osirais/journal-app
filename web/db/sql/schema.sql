@@ -110,6 +110,14 @@ CREATE TABLE IF NOT EXISTS mood_entry (
     deleted_at TIMESTAMPTZ
 );
 
+CREATE TABLE IF NOT EXISTS task_completion (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v7(),
+    user_id UUID NOT NULL REFERENCES users(id),
+    task_id UUID NOT NULL REFERENCES task(id),
+    completed_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+    deleted_at TIMESTAMPTZ
+);
+
 CREATE TABLE IF NOT EXISTS user_settings (
     user_id UUID PRIMARY KEY REFERENCES users(id),
     theme JSONB NOT NULL DEFAULT '{}'::JSONB,
@@ -122,7 +130,7 @@ DO $$ BEGIN
   IF NOT EXISTS (
     SELECT FROM pg_type WHERE typname = 'streak_category'
   ) THEN
-    CREATE TYPE streak_category AS ENUM ('journal_entries', 'mood_entries');
+    CREATE TYPE streak_category AS ENUM ('journal_entries', 'mood_entries', 'task_completions');
   END IF;
 END $$;
 
