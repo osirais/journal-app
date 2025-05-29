@@ -144,18 +144,12 @@ function Theme({
       data: { user }
     } = await supabase.auth.getUser();
 
-    if (!user) {
-      return;
-    }
-
-    const { error } = await supabase
-      .from("user_settings")
-      .update({ theme: { palette: { name } } })
-      .eq("user_id", user.id)
-      .single();
-
-    if (error) {
-      console.error("Error updating theme:", error);
+    if (user) {
+      await supabase
+        .from("user_settings")
+        .update({ theme: { palette: { name } } })
+        .eq("user_id", user.id)
+        .single();
     }
 
     if (systemThemes.includes(name)) {
