@@ -84,7 +84,7 @@ export function ThemeProvider(props: ThemeProviderProps) {
   return <Theme {...props} />;
 }
 
-const systemThemes = ["light", "dark", "system"];
+export const systemThemes = ["light", "dark", "system"];
 
 async function fetchThemeOverrides(): Promise<ThemeOverrides> {
   const supabase = createClient();
