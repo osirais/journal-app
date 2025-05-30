@@ -29,6 +29,12 @@ export default async function RootLayout({
   return (
     <html lang="en" className={geistSans.className} suppressHydrationWarning>
       <body className="bg-background text-foreground">
+        <a
+          href="#main-content"
+          className="bg-primary z-999 text-md text-primary-foreground sr-only rounded-br-md focus:not-sr-only focus:absolute focus:px-4 focus:py-2"
+        >
+          Skip to content
+        </a>
         <ThemeProvider disableTransitionOnChange nonce={nonce}>
           {children}
           <Toaster />

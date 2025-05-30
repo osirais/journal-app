@@ -18,7 +18,7 @@ const Page = async () => {
   return (
     <div className="bg-background min-h-screen">
       <Navbar />
-      <main className="container mx-auto px-4 py-16 md:py-24">
+      <main id="main-content" className="container mx-auto px-4 py-16 md:py-24">
         <div className="mx-auto max-w-4xl space-y-8 text-center">
           <div className="space-y-4">
             <Badge variant="secondary" className="mb-4">

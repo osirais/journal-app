@@ -6,7 +6,9 @@ export default async function Layout({ children }: { children: React.ReactNode }
     <>
       <ThemeProvider>
         <Navbar />
-        <div className="min-h-screen">{children}</div>
+        <div id="main-content" className="min-h-screen">
+          {children}
+        </div>
       </ThemeProvider>
     </>
   );
