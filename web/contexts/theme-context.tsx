@@ -121,8 +121,22 @@ function Theme({
   nonce,
   scriptProps
 }: ThemeProviderProps) {
-  const { data: overrides = {}, mutate } = useSWR("theme", fetchThemeOverrides);
-  const theme = useMemo(() => resolveTheme(overrides), [overrides]);
+  const { data: overrides = {}, isLoading, mutate } = useSWR("theme", fetchThemeOverrides);
+
+  const theme = useMemo(() => {
+    if (isLoading && !isServer) {
+      const stored = localStorage.getItem("palette");
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        if (parsed && Object.keys(parsed).length === 0) {
+          return defaultTheme;
+        }
+        return parsed;
+      }
+      return defaultTheme;
+    }
+    return overrides;
+  }, [isLoading, overrides, storageKey, defaultTheme]);
 
   const paletteName = theme.palette?.name || defaultTheme.palette.name;
 
@@ -289,11 +303,15 @@ function Theme({
       saveToLS(storageKey, newTheme);
       if (!systemThemes.includes(newTheme)) {
         saveToLS("palette", JSON.stringify(getPalette(newTheme)));
+      } else {
+        saveToLS("palette", JSON.stringify({ name: newTheme }));
       }
     } else {
       saveToLS(storageKey, value);
       if (!systemThemes.includes(value)) {
         saveToLS("palette", JSON.stringify(getPalette(value)));
+      } else {
+        saveToLS("palette", JSON.stringify({ name: value }));
       }
     }
   }, []);
@@ -321,24 +339,13 @@ function Theme({
     return () => media.removeListener(handleMediaQuery);
   }, [handleMediaQuery]);
 
-  // localStorage event handling
   useEffect(() => {
-    const handleStorage = (e: StorageEvent) => {
-      if (e.key !== storageKey) {
-        return;
-      }
-
-      // If default theme set, use it if localstorage === null (happens on local storage manual deletion)
-      if (!e.newValue) {
-        setTheme(defaultTheme.palette.name);
-      } else {
-        // setThemeState(e.newValue); // Direct state update to avoid loops
-      }
-    };
-
+    function handleStorage(e: StorageEvent) {
+      if (e.key === storageKey) mutate();
+    }
     window.addEventListener("storage", handleStorage);
     return () => window.removeEventListener("storage", handleStorage);
-  }, [setTheme]);
+  }, [mutate, storageKey]);
 
   // Whenever theme or forcedTheme changes, apply it
   useEffect(() => {
@@ -370,7 +377,6 @@ function Theme({
           scriptProps
         }}
       />
-
       {children}
     </ThemeContext.Provider>
   );
@@ -478,17 +484,6 @@ const ThemeScript = memo(
     );
   }
 );
-
-function getTheme(key: string, fallback?: string) {
-  if (isServer) return undefined;
-  let theme;
-  try {
-    theme = localStorage.getItem(key) || undefined;
-  } catch (e) {
-    // Unsupported
-  }
-  return theme || fallback;
-}
 
 function disableAnimation(nonce?: string) {
   const css = document.createElement("style");
