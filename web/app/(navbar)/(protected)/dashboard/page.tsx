@@ -3,7 +3,7 @@ import { JournalCard } from "@/components/dashboard/journal";
 import { MoodChartSSR } from "@/components/dashboard/mood-chart-ssr";
 import { MoodCardSSR } from "@/components/dashboard/mood-ssr";
 import { TasksCardSSR } from "@/components/dashboard/tasks-ssr";
-import { TreehouseCard } from "@/components/dashboard/treehouse-card";
+import { TreeCard } from "@/components/dashboard/tree-card";
 
 const Page = () => {
   return (
@@ -11,8 +11,8 @@ const Page = () => {
       <section className="flex min-h-screen snap-start snap-always justify-center pt-6">
         <div className="container mx-auto max-w-3xl">
           <div className="space-y-6">
-            <h1 className="text-2xl font-bold">Treehouse</h1>
-            <TreehouseCard />
+            <h1 className="text-2xl font-bold">Tree</h1>
+            <TreeCard />
           </div>
         </div>
       </section>
