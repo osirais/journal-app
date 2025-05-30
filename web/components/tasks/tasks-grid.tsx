@@ -14,11 +14,10 @@ import {
   DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
-import { Switch } from "@/components/ui/switch";
 import { getTasks, toggleTaskActive } from "@/lib/actions/task-actions";
 import { cn } from "@/lib/utils";
 import { Task } from "@/types";
-import { Edit, LoaderCircle, MoreHorizontal, Plus, Search, Trash2 } from "lucide-react";
+import { Edit, MoreHorizontal, Plus, Search, Trash2 } from "lucide-react";
 import { useEffect, useState, useTransition } from "react";
 import { toast } from "sonner";
 
@@ -30,8 +29,6 @@ export function TasksGrid() {
 
   const [taskToDelete, setTaskToDelete] = useState<Task | null>(null);
   const [taskToEdit, setTaskToEdit] = useState<Task | null>(null);
-
-  const [togglingTaskId, setTogglingTaskId] = useState<string | null>(null);
 
   useEffect(() => {
     loadTasks();
@@ -61,16 +58,12 @@ export function TasksGrid() {
   }
 
   function handleToggleActive(taskId: string) {
-    setTogglingTaskId(taskId);
-
     startTransition(async () => {
       try {
         const updatedTask = await toggleTaskActive(taskId);
         setTasks((prev) => prev.map((task) => (task.id === taskId ? updatedTask : task)));
       } catch {
         toast.error("Failed to update task status");
-      } finally {
-        setTogglingTaskId(null);
       }
     });
   }
@@ -148,15 +141,14 @@ export function TasksGrid() {
         ) : (
           <div className="grid gap-4">
             <p className="text-muted-foreground text-sm">
-              {filtered.length} task
-              {filtered.length !== 1 ? "s" : ""} found
+              {filtered.length} task{filtered.length !== 1 ? "s" : ""} found
             </p>
             <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
               {filtered.map((task) => (
                 <Card
                   key={task.id}
                   className={cn(
-                    "group relative transition-all duration-200 duration-300 hover:-translate-y-1 hover:shadow-lg hover:shadow-black/5",
+                    "group relative transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:shadow-black/5",
                     !task.active && "opacity-75"
                   )}
                 >
