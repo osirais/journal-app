@@ -1,8 +1,27 @@
 "use client";
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Canvas } from "@react-three/fiber";
-import { createRoot } from "react-dom/client";
+import { OrbitControls, useGLTF } from "@react-three/drei";
+import { Canvas, useFrame } from "@react-three/fiber";
+import { Suspense, useRef } from "react";
+import * as THREE from "three";
+
+function TreeModel() {
+  const { scene } = useGLTF("/models/Tree_4_A_Color1.gltf");
+  const groupRef = useRef<THREE.Group>(null);
+
+  useFrame(() => {
+    if (groupRef.current) {
+      groupRef.current.rotation.y += 0.003;
+    }
+  });
+
+  return (
+    <group ref={groupRef} position={[0, -2.5, 0]}>
+      <primitive object={scene} />
+    </group>
+  );
+}
 
 export function TreehouseCard() {
   return (
@@ -11,12 +30,19 @@ export function TreehouseCard() {
         <CardTitle>Treehouse</CardTitle>
         <CardDescription>This feature is still under development.</CardDescription>
       </CardHeader>
-      <CardContent>
-        <Canvas>
-          <mesh>
-            <boxGeometry />
-            <meshStandardMaterial />
-          </mesh>
+      <CardContent className="relative h-full p-0">
+        <Canvas camera={{ position: [4.25, 1, 0] }} className="h-full w-full">
+          <ambientLight intensity={0.5} />
+          <directionalLight position={[5, 5, 5]} intensity={1} />
+          <Suspense fallback={null}>
+            <TreeModel />
+          </Suspense>
+          <OrbitControls
+            enableZoom={false}
+            enablePan={false}
+            minPolarAngle={(3 * Math.PI) / 7}
+            maxPolarAngle={(3 * Math.PI) / 7}
+          />
         </Canvas>
       </CardContent>
     </Card>
