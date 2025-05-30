@@ -42,7 +42,7 @@ const Page = async () => {
               </Button>
             </Link>
           </div>
-          <p className="text-muted-foreground text-sm">Free to start • No credit card required</p>
+          <p className="text-muted-foreground text-sm">Free & private • Your space to grow</p>
         </div>
         <div className="mx-auto mt-24 grid max-w-6xl gap-6 md:grid-cols-3">
           <Card className="text-center">
