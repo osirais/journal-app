@@ -10,6 +10,10 @@ export interface Theme {
   palette: { name: string; colors?: Record<string, string> };
 }
 
+declare global {
+  var __THEME__: any;
+}
+
 interface ScriptProps
   extends React.DetailedHTMLProps<
     React.ScriptHTMLAttributes<HTMLScriptElement>,
@@ -105,12 +109,6 @@ async function fetchThemeOverrides(): Promise<ThemeOverrides> {
   return data?.theme ?? {};
 }
 
-function resolveTheme(overrides: ThemeOverrides): Theme {
-  return {
-    palette: { name: overrides.palette?.name ?? DEFAULT_THEME.palette.name }
-  };
-}
-
 function Theme({
   forcedTheme,
   disableTransitionOnChange = false,
@@ -124,19 +122,11 @@ function Theme({
   const { data: overrides = {}, isLoading, mutate } = useSWR("theme", fetchThemeOverrides);
 
   const theme = useMemo(() => {
-    if (isLoading && !isServer) {
-      const stored = localStorage.getItem("palette");
-      if (stored) {
-        const parsed = JSON.parse(stored);
-        if (parsed && Object.keys(parsed).length === 0) {
-          return defaultTheme;
-        }
-        return parsed;
-      }
-      return defaultTheme;
-    }
-    return overrides;
-  }, [isLoading, overrides, storageKey, defaultTheme]);
+    const source = isLoading ? globalThis.__THEME__ : overrides;
+    return {
+      palette: { name: source?.palette?.name ?? defaultTheme.palette.name }
+    };
+  }, [overrides, defaultTheme]);
 
   const paletteName = theme.palette?.name || defaultTheme.palette.name;
 
@@ -451,6 +441,9 @@ function script(storageKey: string, defaultTheme: string, forcedTheme: string, t
   function getSystemTheme() {
     return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
   }
+
+  const palette = JSON.parse(localStorage.getItem("palette") || "{}");
+  globalThis.__THEME__ = { palette: palette };
 
   try {
     const themeName = forcedTheme || localStorage.getItem(storageKey) || defaultTheme;
