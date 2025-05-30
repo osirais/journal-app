@@ -23,44 +23,13 @@ function TreeModel({ letter }: { letter: string }) {
 
   useFrame(() => {
     if (groupRef.current) {
-      groupRef.current.rotation.y += 0.003;
+      groupRef.current.rotation.y += 0.005;
     }
   });
 
   return (
     <group ref={groupRef} position={[0, -2.5, 0]}>
       <primitive object={scene} />
-    </group>
-  );
-}
-
-function SpinningTree({ scale = 1, color = "#22c55e" }: { scale?: number; color?: string }) {
-  const treeRef = useRef<THREE.Group>(null);
-
-  useFrame((state) => {
-    if (treeRef.current) {
-      treeRef.current.rotation.y = state.clock.elapsedTime * 0.5;
-    }
-  });
-
-  return (
-    <group ref={treeRef} scale={scale}>
-      <mesh position={[0, -0.5, 0]}>
-        <cylinderGeometry args={[0.1, 0.15, 1, 8]} />
-        <meshStandardMaterial color="#8b4513" />
-      </mesh>
-      <mesh position={[0, 0.2, 0]}>
-        <sphereGeometry args={[0.4, 8, 6]} />
-        <meshStandardMaterial color={color} />
-      </mesh>
-      <mesh position={[0, 0.6, 0]}>
-        <sphereGeometry args={[0.3, 8, 6]} />
-        <meshStandardMaterial color={color} />
-      </mesh>
-      <mesh position={[0, 0.9, 0]}>
-        <sphereGeometry args={[0.2, 8, 6]} />
-        <meshStandardMaterial color={color} />
-      </mesh>
     </group>
   );
 }
