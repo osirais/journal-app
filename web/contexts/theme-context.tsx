@@ -122,7 +122,8 @@ function Theme({
   const { data: overrides = {}, isLoading, mutate } = useSWR("theme", fetchThemeOverrides);
 
   const theme = useMemo(() => {
-    const source = isLoading ? globalThis.__THEME__ : overrides;
+    const source =
+      isLoading || Object.keys(overrides).length === 0 ? globalThis.__THEME__ : overrides;
     return {
       palette: { name: source?.palette?.name ?? defaultTheme.palette.name }
     };
@@ -195,7 +196,9 @@ function Theme({
       });
     }
 
-    mutate();
+    if (user) {
+      mutate();
+    }
 
     setTheme(name);
   }
