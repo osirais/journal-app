@@ -2,19 +2,19 @@ import EntriesPage from "@/components/entries/entries-page";
 import { createClient } from "@/utils/supabase/server";
 import { Metadata } from "next";
 
-type Props = {
-  params: {
-    journalId: string;
-  };
-};
+export async function generateMetadata({
+  params
+}: {
+  params: Promise<{ journalId: string }>;
+}): Promise<Metadata> {
+  const { journalId } = await params;
 
-export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const supabase = await createClient();
 
   const { data: journal } = await supabase
     .from("journal")
     .select("title")
-    .eq("id", params.journalId)
+    .eq("id", journalId)
     .is("deleted_at", null)
     .single();
 
@@ -23,6 +23,6 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
-export default function Page({ params }: Props) {
+export default function Page() {
   return <EntriesPage />;
 }
