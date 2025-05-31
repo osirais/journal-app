@@ -27,7 +27,7 @@ export const metadata = {
     siteName: "Logal",
     images: [
       {
-        url: `${new URL(defaultUrl)}/og-image.png`,
+        url: `${defaultUrl}/og-image.png`,
         width: 1200,
         height: 630,
         alt: "Logal Banner"
@@ -40,7 +40,7 @@ export const metadata = {
     card: "summary_large_image",
     title: "Logal - Journal Your Way to a Better You",
     description: "Track habits, reflect on your day, and grow intentionally with Logal.",
-    images: [`${new URL(defaultUrl)}/og-image.png`]
+    images: [`${defaultUrl}/og-image.png`]
   }
 };
 
