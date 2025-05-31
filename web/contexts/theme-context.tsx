@@ -90,14 +90,14 @@ export function ThemeProvider(props: ThemeProviderProps) {
 
 export const systemThemes = ["light", "dark", "system"];
 
-async function fetchThemeOverrides(): Promise<ThemeOverrides> {
+async function fetchTheme(): Promise<Theme> {
   const supabase = createClient();
   const {
     data: { user }
   } = await supabase.auth.getUser();
 
   if (!user) {
-    return {};
+    return resolveTheme(globalThis.__THEME__);
   }
 
   const { data } = await supabase
@@ -106,7 +106,14 @@ async function fetchThemeOverrides(): Promise<ThemeOverrides> {
     .eq("user_id", user.id)
     .single();
 
-  return data?.theme ?? {};
+  return resolveTheme(data?.theme || globalThis.__THEME__);
+}
+
+function resolveTheme(overrides: Partial<Theme> = {}) {
+  return {
+    ...DEFAULT_THEME,
+    ...overrides
+  };
 }
 
 function Theme({
@@ -119,29 +126,24 @@ function Theme({
   nonce,
   scriptProps
 }: ThemeProviderProps) {
-  const { data: overrides = {}, isLoading, mutate } = useSWR("theme", fetchThemeOverrides);
+  const { data: theme, mutate } = useSWR("theme", fetchTheme, {
+    fallbackData: resolveTheme(globalThis.__THEME__)
+  });
 
-  const theme = useMemo(() => {
-    const source =
-      isLoading || Object.keys(overrides).length === 0 ? globalThis.__THEME__ : overrides;
-    return {
-      palette: { name: source?.palette?.name ?? defaultTheme.palette.name }
-    };
-  }, [overrides, defaultTheme]);
-
-  const paletteName = theme.palette?.name || defaultTheme.palette.name;
+  const paletteName = theme.palette.name;
 
   const [resolvedPaletteName, setResolvedPaletteName] = useState(() =>
     paletteName === "system" ? getSystemTheme() : paletteName
   );
 
   async function setPaletteName(name: string) {
+    const newPalette = getPalette(name) || { name: name };
+
     mutate(
-      (current: ThemeOverrides = {}) => ({
-        ...current,
-        palette: { name }
-      }),
-      false
+      { ...theme, palette: newPalette },
+      {
+        revalidate: false
+      }
     );
 
     const supabase = createClient();
