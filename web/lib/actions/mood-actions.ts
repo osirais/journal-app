@@ -80,9 +80,9 @@ async function handleDailyMoodEntryReward(
     .from("balance_transaction")
     .select("id")
     .eq("user_id", userId)
-    .eq("currency", "stamps")
+    .eq("currency", "droplets")
     .eq("reason", "daily_mood_entry")
-    .gt("created_at", new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString())
+    .gt("created_at", new Date(Date.now() - 86400000).toISOString())
     .limit(1)
     .maybeSingle();
 
@@ -100,23 +100,30 @@ async function handleDailyMoodEntryReward(
     .from("user_balance")
     .select("balance")
     .eq("user_id", userId)
-    .eq("currency", "stamps")
-    .single();
+    .eq("currency", "droplets")
+    .maybeSingle();
 
-  await supabase.from("balance_transaction").insert([
-    {
-      user_id: userId,
-      currency: "stamps",
-      amount: DAILY_MOOD_ENTRY_REWARD,
-      reason: "daily_mood_entry"
-    }
-  ]);
+  if (!userBalance) {
+    await supabase.from("user_balance").insert([
+      {
+        user_id: userId,
+        currency: "droplets",
+        balance: DAILY_MOOD_ENTRY_REWARD
+      }
+    ]);
+  } else {
+    await supabase
+      .from("user_balance")
+      .update({ balance: userBalance.balance + DAILY_MOOD_ENTRY_REWARD })
+      .eq("user_id", userId)
+      .eq("currency", "droplets");
+  }
 
   await supabase
     .from("user_balance")
     .update({ balance: userBalance.balance + DAILY_MOOD_ENTRY_REWARD })
     .eq("user_id", userId)
-    .eq("currency", "stamps");
+    .eq("currency", "droplets");
 
   const today = new Date().toISOString().slice(0, 10);
 
@@ -142,7 +149,6 @@ async function handleDailyMoodEntryReward(
   } else {
     const lastDate = streak.last_completed_date ? new Date(streak.last_completed_date) : null;
     const lastDateStr = lastDate ? lastDate.toISOString().slice(0, 10) : null;
-
     const yesterdayStr = new Date(Date.now() - 86400000).toISOString().slice(0, 10);
 
     if (lastDateStr === today) {

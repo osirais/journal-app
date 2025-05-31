@@ -168,7 +168,7 @@ async function handleDailyEntryReward(
     .from("balance_transaction")
     .select("id")
     .eq("user_id", userId)
-    .eq("currency", "stamps")
+    .eq("currency", "droplets")
     .eq("reason", "daily_entry")
     .gt("created_at", new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString())
     .limit(1)
@@ -180,21 +180,26 @@ async function handleDailyEntryReward(
       .from("user_balance")
       .select("balance")
       .eq("user_id", userId)
-      .eq("currency", "stamps")
+      .eq("currency", "droplets")
       .single();
 
     if (userBalance) {
       await supabase
         .from("balance_transaction")
         .insert([
-          { user_id: userId, currency: "stamps", amount: DAILY_ENTRY_REWARD, reason: "daily_entry" }
+          {
+            user_id: userId,
+            currency: "droplets",
+            amount: DAILY_ENTRY_REWARD,
+            reason: "daily_entry"
+          }
         ]);
 
       await supabase
         .from("user_balance")
         .update({ balance: userBalance.balance + DAILY_ENTRY_REWARD })
         .eq("user_id", userId)
-        .eq("currency", "stamps");
+        .eq("currency", "droplets");
 
       reward = DAILY_ENTRY_REWARD;
     }
@@ -231,7 +236,6 @@ async function handleDailyEntryReward(
     } else if (lastDateStr === yesterdayStr) {
       currentStreak = streakData.current_streak + 1;
     } else {
-      // if lastDateStr is null or older than yesterday, reset streak to 1
       currentStreak = 1;
     }
 

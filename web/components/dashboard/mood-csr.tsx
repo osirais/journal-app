@@ -46,13 +46,13 @@ export function MoodCardCSR({ initialMood, eligible, streak }: MoodCardCSRProps)
         setOptimisticMood(initialMood);
         toast.error(result.error || "Failed to update mood");
       } else if (result.reward) {
-        receiveReward(`Daily mood entry reward: +${result.reward} stamps!`, result.streak);
+        receiveReward(`Daily mood entry reward: +${result.reward} droplets!`, result.streak);
       }
     });
   };
 
   const message = eligible
-    ? `✅ You can claim your daily +${DAILY_MOOD_ENTRY_REWARD} stamp`
+    ? `✅ You can claim your daily +${DAILY_MOOD_ENTRY_REWARD} droplet`
     : "🕒 You've already claimed your reward today";
 
   return (

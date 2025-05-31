@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { DAILY_ENTRY_REWARD } from "@/constants/rewards";
 import { createClient } from "@/utils/supabase/server";
 import { FlameIcon as FireIcon } from "lucide-react";
 import Link from "next/link";
@@ -39,7 +40,7 @@ export const JournalCard: FC = async () => {
     } else {
       eligible = !lastTransaction;
       message = eligible
-        ? "✅ You can claim your daily plus five stamps"
+        ? `✅ You can claim your daily +${DAILY_ENTRY_REWARD} droplets`
         : "🕒 You have already claimed your reward today";
     }
 

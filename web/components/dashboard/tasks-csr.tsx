@@ -45,7 +45,10 @@ export function TasksCardCSR({ tasks, error, streak, completedTaskIds }: TasksCa
         }
 
         if (typeof result.reward === "number" && result.reward > 0) {
-          receiveReward(`Daily task completions reward: +${result.reward} stamps!`, result.streak);
+          receiveReward(
+            `Daily task completions reward: +${result.reward} droplets!`,
+            result.streak
+          );
         }
       } else {
         toast.error("Error", { description: result.error || "Failed to complete task" });

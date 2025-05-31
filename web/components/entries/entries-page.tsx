@@ -129,7 +129,7 @@ export default function EntriesPage() {
       const { reward, streak } = response.data;
 
       if (reward) {
-        receiveReward(`Daily journal entry reward: +${reward} stamps!`, streak);
+        receiveReward(`Daily journal entry reward: +${reward} droplets!`, streak);
       }
 
       setEntries((prev) => [

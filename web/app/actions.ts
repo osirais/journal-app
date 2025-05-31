@@ -41,7 +41,7 @@ export async function registerAction(username: string, email: string, password: 
 
   const { error: balanceError } = await supabase
     .from("user_balance")
-    .insert([{ user_id: authData.user.id, currency: "stamps" }]);
+    .insert([{ user_id: authData.user.id, currency: "droplets" }]);
 
   if (balanceError) {
     console.error(balanceError.code + " " + balanceError.message);

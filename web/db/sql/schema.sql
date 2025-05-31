@@ -71,15 +71,15 @@ CREATE TABLE IF NOT EXISTS balance_transaction (
         REFERENCES user_balance(user_id, currency)
 );
 
-CREATE OR REPLACE VIEW users_with_stamps
+CREATE OR REPLACE VIEW users_with_droplets
 WITH (security_invoker = on) AS
 SELECT
     u.*,
-    COALESCE(b.balance, 0) AS stamps
+    COALESCE(b.balance, 0) AS droplets
 FROM users u
 LEFT JOIN user_balance b
     ON b.user_id = u.id
-   AND b.currency = 'stamps';
+   AND b.currency = 'droplets';
 
 DO $$ BEGIN
   IF NOT EXISTS (

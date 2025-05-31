@@ -1,4 +1,4 @@
-import StampCountSSR from "@/components/navbar/stamp-count-ssr-wrapper";
+import StampCountSSR from "@/components/navbar/droplet-count-ssr";
 import { UserActionsDropdown } from "@/components/navbar/user-actions-dropdown";
 import { Button } from "@/components/ui/button";
 import { hasEnvVars } from "@/utils/supabase/check-env-vars";

@@ -211,7 +211,7 @@ async function handleDailyTaskCompletionReward(
     .from("balance_transaction")
     .select("id")
     .eq("user_id", userId)
-    .eq("currency", "stamps")
+    .eq("currency", "droplets")
     .eq("reason", "daily_task_completion")
     .gte("created_at", `${today}T00:00:00.000Z`)
     .lt("created_at", `${today}T23:59:59.999Z`)
@@ -237,7 +237,7 @@ async function handleDailyTaskCompletionReward(
     .from("user_balance")
     .select("balance")
     .eq("user_id", userId)
-    .eq("currency", "stamps")
+    .eq("currency", "droplets")
     .single();
 
   if (!userBalance) throw new Error("User balance not found");
@@ -245,7 +245,7 @@ async function handleDailyTaskCompletionReward(
   await supabase.from("balance_transaction").insert([
     {
       user_id: userId,
-      currency: "stamps",
+      currency: "droplets",
       amount: DAILY_TASKS_COMPLETION_REWARD,
       reason: "daily_task_completion"
     }
@@ -255,7 +255,7 @@ async function handleDailyTaskCompletionReward(
     .from("user_balance")
     .update({ balance: userBalance.balance + DAILY_TASKS_COMPLETION_REWARD })
     .eq("user_id", userId)
-    .eq("currency", "stamps");
+    .eq("currency", "droplets");
 
   const yesterday = new Date(Date.now() - 86400000).toISOString().slice(0, 10);
 
