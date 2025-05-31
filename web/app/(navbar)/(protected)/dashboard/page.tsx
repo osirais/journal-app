@@ -5,6 +5,10 @@ import { MoodCardSSR } from "@/components/dashboard/mood-ssr";
 import { TasksCardSSR } from "@/components/dashboard/tasks-ssr";
 import { TreeCard } from "@/components/dashboard/tree-card";
 
+export const metadata = {
+  title: "Dashboard"
+};
+
 const Page = () => {
   return (
     <div className="hide-scrollbar h-screen snap-y snap-mandatory overflow-y-scroll">

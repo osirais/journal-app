@@ -1,5 +1,9 @@
 import { AchievementsMap } from "@/components/achievements-map";
 
+export const metadata = {
+  title: "Achievements"
+};
+
 const Page = () => {
   return (
     <div>

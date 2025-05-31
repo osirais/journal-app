@@ -5,6 +5,10 @@ import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { Calendar, Lock, User } from "lucide-react";
 
+export const metadata = {
+  title: "Manage Account"
+};
+
 const Page = () => {
   return (
     <div className="bg-background min-h-screen">
