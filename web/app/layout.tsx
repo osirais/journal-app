@@ -2,11 +2,8 @@ import { ThemeProvider } from "@/contexts/theme-context";
 import { Geist } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "@/components/ui/sonner";
+import { defaultUrl } from "@/constants/url";
 import { headers } from "next/headers";
-
-const defaultUrl = process.env.VERCEL_URL
-  ? `https://${process.env.VERCEL_URL}`
-  : "http://localhost:3000";
 
 export const metadata = {
   metadataBase: new URL(defaultUrl),

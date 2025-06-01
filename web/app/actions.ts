@@ -1,5 +1,6 @@
 "use server";
 
+import { defaultUrl } from "@/constants/url";
 import { createClient } from "@/utils/supabase/server";
 import { encodedRedirect } from "@/utils/utils";
 import { headers } from "next/headers";
@@ -7,7 +8,7 @@ import { redirect } from "next/navigation";
 
 export async function registerAction(username: string, email: string, password: string) {
   const supabase = await createClient();
-  const origin = (await headers()).get("origin");
+  // const origin = (await headers()).get("origin");
 
   if (!email || !password) {
     return encodedRedirect("error", "/register", "Email and password are required");
@@ -17,7 +18,7 @@ export async function registerAction(username: string, email: string, password: 
     email,
     password,
     options: {
-      emailRedirectTo: `${origin}/auth/callback`
+      emailRedirectTo: `${defaultUrl}/auth/callback`
     }
   });
 
