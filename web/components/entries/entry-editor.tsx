@@ -1,9 +1,9 @@
+import { HeadingWithId } from "@/lib/tiptap/heading-with-id";
 import Typography from "@tiptap/extension-typography";
 import { Editor, EditorContent, useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import React from "react";
 import { Markdown } from "tiptap-markdown";
-import { HeadingWithId } from "./heading-with-id";
 
 export default function EntryEditor({
   content,

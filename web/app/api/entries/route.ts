@@ -184,16 +184,14 @@ async function handleDailyEntryReward(
       .single();
 
     if (userBalance) {
-      await supabase
-        .from("balance_transaction")
-        .insert([
-          {
-            user_id: userId,
-            currency: "droplets",
-            amount: DAILY_ENTRY_REWARD,
-            reason: "daily_entry"
-          }
-        ]);
+      await supabase.from("balance_transaction").insert([
+        {
+          user_id: userId,
+          currency: "droplets",
+          amount: DAILY_ENTRY_REWARD,
+          reason: "daily_entry"
+        }
+      ]);
 
       await supabase
         .from("user_balance")
