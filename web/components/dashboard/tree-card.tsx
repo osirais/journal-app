@@ -1,5 +1,6 @@
 "use client";
 
+import { useDropletStore } from "@/app/stores/droplets-store";
 import { TreeProgressionDrawer } from "@/components/tree/tree-progression-drawer";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { getCurrentTreeStage, getNextRequiredDroplets } from "@/utils/tree-stage-utils";
@@ -27,7 +28,7 @@ function TreeModel({ modelPath }: { modelPath: string }) {
 }
 
 export function TreeCard() {
-  const droplets = 47;
+  const droplets = useDropletStore((state) => state.droplets) ?? 0;
   const currentStage = getCurrentTreeStage(droplets);
   const nextRequired = getNextRequiredDroplets(droplets);
 

@@ -49,7 +49,8 @@
     "swr": "^2.3.3",
     "three": "^0.177.0",
     "tiptap-markdown": "^0.8.10",
-    "vaul": "^1.1.2"
+    "vaul": "^1.1.2",
+    "zustand": "^5.0.5"
   },
   "devDependencies": {
     "@chromatic-com/storybook": "^4.0.0",

@@ -1,8 +1,9 @@
 "use client";
 
+import { useDropletStore } from "@/app/stores/droplets-store";
 import { createClient } from "@/utils/supabase/client";
 import { Droplet } from "lucide-react";
-import React, { FC, useCallback, useEffect, useState } from "react";
+import React, { FC, useCallback, useEffect } from "react";
 
 interface DropletCountCSRProps {
   userId: string;
@@ -10,8 +11,9 @@ interface DropletCountCSRProps {
 }
 
 export const DropletCountCSR: FC<DropletCountCSRProps> = ({ userId, initialDroplets }) => {
-  const [droplets, setDroplets] = useState<number | null>(initialDroplets);
-  const [loading, setLoading] = useState(false);
+  const droplets = useDropletStore((state) => state.droplets);
+  const setDroplets = useDropletStore((state) => state.setDroplets);
+  const [loading, setLoading] = React.useState(false);
 
   const fetchDroplets = useCallback(async () => {
     setLoading(true);
@@ -24,7 +26,11 @@ export const DropletCountCSR: FC<DropletCountCSRProps> = ({ userId, initialDropl
 
     if (data) setDroplets(data.droplets);
     setLoading(false);
-  }, [userId]);
+  }, [userId, setDroplets]);
+
+  useEffect(() => {
+    setDroplets(initialDroplets);
+  }, [initialDroplets, setDroplets]);
 
   useEffect(() => {
     // @ts-ignore
