@@ -8,7 +8,7 @@ import { Suspense, useRef } from "react";
 import type * as THREE from "three";
 
 function TreeModel() {
-  const { scene } = useGLTF("/models/tree_stages/current/Tree_2_A_Color1.gltf");
+  const { scene } = useGLTF("/models/tree_stages/_current/Tree_2_A_Color1.gltf");
   const groupRef = useRef<THREE.Group>(null);
 
   useFrame(() => {

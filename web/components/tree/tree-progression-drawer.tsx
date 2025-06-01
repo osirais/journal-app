@@ -17,8 +17,19 @@ import { Canvas, useFrame } from "@react-three/fiber";
 import { useRef, useState } from "react";
 import type * as THREE from "three";
 
+const treeModelPaths: Record<string, string> = {
+  A: "/models/tree_stages/A/Grass_2_A_Color1.gltf",
+  B: "/models/tree_stages/B/Grass_2_B_Color1.gltf",
+  C: "/models/tree_stages/C/Tree_2_A_Color1.gltf",
+  D: "/models/tree_stages/D/Tree_2_B_Color1.gltf",
+  E: "/models/tree_stages/E/Tree_2_C_Color1.gltf",
+  F: "/models/tree_stages/F/Tree_2_D_Color1.gltf",
+  G: "/models/tree_stages/G/Tree_2_E_Color1.gltf"
+};
+
 function TreeModel({ letter }: { letter: string }) {
-  const { scene } = useGLTF(`/models/tree_stages/${letter}/Tree_2_${letter}_Color1.gltf`);
+  const path = treeModelPaths[letter];
+  const { scene } = useGLTF(path);
   const groupRef = useRef<THREE.Group>(null);
 
   useFrame(() => {
@@ -36,7 +47,7 @@ function TreeModel({ letter }: { letter: string }) {
 
 function TreeScene({ letter }: { letter: string }) {
   return (
-    <div className="h-20 w-20 overflow-hidden rounded-lg border bg-transparent">
+    <div className="h-28 w-28 overflow-hidden rounded-lg border bg-transparent">
       <Canvas
         camera={{ position: [0, 0, 6], fov: 90 }}
         gl={{ preserveDrawingBuffer: true, alpha: true }}
@@ -54,36 +65,13 @@ export function TreeProgressionDrawer() {
   const [open, setOpen] = useState(false);
 
   const progressionSteps = [
-    {
-      name: "Sprout",
-      progress: 20,
-      status: "completed",
-      letter: "A"
-    },
-    {
-      name: "Sapling",
-      progress: 40,
-      status: "completed",
-      letter: "B"
-    },
-    {
-      name: "Young Tree",
-      progress: 60,
-      status: "current",
-      letter: "C"
-    },
-    {
-      name: "Mature Tree",
-      progress: 80,
-      status: "upcoming",
-      letter: "D"
-    },
-    {
-      name: "Elder Tree",
-      progress: 100,
-      status: "upcoming",
-      letter: "E"
-    }
+    { name: "Sprout", letter: "A", progress: 14, status: "completed" },
+    { name: "Sapling", letter: "B", progress: 28, status: "completed" },
+    { name: "Young Tree", letter: "C", progress: 42, status: "completed" },
+    { name: "Mature Tree", letter: "D", progress: 56, status: "current" },
+    { name: "Elder Tree", letter: "E", progress: 70, status: "upcoming" },
+    { name: "Ancient Tree", letter: "F", progress: 85, status: "upcoming" },
+    { name: "Mythic Tree", letter: "G", progress: 100, status: "upcoming" }
   ];
 
   const currentStep = progressionSteps.findIndex((step) => step.status === "current");
@@ -96,7 +84,7 @@ export function TreeProgressionDrawer() {
         View Stages
       </Button>
       <Drawer open={open} onOpenChange={setOpen}>
-        <DrawerContent className="h-[400px]">
+        <DrawerContent className="h-[450px]">
           <DrawerHeader className="pb-2 text-center">
             <DrawerTitle className="text-xl font-bold">
               Growth Progression Timeline (WIP)
@@ -105,9 +93,12 @@ export function TreeProgressionDrawer() {
           </DrawerHeader>
           <div className="x-6 flex-1">
             <div className="relative">
-              <div className="relative flex items-start justify-between gap-4">
+              <div className="relative flex items-start justify-between gap-4 overflow-x-auto px-4">
                 {progressionSteps.map((step, index) => (
-                  <div key={index} className="flex flex-1 flex-col items-center space-y-3">
+                  <div
+                    key={index}
+                    className="flex min-w-[80px] flex-1 flex-col items-center space-y-3"
+                  >
                     <TreeScene letter={step.letter} />
                     <div
                       className={`relative z-10 h-4 w-4 rounded-full border-2 ${
