@@ -12,24 +12,16 @@ import {
   DrawerTitle
 } from "@/components/ui/drawer";
 import { Progress } from "@/components/ui/progress";
+import { TREE_PROGRESSION_STAGES } from "@/constants/tree-stages";
 import { useGLTF } from "@react-three/drei";
 import { Canvas, useFrame } from "@react-three/fiber";
 import { useRef, useState } from "react";
 import type * as THREE from "three";
 
-const treeModelPaths: Record<string, string> = {
-  A: "/models/tree_stages/A/Grass_2_A_Color1.gltf",
-  B: "/models/tree_stages/B/Grass_2_B_Color1.gltf",
-  C: "/models/tree_stages/C/Tree_2_A_Color1.gltf",
-  D: "/models/tree_stages/D/Tree_2_B_Color1.gltf",
-  E: "/models/tree_stages/E/Tree_2_C_Color1.gltf",
-  F: "/models/tree_stages/F/Tree_2_D_Color1.gltf",
-  G: "/models/tree_stages/G/Tree_2_E_Color1.gltf"
-};
-
 function TreeModel({ letter }: { letter: string }) {
-  const path = treeModelPaths[letter];
-  const { scene } = useGLTF(path);
+  const relativePath = TREE_PROGRESSION_STAGES.find((s) => s.letter === letter)?.path ?? "";
+  const fullPath = `/models/tree_stages/${relativePath}`;
+  const { scene } = useGLTF(fullPath);
   const groupRef = useRef<THREE.Group>(null);
 
   useFrame(() => {
@@ -61,22 +53,25 @@ function TreeScene({ letter }: { letter: string }) {
   );
 }
 
-export function TreeProgressionDrawer() {
+export function TreeProgressionDrawer({ droplets }: { droplets: number }) {
   const [open, setOpen] = useState(false);
 
-  const progressionSteps = [
-    { name: "Sprout", letter: "A", progress: 14, status: "completed" },
-    { name: "Sapling", letter: "B", progress: 28, status: "completed" },
-    { name: "Young Tree", letter: "C", progress: 42, status: "completed" },
-    { name: "Mature Tree", letter: "D", progress: 56, status: "current" },
-    { name: "Elder Tree", letter: "E", progress: 70, status: "upcoming" },
-    { name: "Ancient Tree", letter: "F", progress: 85, status: "upcoming" },
-    { name: "Mythic Tree", letter: "G", progress: 100, status: "upcoming" }
-  ];
+  const stepsWithStatus = TREE_PROGRESSION_STAGES.map((step, index) => {
+    if (droplets >= step.required) {
+      return { ...step, status: "completed" };
+    }
+    const previousStep = TREE_PROGRESSION_STAGES[index - 1];
+    if (previousStep && droplets >= previousStep.required && droplets < step.required) {
+      return { ...step, status: "current" };
+    }
+    if (index === 0 && droplets < step.required) {
+      return { ...step, status: "current" };
+    }
+    return { ...step, status: "upcoming" };
+  });
 
-  const currentStep = progressionSteps.findIndex((step) => step.status === "current");
-  const overallProgress =
-    currentStep >= 0 ? ((currentStep + 1) / progressionSteps.length) * 100 : 0;
+  const completedSteps = stepsWithStatus.filter((s) => s.status === "completed").length;
+  const overallProgress = (completedSteps / TREE_PROGRESSION_STAGES.length) * 100;
 
   return (
     <>
@@ -94,21 +89,20 @@ export function TreeProgressionDrawer() {
           <div className="x-6 flex-1">
             <div className="relative">
               <div className="relative flex items-start justify-between gap-4 overflow-x-auto px-4">
-                {progressionSteps.map((step, index) => (
+                {stepsWithStatus.map((step, index) => (
                   <div
                     key={index}
                     className="flex min-w-[80px] flex-1 flex-col items-center space-y-3"
                   >
                     <TreeScene letter={step.letter} />
-                    <div
-                      className={`relative z-10 h-4 w-4 rounded-full border-2 ${
-                        step.status === "completed"
-                          ? "border-green-500 bg-green-500"
-                          : step.status === "current"
-                            ? "bg-primary border-primary"
-                            : "bg-background border-muted-foreground"
-                      }`}
-                    />
+                    <div className="border-primary bg-background relative z-10 h-4 w-4 rounded-full border-2">
+                      {step.status === "completed" && (
+                        <div className="absolute inset-0 rounded-full border-green-500 bg-green-500" />
+                      )}
+                      {step.status === "current" && (
+                        <div className="bg-primary absolute left-0 top-0 h-full w-1/2 rounded-l-full" />
+                      )}
+                    </div>
                     <div className="space-y-1 text-center">
                       <div className="flex items-center justify-center gap-1">
                         <h4 className="text-sm font-medium">{step.name}</h4>
@@ -129,7 +123,9 @@ export function TreeProgressionDrawer() {
                               : "○"}
                         </Badge>
                       </div>
-                      <div className="text-xs font-medium">{step.progress}%</div>
+                      <div className="text-xs font-medium">
+                        {droplets} / {step.required}
+                      </div>
                     </div>
                   </div>
                 ))}

@@ -1,4 +1,4 @@
-import StampCountSSR from "@/components/navbar/droplet-count-ssr";
+import DropletCountSSR from "@/components/navbar/droplet-count-ssr";
 import { UserActionsDropdown } from "@/components/navbar/user-actions-dropdown";
 import { Button } from "@/components/ui/button";
 import { hasEnvVars } from "@/utils/supabase/check-env-vars";
@@ -37,7 +37,7 @@ export default async function AuthButton() {
   }
 
   const { data } = await supabase
-    .from("users_with_stamps")
+    .from("users_with_droplets")
     .select("username")
     .eq("id", user.id)
     .single();
@@ -48,7 +48,7 @@ export default async function AuthButton() {
     <div className="flex items-center gap-3">
       <div className="grid grid-cols-[repeat(3,max-content)] place-items-center gap-2">
         <UserActionsDropdown username={data.username} />
-        <StampCountSSR userId={user.id} />
+        <DropletCountSSR userId={user.id} />
       </div>
     </div>
   );

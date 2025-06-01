@@ -2,13 +2,15 @@
 
 import { TreeProgressionDrawer } from "@/components/tree/tree-progression-drawer";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { getCurrentTreeStage, getNextRequiredDroplets } from "@/utils/tree-stage-utils";
 import { OrbitControls, useGLTF } from "@react-three/drei";
 import { Canvas, useFrame } from "@react-three/fiber";
 import { Suspense, useRef } from "react";
 import type * as THREE from "three";
 
-function TreeModel() {
-  const { scene } = useGLTF("/models/tree_stages/_current/Tree_2_A_Color1.gltf");
+function TreeModel({ modelPath }: { modelPath: string }) {
+  const fullPath = `/models/tree_stages_current/${modelPath}`;
+  const { scene } = useGLTF(fullPath);
   const groupRef = useRef<THREE.Group>(null);
 
   useFrame(() => {
@@ -25,6 +27,10 @@ function TreeModel() {
 }
 
 export function TreeCard() {
+  const droplets = 47;
+  const currentStage = getCurrentTreeStage(droplets);
+  const nextRequired = getNextRequiredDroplets(droplets);
+
   return (
     <Card className="flex h-[80vh] w-full flex-col pb-0">
       <CardHeader>
@@ -38,7 +44,7 @@ export function TreeCard() {
               <ambientLight intensity={0.5} />
               <directionalLight position={[5, 5, 5]} intensity={1} />
               <Suspense fallback={null}>
-                <TreeModel />
+                <TreeModel modelPath={currentStage.path} />
               </Suspense>
               <OrbitControls
                 enableZoom={false}
@@ -49,7 +55,10 @@ export function TreeCard() {
             </Canvas>
           </div>
           <div className="ml-auto mt-auto w-max pb-6 pr-6">
-            <TreeProgressionDrawer />
+            <div className="mb-2 text-right font-mono text-sm text-gray-700">
+              {nextRequired ? `${droplets} / ${nextRequired}` : `${droplets} / —`} droplets
+            </div>
+            <TreeProgressionDrawer droplets={droplets} />
           </div>
         </div>
       </CardContent>
