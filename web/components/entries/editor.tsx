@@ -3,6 +3,7 @@ import { Editor, EditorContent, useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import React from "react";
 import { Markdown } from "tiptap-markdown";
+import { HeadingWithId } from "./heading-with-id";
 
 export default function EntryEditor({
   content,
@@ -12,7 +13,7 @@ export default function EntryEditor({
   onCreate?: (editor: Editor) => void;
 }) {
   const editor = useEditor({
-    extensions: [StarterKit, Markdown, Typography],
+    extensions: [StarterKit, Markdown, Typography, HeadingWithId],
     content: content,
     editorProps: {
       attributes: {
@@ -21,7 +22,8 @@ export default function EntryEditor({
     },
     onCreate({ editor }) {
       onCreate?.(editor);
-    }
+    },
+    editable: false
   });
 
   return (

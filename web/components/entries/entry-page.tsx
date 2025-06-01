@@ -2,7 +2,7 @@
 
 import EntryEditor from "@/components/entries/editor";
 import { EntryDrawer } from "@/components/entries/entry-drawer";
-import { Markdown } from "@/components/markdown";
+import { OutlineCombobox } from "@/components/entries/outline-combobox";
 import { TagComponent } from "@/components/tag-component";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -140,6 +140,12 @@ function EntryContent() {
     }
   });
 
+  useEffect(() => {
+    if (editorRef.current) {
+      editorRef.current.setEditable(isEditing);
+    }
+  }, [isEditing]);
+
   const { data: userTags } = useSWR(data?.userId ? `user-tags-${data.userId}` : null, () =>
     data?.userId ? fetchUserTags(data.userId) : null
   );
@@ -273,6 +279,77 @@ function EntryContent() {
 
       <div className="space-y-4">
         <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2 text-lg font-semibold">
+            <FileText className="size-4" />
+            <span>Content</span>
+          </div>
+          {!isEditing ? (
+            <div className="flex items-center gap-2">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setIsEditing(true)}
+                className="cursor-pointer"
+              >
+                <Edit3 className="size-3" />
+                <span className="sr-only">Edit Content</span>
+              </Button>
+              {editorRef.current && <OutlineCombobox editor={editorRef.current} />}
+            </div>
+          ) : (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setIsEditing(false)}
+              className="cursor-pointer"
+            >
+              <X className="size-3" />
+              <span className="sr-only">Cancel Edit</span>
+            </Button>
+          )}
+        </div>
+
+        <div className="border-input bg-background rounded-md border p-4">
+          <EntryEditor
+            content={entry.content}
+            onCreate={(editor) => (editorRef.current = editor)}
+          />
+        </div>
+        {isEditing && (
+          <div className="flex gap-2">
+            <Button
+              onClick={() => saveEntry()}
+              disabled={isSavingEntry}
+              className="flex cursor-pointer items-center gap-2"
+            >
+              {isSavingEntry ? (
+                <>
+                  <LoaderCircle className="size-4 animate-spin" />
+                  Saving...
+                </>
+              ) : (
+                <>
+                  <Save className="size-4" />
+                  Save
+                </>
+              )}
+            </Button>
+            <Button
+              variant="outline"
+              onClick={() => setIsEditing(false)}
+              disabled={isSavingEntry}
+              className="cursor-pointer"
+            >
+              Cancel
+            </Button>
+          </div>
+        )}
+      </div>
+
+      <Separator className="my-6" />
+
+      <div className="space-y-4">
+        <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <TagIcon className="size-4" />
             <span className="text-lg font-semibold">Tags</span>
@@ -350,80 +427,6 @@ function EntryContent() {
             ) : (
               <span className="text-muted-foreground text-sm">No tags</span>
             )}
-          </div>
-        )}
-      </div>
-
-      <Separator className="my-6" />
-
-      <div className="space-y-4">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2 text-lg font-semibold">
-            <FileText className="size-4" />
-            <span>Content</span>
-          </div>
-          {!isEditing ? (
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setIsEditing(true)}
-              className="cursor-pointer"
-            >
-              <Edit3 className="size-3" />
-              <span className="sr-only">Edit Content</span>
-            </Button>
-          ) : (
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setIsEditing(false)}
-              className="cursor-pointer"
-            >
-              <X className="size-3" />
-              <span className="sr-only">Cancel Edit</span>
-            </Button>
-          )}
-        </div>
-
-        {isEditing ? (
-          <>
-            <div className="border-input bg-background rounded-md border p-4">
-              <EntryEditor
-                content={entry.content}
-                onCreate={(editor) => (editorRef.current = editor)}
-              />
-            </div>
-            <div className="flex gap-2">
-              <Button
-                onClick={() => saveEntry()}
-                disabled={isSavingEntry}
-                className="flex cursor-pointer items-center gap-2"
-              >
-                {isSavingEntry ? (
-                  <>
-                    <LoaderCircle className="size-4 animate-spin" />
-                    Saving...
-                  </>
-                ) : (
-                  <>
-                    <Save className="size-4" />
-                    Save
-                  </>
-                )}
-              </Button>
-              <Button
-                variant="outline"
-                onClick={() => setIsEditing(false)}
-                disabled={isSavingEntry}
-                className="cursor-pointer"
-              >
-                Cancel
-              </Button>
-            </div>
-          </>
-        ) : (
-          <div className="prose prose-current dark:prose-invert max-w-none">
-            <Markdown>{entry.content}</Markdown>
           </div>
         )}
       </div>
