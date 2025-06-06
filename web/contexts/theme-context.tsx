@@ -2,7 +2,7 @@
 
 import { getPalette } from "@/lib/theme-palettes";
 import { createClient } from "@/utils/supabase/client";
-import { createContext, memo, useCallback, useContext, useEffect, useMemo, useState } from "react";
+import { createContext, memo, useCallback, useContext, useEffect, useMemo } from "react";
 import * as React from "react";
 import useSWR from "swr";
 
@@ -24,11 +24,7 @@ export interface UseThemeProps {
   /** List of all available theme names */
   themes: string[];
   /** Forced theme name for the current page */
-  forcedTheme?: string | undefined;
-  /** If the active theme is "system", this returns whether the system preference resolved to "dark" or "light". Otherwise, identical to `theme` */
-  resolvedTheme?: string | undefined;
-  /** System theme preference ("dark" or "light"), regardless what the active theme is */
-  systemTheme?: "dark" | "light" | undefined;
+  forcedTheme?: string;
 
   theme: Theme;
 
@@ -39,15 +35,15 @@ export interface UseThemeProps {
 
 export interface ThemeProviderProps extends React.PropsWithChildren {
   /** List of all available theme names */
-  themes?: string[] | undefined;
+  themes?: string[];
   /** Forced theme name for the current page */
-  forcedTheme?: string | undefined;
+  forcedTheme?: string;
   /** Disable all CSS transitions when switching themes */
-  disableTransitionOnChange?: boolean | undefined;
+  disableTransitionOnChange?: boolean;
   /** Key used to store theme setting in localStorage */
-  storageKey?: string | undefined;
+  storageKey?: string;
   /** Default theme */
-  defaultTheme?: Theme | undefined;
+  defaultTheme?: Theme;
   /** Nonce string to pass to the inline script and style elements for CSP headers */
   nonce?: string;
   /** Props to pass the inline script */
@@ -62,8 +58,6 @@ const ThemeContext = createContext<UseThemeProps | undefined>(undefined);
 const DEFAULT_THEME: Theme = {
   palette: { name: "system" }
 };
-
-type ThemeOverrides = Partial<Theme>;
 
 function saveToLS(storageKey: string, value: string) {
   // Save to storage
@@ -131,10 +125,6 @@ function Theme({
   });
 
   const paletteName = theme.palette.name;
-
-  const [resolvedPaletteName, setResolvedPaletteName] = useState(() =>
-    paletteName === "system" ? getSystemTheme() : paletteName
-  );
 
   async function setPaletteName(name: string) {
     const newPalette = getPalette(name) || { name: name };
@@ -267,7 +257,6 @@ function Theme({
       let resolved = theme;
       if (!resolved) return;
 
-      // If theme is system, resolve it before setting theme
       if (theme === "system") {
         resolved = getSystemTheme();
       }
@@ -295,14 +284,12 @@ function Theme({
     if (typeof value === "function") {
       const newTheme = value(paletteName);
 
-      saveToLS(storageKey, newTheme);
       if (!systemThemes.includes(newTheme)) {
         saveToLS("palette", JSON.stringify(getPalette(newTheme)));
       } else {
         saveToLS("palette", JSON.stringify({ name: newTheme }));
       }
     } else {
-      saveToLS(storageKey, value);
       if (!systemThemes.includes(value)) {
         saveToLS("palette", JSON.stringify(getPalette(value)));
       } else {
@@ -313,9 +300,6 @@ function Theme({
 
   const handleMediaQuery = useCallback(
     (e: MediaQueryListEvent | MediaQueryList) => {
-      const resolved = getSystemTheme(e);
-      setResolvedPaletteName(resolved);
-
       if (paletteName === "system" && !forcedTheme) {
         applyTheme("system");
       }
@@ -353,11 +337,9 @@ function Theme({
       paletteName,
       setPaletteName,
       forcedTheme,
-      resolvedPaletteName: paletteName === "system" ? resolvedPaletteName : paletteName,
-      themes: themes,
-      systemTheme: resolvedPaletteName as "light" | "dark" | undefined
+      themes: themes
     }),
-    [theme, forcedTheme, resolvedPaletteName, themes]
+    [theme, forcedTheme, themes]
   );
 
   return (
@@ -451,7 +433,7 @@ function script(storageKey: string, defaultTheme: string, forcedTheme: string, t
   globalThis.__THEME__ = { palette: palette };
 
   try {
-    const themeName = forcedTheme || localStorage.getItem(storageKey) || defaultTheme;
+    const themeName = forcedTheme || palette.name || defaultTheme;
     updateDOM(!forcedTheme && themeName === "system" ? getSystemTheme() : themeName);
   } catch (e) {
     //
