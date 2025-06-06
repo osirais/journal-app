@@ -52,7 +52,8 @@ export const TiptapEditor: FC<TiptapEditorProps> = ({
       }
     },
     onFocus: () => setIsFocused(true),
-    onBlur: () => setIsFocused(false)
+    onBlur: () => setIsFocused(false),
+    shouldRerenderOnTransaction: false
   });
 
   useEffect(() => {

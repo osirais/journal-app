@@ -23,7 +23,8 @@ export default function EntryEditor({
     onCreate({ editor }) {
       onCreate?.(editor);
     },
-    editable: false
+    editable: false,
+    shouldRerenderOnTransaction: false
   });
 
   return (
