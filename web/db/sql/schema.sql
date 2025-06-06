@@ -1,7 +1,7 @@
 CREATE EXTENSION IF NOT EXISTS citext SCHEMA extensions;
 
 CREATE TABLE IF NOT EXISTS users (
-    id UUID PRIMARY KEY REFERENCES auth.users(id),
+    id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
     username CITEXT UNIQUE NOT NULL,
     name TEXT NOT NULL,
     avatar_url TEXT,
@@ -14,7 +14,7 @@ CREATE TABLE IF NOT EXISTS users (
 
 CREATE TABLE IF NOT EXISTS journal (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v7(),
-    author_id UUID NOT NULL REFERENCES users(id),
+    author_id UUID REFERENCES users(id) ON DELETE SET NULL,
     title TEXT NOT NULL,
     description TEXT,
     thumbnail_url TEXT,
@@ -26,7 +26,7 @@ CREATE TABLE IF NOT EXISTS journal (
 
 CREATE TABLE IF NOT EXISTS entry (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v7(),
-    journal_id UUID NOT NULL REFERENCES journal(id),
+    journal_id UUID NOT NULL REFERENCES journal(id) ON DELETE CASCADE,
     title TEXT NOT NULL,
     content TEXT NOT NULL,
     created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
@@ -36,23 +36,23 @@ CREATE TABLE IF NOT EXISTS entry (
 
 CREATE TABLE IF NOT EXISTS tag (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v7(),
-    user_id UUID NOT NULL REFERENCES users(id),
+    user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
     name CITEXT NOT NULL,
     created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
     deleted_at TIMESTAMPTZ,
-    CONSTRAINT user_tag_unique UNIQUE(user_id, name)
+    UNIQUE (user_id, name)
 );
 
 CREATE TABLE IF NOT EXISTS entry_tag (
-    entry_id UUID NOT NULL REFERENCES entry(id),
-    tag_id UUID NOT NULL REFERENCES tag(id),
+    entry_id UUID REFERENCES entry(id) ON DELETE CASCADE,
+    tag_id UUID REFERENCES tag(id) ON DELETE CASCADE,
     PRIMARY KEY (entry_id, tag_id)
 );
 
 CREATE TABLE IF NOT EXISTS user_balance (
-    user_id UUID NOT NULL REFERENCES users(id),
-    currency TEXT NOT NULL,
+    user_id UUID REFERENCES users(id) ON DELETE CASCADE,
+    currency TEXT,
     balance INT8 NOT NULL DEFAULT 0,
     created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
@@ -69,6 +69,7 @@ CREATE TABLE IF NOT EXISTS balance_transaction (
     created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
     FOREIGN KEY (user_id, currency)
         REFERENCES user_balance(user_id, currency)
+        ON DELETE CASCADE
 );
 
 CREATE OR REPLACE VIEW users_with_droplets
@@ -91,7 +92,7 @@ END $$;
 
 CREATE TABLE IF NOT EXISTS task (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v7(),
-    user_id UUID NOT NULL REFERENCES users(id),
+    user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
     name TEXT NOT NULL,
     description TEXT,
     color_hex CHAR(7),
@@ -103,7 +104,7 @@ CREATE TABLE IF NOT EXISTS task (
 
 CREATE TABLE IF NOT EXISTS mood_entry (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v7(),
-    user_id UUID NOT NULL REFERENCES users(id),
+    user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
     scale INT NOT NULL CHECK (scale BETWEEN 1 AND 5),
     created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
@@ -112,14 +113,14 @@ CREATE TABLE IF NOT EXISTS mood_entry (
 
 CREATE TABLE IF NOT EXISTS task_completion (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v7(),
-    user_id UUID NOT NULL REFERENCES users(id),
-    task_id UUID NOT NULL REFERENCES task(id),
+    user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    task_id UUID NOT NULL REFERENCES task(id) ON DELETE CASCADE,
     completed_at TIMESTAMPTZ NOT NULL DEFAULT now(),
     deleted_at TIMESTAMPTZ
 );
 
 CREATE TABLE IF NOT EXISTS user_settings (
-    user_id UUID PRIMARY KEY REFERENCES users(id),
+    user_id UUID PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE,
     theme JSONB NOT NULL DEFAULT '{}'::JSONB,
     created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
@@ -136,7 +137,7 @@ END $$;
 
 CREATE TABLE IF NOT EXISTS streak (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v7(),
-    user_id UUID NOT NULL REFERENCES users(id),
+    user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
     category streak_category NOT NULL,
     current_streak INT NOT NULL DEFAULT 0,
     longest_streak INT NOT NULL DEFAULT 0,
