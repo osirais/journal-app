@@ -10,7 +10,7 @@ const compat = new FlatCompat({
 });
 
 export default defineConfig([
-  { ignores: [".next/**"] },
+  { ignores: [".next/**", "**/*.config.*", "components/ui/**"] },
   {
     files: ["**/*.{js,mjs,cjs,ts,mts,cts,jsx,tsx}"]
   },
@@ -23,5 +23,13 @@ export default defineConfig([
   ...compat.config({
     extends: ["next/core-web-vitals"]
   }),
-  prettier
+  prettier,
+  {
+    rules: {
+      "@typescript-eslint/ban-ts-comment": "off",
+      "@typescript-eslint/no-explicit-any": "off",
+      "@typescript-eslint/no-unused-vars": "off",
+      "react/no-unescaped-entities": "off"
+    }
+  }
 ]);

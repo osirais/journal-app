@@ -14,6 +14,7 @@ import {
 import type { JournalWithEntryCount } from "@/types";
 import { formatDateAgo } from "@/utils/format-date-ago";
 import { CalendarIcon, Clock, Edit, FileEdit, MoreVertical, Trash2 } from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
 import type React from "react";
 import type { FC } from "react";
@@ -60,7 +61,7 @@ export const JournalCard: FC<JournalCardProps> = ({
           <div className="flex items-start gap-4">
             {journal.thumbnail_url ? (
               <div className="bg-muted size-20 flex-shrink-0 overflow-hidden rounded-lg border">
-                <img
+                <Image
                   src={journal.thumbnail_url || "/placeholder.svg"}
                   alt={journal.title}
                   className="h-full w-full object-cover"

@@ -35,7 +35,7 @@ export function PaletteSelector() {
         palettes.filter((palette) => palette.name.toLowerCase().includes(searchQuery.toLowerCase()))
       );
     }
-  }, [searchQuery, palettes]);
+  }, [searchQuery]);
 
   return (
     <div>

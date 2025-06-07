@@ -110,7 +110,7 @@ export const TiptapEditor: FC<TiptapEditorProps> = ({
     if (!editor) return;
 
     editor.commands.setContent(content || "");
-  }, [content]);
+  }, [content, editor]);
 
   if (!editor) {
     return null;
