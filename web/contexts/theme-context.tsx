@@ -144,9 +144,7 @@ function Theme({
     if (user) {
       await supabase
         .from("user_settings")
-        .update({ theme: { palette: { name } } })
-        .eq("user_id", user.id)
-        .single();
+        .upsert({ user_id: user.id, theme: { palette: { name } } });
     }
 
     if (systemThemes.includes(name)) {
