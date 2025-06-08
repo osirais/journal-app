@@ -36,7 +36,7 @@ export interface UseThemeProps {
 export interface ThemeProviderProps extends React.PropsWithChildren {
   /** List of all available theme names */
   themes?: string[];
-  /** Forced theme name for the current page */
+  /** Forced theme name for the current page (wip) */
   forcedTheme?: string;
   /** Disable all CSS transitions when switching themes */
   disableTransitionOnChange?: boolean;
@@ -59,7 +59,6 @@ const DEFAULT_THEME: Theme = {
 };
 
 function saveToLS(storageKey: string, value: string) {
-  // Save to storage
   try {
     localStorage.setItem(storageKey, value);
   } catch {
@@ -125,18 +124,6 @@ function Theme({
 
   const paletteName = theme.palette.name;
 
-  const setTheme = useCallback(
-    (value: string | ((prev: string) => string)) => {
-      const newTheme = typeof value === "function" ? value(paletteName) : value;
-      if (!systemThemes.includes(newTheme)) {
-        saveToLS("palette", JSON.stringify(getPalette(newTheme)));
-      } else {
-        saveToLS("palette", JSON.stringify({ name: newTheme }));
-      }
-    },
-    [paletteName]
-  );
-
   const setPaletteName = useCallback(
     async (name: string) => {
       const newPalette = getPalette(name) || { name: name };
@@ -157,57 +144,54 @@ function Theme({
         await supabase
           .from("user_settings")
           .upsert({ user_id: user.id, theme: { palette: { name } } });
-      }
-
-      if (systemThemes.includes(name)) {
-        const cssVars = [
-          "--color-bg",
-          "--color-main",
-          "--color-caret",
-          "--color-sub",
-          "--color-sub-alt",
-          "--color-text",
-          "--color-error",
-          "--color-error-extra",
-          "--color-colorful-error",
-          "--color-colorful-error-extra",
-          "--color-background",
-          "--color-foreground",
-          "--color-card",
-          "--color-card-foreground",
-          "--color-popover",
-          "--color-popover-foreground",
-          "--color-primary",
-          "--color-primary-foreground",
-          "--color-secondary",
-          "--color-secondary-foreground",
-          "--color-muted",
-          "--color-muted-foreground",
-          "--color-accent",
-          "--color-accent-foreground",
-          "--color-destructive",
-          "--color-destructive-foreground",
-          "--color-border",
-          "--color-input",
-          "--color-ring",
-          "--color-hover"
-        ];
-
-        cssVars.forEach((variable) => {
-          document.documentElement.style.removeProperty(variable);
-        });
-      }
-
-      if (user) {
         mutate();
       }
 
-      setTheme(name);
+      saveToLS("palette", JSON.stringify(newPalette));
     },
-    [mutate, theme, setTheme]
+    [mutate, theme]
   );
 
   useEffect(() => {
+    if (systemThemes.includes(paletteName)) {
+      const cssVars = [
+        "--color-bg",
+        "--color-main",
+        "--color-caret",
+        "--color-sub",
+        "--color-sub-alt",
+        "--color-text",
+        "--color-error",
+        "--color-error-extra",
+        "--color-colorful-error",
+        "--color-colorful-error-extra",
+        "--color-background",
+        "--color-foreground",
+        "--color-card",
+        "--color-card-foreground",
+        "--color-popover",
+        "--color-popover-foreground",
+        "--color-primary",
+        "--color-primary-foreground",
+        "--color-secondary",
+        "--color-secondary-foreground",
+        "--color-muted",
+        "--color-muted-foreground",
+        "--color-accent",
+        "--color-accent-foreground",
+        "--color-destructive",
+        "--color-destructive-foreground",
+        "--color-border",
+        "--color-input",
+        "--color-ring",
+        "--color-hover"
+      ];
+
+      cssVars.forEach((variable) => {
+        document.documentElement.style.removeProperty(variable);
+      });
+    }
+
     const palette = getPalette(paletteName);
     if (!palette) return;
 
@@ -292,22 +276,23 @@ function Theme({
     [defaultTheme.palette.name, disableTransitionOnChange, nonce, themes]
   );
 
-  const handleMediaQuery = useCallback(() => {
-    if (paletteName === "system" && !forcedTheme) {
-      applyTheme("system");
-    }
-  }, [paletteName, forcedTheme, applyTheme]);
-
-  // Always listen to System preference
   useEffect(() => {
+    if (paletteName !== "system" || forcedTheme) return;
+
     const media = window.matchMedia(MEDIA);
+    const handler = () => applyTheme("system");
+
+    handler();
 
     // Intentionally use deprecated listener methods to support iOS & old browsers
-    media.addListener(handleMediaQuery);
-    handleMediaQuery();
+    media.addListener?.(handler);
+    media.addEventListener?.("change", handler);
 
-    return () => media.removeListener(handleMediaQuery);
-  }, [handleMediaQuery]);
+    return () => {
+      media.removeListener?.(handler);
+      media.removeEventListener?.("change", handler);
+    };
+  }, [paletteName, forcedTheme, applyTheme]);
 
   useEffect(() => {
     function handleStorage(e: StorageEvent) {
