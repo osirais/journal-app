@@ -60,7 +60,7 @@ export async function loginAction(formData: FormData) {
   const password = formData.get("password") as string;
   const supabase = await createClient();
 
-  const { error } = await supabase.auth.signInWithPassword({
+  const { error, data: authData } = await supabase.auth.signInWithPassword({
     email,
     password
   });
@@ -69,7 +69,19 @@ export async function loginAction(formData: FormData) {
     return encodedRedirect("error", "/login", error.message);
   }
 
-  return redirect("/journals");
+  const { data: userData, error: userError } = await supabase
+    .from("users")
+    .select("onboarded")
+    .eq("id", authData.user.id)
+    .single();
+
+  if (userError) {
+    return encodedRedirect("error", "/login", userError.message);
+  }
+
+  const onboarded = userData.onboarded;
+
+  return redirect(onboarded ? "/dashboard" : "/onboarding");
 }
 
 export async function forgotPasswordAction(formData: FormData) {
