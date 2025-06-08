@@ -1,3 +1,6 @@
+// This component must be the top-most import in this file!
+// prettier-ignore
+import { ReactScan } from "@/components/react-scan";
 import { ThemeProvider } from "@/contexts/theme-context";
 import { Geist } from "next/font/google";
 import "./globals.css";
@@ -55,6 +58,7 @@ export default async function RootLayout({
 
   return (
     <html lang="en" className={geistSans.className} suppressHydrationWarning>
+      <ReactScan />
       <body className="bg-background text-foreground">
         <a
           href="#main-content"
