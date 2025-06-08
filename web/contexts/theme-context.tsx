@@ -119,7 +119,7 @@ function resolveTheme(overrides: Partial<Theme> = {}) {
 function Theme({
   forcedTheme,
   disableTransitionOnChange = false,
-  storageKey = "theme",
+  storageKey = "palette",
   themes = systemThemes,
   defaultTheme = DEFAULT_THEME,
   children,
@@ -130,7 +130,7 @@ function Theme({
     fallbackData: resolveTheme(globalThis.__THEME__),
     keepPreviousData: true,
     onSuccess: (theme) => {
-      saveToLS("palette", JSON.stringify(theme.palette));
+      saveToLS(storageKey, JSON.stringify(theme.palette));
     }
   });
 
@@ -140,12 +140,9 @@ function Theme({
     async (name: string) => {
       const newPalette = getPalette(name) || { name: name };
 
-      mutate(
-        { ...theme, palette: newPalette },
-        {
-          revalidate: false
-        }
-      );
+      mutate({ ...theme, palette: newPalette }, { revalidate: false });
+
+      saveToLS(storageKey, JSON.stringify(newPalette));
 
       const supabase = createClient();
       const {
@@ -156,59 +153,12 @@ function Theme({
         await supabase
           .from("user_settings")
           .upsert({ user_id: user.id, theme: { palette: { name } } });
-        mutate();
       }
-
-      saveToLS("palette", JSON.stringify(newPalette));
     },
-    [mutate, theme]
+    [mutate, storageKey, theme]
   );
 
-  useEffect(() => {
-    if (systemThemes.includes(paletteName)) {
-      const cssVars = [
-        "--color-bg",
-        "--color-main",
-        "--color-caret",
-        "--color-sub",
-        "--color-sub-alt",
-        "--color-text",
-        "--color-error",
-        "--color-error-extra",
-        "--color-colorful-error",
-        "--color-colorful-error-extra",
-        "--color-background",
-        "--color-foreground",
-        "--color-card",
-        "--color-card-foreground",
-        "--color-popover",
-        "--color-popover-foreground",
-        "--color-primary",
-        "--color-primary-foreground",
-        "--color-secondary",
-        "--color-secondary-foreground",
-        "--color-muted",
-        "--color-muted-foreground",
-        "--color-accent",
-        "--color-accent-foreground",
-        "--color-destructive",
-        "--color-destructive-foreground",
-        "--color-border",
-        "--color-input",
-        "--color-ring",
-        "--color-hover"
-      ];
-
-      cssVars.forEach((variable) => {
-        document.documentElement.style.removeProperty(variable);
-      });
-    }
-
-    const palette = getPalette(paletteName);
-    if (!palette) return;
-
-    const { colors } = palette;
-
+  function defineCssVarMap(c: any) {
     const {
       bg,
       main,
@@ -220,9 +170,8 @@ function Theme({
       errorExtra,
       colorfulError,
       colorfulErrorExtra
-    } = colors;
-
-    const cssVars = {
+    } = c;
+    return {
       "--color-bg": bg,
       "--color-main": main,
       "--color-caret": caret,
@@ -254,70 +203,70 @@ function Theme({
       "--color-ring": main,
       "--color-hover": text
     };
+  }
 
-    for (const [key, value] of Object.entries(cssVars)) {
-      document.documentElement.style.setProperty(key, value);
+  const applyTheme = useCallback(() => {
+    if (!paletteName) return;
+
+    if (disableTransitionOnChange) {
+      disableAnimation(nonce)();
     }
-  }, [paletteName]);
 
-  const applyTheme = useCallback(
-    (theme: string) => {
-      let resolved = theme;
-      if (!resolved) return;
+    const resolved = paletteName === "system" ? (getSystemTheme() ?? "dark") : paletteName;
+    const el = document.documentElement;
 
-      if (theme === "system") {
-        resolved = getSystemTheme() ?? "dark";
-      }
+    el.classList.remove(...themes);
+    if (resolved) el.classList.add(resolved);
 
-      const name = resolved;
-      const enable = disableTransitionOnChange ? disableAnimation(nonce) : null;
-      const d = document.documentElement;
-
-      d.classList.remove(...themes);
-      if (name) d.classList.add(name);
-
-      const fallback = colorSchemes.includes(defaultTheme.palette.name)
+    const colorScheme = colorSchemes.includes(resolved)
+      ? resolved
+      : colorSchemes.includes(defaultTheme.palette.name)
         ? defaultTheme.palette.name
         : null;
-      const colorScheme = colorSchemes.includes(resolved) ? resolved : fallback;
-      // @ts-ignore
-      d.style.colorScheme = colorScheme;
 
-      enable?.();
-    },
-    [defaultTheme.palette.name, disableTransitionOnChange, nonce, themes]
-  );
+    (el.style as any).colorScheme = colorScheme;
+
+    if (systemThemes.includes(resolved)) {
+      Object.keys(defineCssVarMap({})).forEach((key) => {
+        el.style.removeProperty(key);
+      });
+      return;
+    }
+
+    const palette = getPalette(resolved);
+    if (!palette) return;
+
+    Object.entries(defineCssVarMap(palette.colors)).forEach(([k, v]) => {
+      el.style.setProperty(k, v);
+    });
+  }, [defaultTheme.palette.name, disableTransitionOnChange, nonce, paletteName, themes]);
 
   useEffect(() => {
-    if (paletteName !== "system" || forcedTheme) return;
+    applyTheme();
 
-    const media = window.matchMedia(MEDIA);
-    const handler = () => applyTheme("system");
+    if (paletteName === "system" && !forcedTheme) {
+      const media = window.matchMedia(MEDIA);
 
-    handler();
+      // Intentionally use deprecated listener methods to support iOS & old browsers
+      media.addListener?.(applyTheme);
+      media.addEventListener?.("change", applyTheme);
 
-    // Intentionally use deprecated listener methods to support iOS & old browsers
-    media.addListener?.(handler);
-    media.addEventListener?.("change", handler);
-
-    return () => {
-      media.removeListener?.(handler);
-      media.removeEventListener?.("change", handler);
-    };
-  }, [paletteName, forcedTheme, applyTheme]);
+      return () => {
+        media.removeListener?.(applyTheme);
+        media.removeEventListener?.("change", applyTheme);
+      };
+    }
+  }, [applyTheme, forcedTheme, paletteName]);
 
   useEffect(() => {
     function handleStorage(e: StorageEvent) {
-      if (e.key === storageKey) mutate();
+      if (e.key === storageKey) {
+        mutate();
+      }
     }
     window.addEventListener("storage", handleStorage);
     return () => window.removeEventListener("storage", handleStorage);
-  }, [mutate, storageKey]);
-
-  // Whenever theme or forcedTheme changes, apply it
-  useEffect(() => {
-    applyTheme(forcedTheme ?? paletteName);
-  }, [applyTheme, forcedTheme, paletteName]);
+  }, [mutate, storageKey, applyTheme, theme]);
 
   const providerValue = useMemo(
     () => ({
@@ -357,7 +306,7 @@ function script(storageKey: string, defaultTheme: string, forcedTheme: string, t
     if (theme === "light" || theme === "dark") {
       el.style.colorScheme = theme;
     } else {
-      const palette = JSON.parse(localStorage.getItem("palette") || "{}");
+      const palette = JSON.parse(localStorage.getItem(storageKey) || "{}");
 
       if (palette?.colors) {
         const {
@@ -417,7 +366,7 @@ function script(storageKey: string, defaultTheme: string, forcedTheme: string, t
     return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
   }
 
-  const palette = JSON.parse(localStorage.getItem("palette") || "{}");
+  const palette = JSON.parse(localStorage.getItem(storageKey) || "{}");
   globalThis.__THEME__ = { palette: palette };
 
   try {
