@@ -58,7 +58,6 @@ export default async function RootLayout({
 
   return (
     <html lang="en" className={geistSans.className} suppressHydrationWarning>
-      <ReactScan />
       <body className="bg-background text-foreground">
         <a
           href="#main-content"

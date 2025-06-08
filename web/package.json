@@ -2,7 +2,7 @@
   "private": true,
   "scripts": {
     "d": "bun dev",
-    "dev": "next dev & bunx react-scan@latest localhost:3000",
+    "dev": "next dev",
     "build": "next build",
     "start": "next start",
     "prettier": "prettier --write \"./**/*.{js,jsx,mjs,cjs,ts,tsx,json}\"",
