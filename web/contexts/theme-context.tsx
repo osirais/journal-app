@@ -89,7 +89,7 @@ async function fetchTheme(): Promise<Theme> {
   } = await supabase.auth.getUser();
 
   if (!user) {
-    return resolveTheme(globalThis.__THEME__);
+    throw new Error("User not authenticated");
   }
 
   const { data } = await supabase
@@ -98,7 +98,15 @@ async function fetchTheme(): Promise<Theme> {
     .eq("user_id", user.id)
     .single();
 
-  return resolveTheme(data?.theme || globalThis.__THEME__);
+  if (!data?.theme) {
+    throw new Error("Theme not found for user");
+  }
+
+  if (data.theme.palette.name) {
+    data.theme.palette = getPalette(data.theme.palette.name) || { name: data.theme.palette.name };
+  }
+
+  return resolveTheme(data.theme);
 }
 
 function resolveTheme(overrides: Partial<Theme> = {}) {
@@ -119,7 +127,11 @@ function Theme({
   scriptProps
 }: ThemeProviderProps) {
   const { data: theme, mutate } = useSWR("theme", fetchTheme, {
-    fallbackData: resolveTheme(globalThis.__THEME__)
+    fallbackData: resolveTheme(globalThis.__THEME__),
+    keepPreviousData: true,
+    onSuccess: (theme) => {
+      saveToLS("palette", JSON.stringify(theme.palette));
+    }
   });
 
   const paletteName = theme.palette.name;
