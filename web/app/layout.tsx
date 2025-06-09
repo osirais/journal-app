@@ -1,12 +1,12 @@
-// This component must be the top-most import in this file!
-// prettier-ignore
-import { ReactScan } from "@/components/react-scan";
 import { ThemeProvider } from "@/contexts/theme-context";
 import { Geist } from "next/font/google";
 import "./globals.css";
+import ShadcnCustomCard from "@/components/tour/tour-card";
 import { Toaster } from "@/components/ui/sonner";
+import { steps } from "@/constants/steps";
 import { defaultUrl } from "@/constants/url";
 import { headers } from "next/headers";
+import { NextStep, NextStepProvider } from "nextstepjs";
 
 export const metadata = {
   metadataBase: new URL(defaultUrl),
@@ -66,8 +66,12 @@ export default async function RootLayout({
           Skip to content
         </a>
         <ThemeProvider disableTransitionOnChange nonce={nonce}>
-          {children}
-          <Toaster />
+          <NextStepProvider>
+            <NextStep steps={steps} cardComponent={ShadcnCustomCard as any}>
+              {children}
+              <Toaster />
+            </NextStep>
+          </NextStepProvider>
         </ThemeProvider>
       </body>
     </html>
