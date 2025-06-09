@@ -25,7 +25,7 @@ const ShadcnCustomCard = ({
   arrow
 }: ShadcnCustomCardProps) => {
   return (
-    <Card className="w-[350px]">
+    <Card className="fixed z-50 w-[350px]">
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           {step.icon && <span>{step.icon}</span>}

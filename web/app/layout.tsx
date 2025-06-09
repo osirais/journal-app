@@ -71,11 +71,9 @@ export default async function RootLayout({
               steps={steps}
               cardComponent={ShadcnCustomCard as any}
               cardTransition={{
-                ease: "easeOut",
-                duration: 2000,
-                stiffness: 0,
-                damping: 0,
-                delay: 2000
+                type: "spring",
+                stiffness: 300,
+                damping: 20
               }}
             >
               {children}
