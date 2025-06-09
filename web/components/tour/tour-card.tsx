@@ -45,17 +45,17 @@ const ShadcnCustomCard = ({
 
         <div className="flex gap-2">
           {currentStep > 0 && (
-            <Button variant="outline" size="sm" onClick={prevStep}>
+            <Button variant="outline" size="sm" onClick={prevStep} className="cursor-pointer">
               Previous
             </Button>
           )}
 
-          <Button size="sm" onClick={nextStep}>
+          <Button size="sm" onClick={nextStep} className="cursor-pointer">
             {currentStep === totalSteps - 1 ? "Finish" : "Next"}
           </Button>
 
           {step.showSkip && (
-            <Button variant="ghost" size="sm" onClick={skipTour}>
+            <Button variant="ghost" size="sm" onClick={skipTour} className="cursor-pointer">
               Skip
             </Button>
           )}

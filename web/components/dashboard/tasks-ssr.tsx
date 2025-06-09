@@ -13,19 +13,7 @@ export async function TasksCardSSR() {
     data: { user }
   } = await supabase.auth.getUser();
 
-  if (!user) {
-    return (
-      <Card className="w-full">
-        <CardHeader>
-          <CardTitle>Tasks</CardTitle>
-          <CardDescription>Your recurring or to-do tasks</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <p className="text-muted-foreground text-sm">Please sign in to view your tasks.</p>
-        </CardContent>
-      </Card>
-    );
-  }
+  if (!user) return null;
 
   let tasks: Task[] = [];
   let error = null;

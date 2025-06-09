@@ -59,7 +59,7 @@ export function MoodCardCSR({ initialMood, eligible, streak }: MoodCardCSRProps)
     <Card>
       <CardHeader className="flex flex-row items-center justify-between">
         <div>
-          <CardTitle>Mood</CardTitle>
+          <CardTitle id="tour-mood">Mood</CardTitle>
           <CardDescription>Describe your mood today</CardDescription>
         </div>
       </CardHeader>

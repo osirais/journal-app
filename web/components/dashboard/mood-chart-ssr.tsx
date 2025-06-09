@@ -11,7 +11,7 @@ export const MoodChartSSR = async () => {
     return (
       <Card>
         <CardHeader>
-          <CardTitle>Mood Trend</CardTitle>
+          <CardTitle id="tour-mood-trend">Mood Trend</CardTitle>
           <CardDescription>Unable to display mood history</CardDescription>
         </CardHeader>
         <CardContent className="flex h-[300px] items-center justify-center">

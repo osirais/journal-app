@@ -66,7 +66,7 @@ export function TasksCardCSR({ tasks, error, streak, completedTaskIds }: TasksCa
     <Card className="w-full">
       <CardHeader className="flex flex-row items-center justify-between">
         <div>
-          <CardTitle>Tasks</CardTitle>
+          <CardTitle id="tour-tasks">Tasks</CardTitle>
           <CardDescription>Your recurring or to-do tasks</CardDescription>
         </div>
       </CardHeader>
@@ -125,7 +125,11 @@ export function TasksCardCSR({ tasks, error, streak, completedTaskIds }: TasksCa
           </div>
           <div className="grid place-items-center">
             <Link href="/tasks">
-              <Button variant="outline" className="mt-auto cursor-pointer">
+              <Button
+                variant="outline"
+                className="mt-auto cursor-pointer"
+                id="tour-tasks-manage-button"
+              >
                 Manage Tasks
               </Button>
             </Link>

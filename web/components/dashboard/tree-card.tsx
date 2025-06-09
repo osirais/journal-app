@@ -35,7 +35,7 @@ export function TreeCard() {
   return (
     <Card className="flex h-[80vh] w-full flex-col pb-0">
       <CardHeader>
-        <CardTitle>Tree</CardTitle>
+        <CardTitle id="tour-tree">Tree</CardTitle>
         <CardDescription>This feature is still under development.</CardDescription>
       </CardHeader>
       <CardContent className="relative flex-1 overflow-hidden p-0">

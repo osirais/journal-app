@@ -60,7 +60,7 @@ export const JournalCard: FC = async () => {
     <Card>
       <CardHeader className="flex flex-row items-center justify-between">
         <div>
-          <CardTitle>Journal</CardTitle>
+          <CardTitle id="tour-journal">Journal</CardTitle>
           <CardDescription>Record your thoughts and experiences</CardDescription>
         </div>
       </CardHeader>
@@ -75,7 +75,11 @@ export const JournalCard: FC = async () => {
             )}
           </div>
           <Link href="/journals" className="w-full">
-            <Button variant="outline" className="w-full cursor-pointer">
+            <Button
+              variant="outline"
+              className="w-full cursor-pointer"
+              id="tour-journal-entry-button"
+            >
               Create Entry
             </Button>
           </Link>

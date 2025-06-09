@@ -17,9 +17,7 @@ export default function Page() {
       <TourDialog />
       <DashboardCarousel>
         <div className="space-y-6">
-          <h1 className="text-2xl font-bold" id="tour-tree">
-            Tree
-          </h1>
+          <h1 className="text-2xl font-bold">Tree</h1>
           <TreeCard />
         </div>
         <div className="space-y-6">

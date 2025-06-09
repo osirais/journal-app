@@ -34,7 +34,7 @@ export function ActivityCalendarCSR({ data }: ActivityCalendarCSRProps) {
   return (
     <Card className="w-full overflow-hidden">
       <CardHeader>
-        <CardTitle>Activity Calendar</CardTitle>
+        <CardTitle id="tour-activity-calendar">Activity Calendar</CardTitle>
       </CardHeader>
       <CardContent>
         <div className="flex min-h-[200px] items-center justify-center">
