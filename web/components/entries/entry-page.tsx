@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useArrowKeyNavigation } from "@/hooks/useArrowKeyNavigation";
 import { getUserOrThrow } from "@/utils/get-user-throw";
 import { createClient } from "@/utils/supabase/client";
 import type { Editor } from "@tiptap/react";
@@ -24,7 +25,7 @@ import {
   X
 } from "lucide-react";
 import Link from "next/link";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { Suspense, useEffect, useRef, useState } from "react";
 import { ErrorBoundary } from "react-error-boundary";
 import { WithContext as ReactTags } from "react-tag-input";
@@ -133,6 +134,8 @@ function EntryContent() {
   const [isEditingTags, setIsEditingTags] = useState(false);
   const [tags, setTags] = useState<{ id: string; text: string; className: string }[]>([]);
 
+  const router = useRouter();
+
   const { data, mutate } = useSWR(entryId, fetchEntry, {
     suspense: true,
     onSuccess: (data) => {
@@ -221,6 +224,23 @@ function EntryContent() {
   });
 
   const { entry, prevEntryId, nextEntryId } = data;
+
+  function goToPrevEntry() {
+    if (prevEntryId) {
+      router.push(`/entry/${prevEntryId}`);
+    }
+  }
+
+  function goToNextEntry() {
+    if (nextEntryId) {
+      router.push(`/entry/${nextEntryId}`);
+    }
+  }
+
+  useArrowKeyNavigation({
+    onLeft: goToPrevEntry,
+    onRight: goToNextEntry
+  });
 
   const handleDeleteTag = (i: number) => {
     setTags(tags.filter((_, index) => index !== i));

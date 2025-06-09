@@ -60,8 +60,8 @@ export default function DashboardCarousel({ children }: { children: React.ReactN
           ))}
         </CarouselContent>
         <div className="absolute right-0 top-1/2 z-10 flex -translate-y-1/2 flex-col gap-2">
-          <CarouselPrevious />
-          <CarouselNext />
+          <CarouselPrevious className="cursor-pointer" />
+          <CarouselNext className="cursor-pointer" />
         </div>
       </Carousel>
     </div>
