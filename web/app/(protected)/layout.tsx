@@ -13,5 +13,20 @@ export default async function Layout({ children }: { children: React.ReactNode }
     return redirect("/login");
   }
 
+  const { data: profile, error: profileError } = await supabase
+    .from("users")
+    .select("onboarded")
+    .eq("id", user.id)
+    .single();
+
+  // shouldn't happen
+  if (profileError || !profile) {
+    return redirect("/login");
+  }
+
+  if (!profile.onboarded) {
+    return redirect("/onboarded");
+  }
+
   return children;
 }
