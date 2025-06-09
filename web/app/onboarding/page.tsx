@@ -13,7 +13,11 @@ export default async function Page() {
     .eq("id", user.id)
     .single();
 
-  if (error || profile?.onboarded) {
+  if (error || !profile) {
+    redirect("/login");
+  }
+
+  if (profile.onboarded) {
     redirect("/dashboard");
   }
 
