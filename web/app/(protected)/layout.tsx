@@ -25,7 +25,7 @@ export default async function Layout({ children }: { children: React.ReactNode }
   }
 
   if (!profile.onboarded) {
-    return redirect("/onboarded");
+    return redirect("/onboarding");
   }
 
   return children;
