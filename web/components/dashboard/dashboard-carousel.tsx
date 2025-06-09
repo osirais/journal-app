@@ -1,0 +1,69 @@
+"use client";
+
+import {
+  Carousel,
+  CarouselApi,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious
+} from "@/components/ui/carousel";
+import { useArrowKeyNavigation } from "@/hooks/useArrowKeyNavigation";
+import React, { useCallback, useEffect, useRef } from "react";
+
+export default function DashboardCarousel({ children }: { children: React.ReactNode }) {
+  const carouselRef = useRef<CarouselApi>(null);
+  const lastScroll = useRef(0);
+
+  // block default scroll behavior
+  useEffect(() => {
+    const original = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = original;
+    };
+  }, []);
+
+  const handleWheel = useCallback((e: React.WheelEvent<HTMLDivElement>) => {
+    if (!carouselRef.current) return;
+
+    // prevent excessive scrolling
+    const now = Date.now();
+    if (now - lastScroll.current < 100) return;
+
+    if (e.deltaY > 0) {
+      carouselRef.current.scrollNext();
+    } else if (e.deltaY < 0) {
+      carouselRef.current.scrollPrev();
+    }
+
+    lastScroll.current = now;
+  }, []);
+
+  useArrowKeyNavigation({
+    onDown: () => carouselRef.current?.scrollNext(),
+    onUp: () => carouselRef.current?.scrollPrev()
+  });
+
+  return (
+    <div className="flex items-center justify-center" onWheel={handleWheel}>
+      <Carousel
+        className="relative w-full max-w-3xl"
+        orientation="vertical"
+        setApi={(api) => {
+          carouselRef.current = api;
+        }}
+      >
+        <CarouselContent className="mx-8 h-screen pt-6">
+          {React.Children.map(children, (child, idx) => (
+            <CarouselItem key={idx}>{child}</CarouselItem>
+          ))}
+        </CarouselContent>
+        <div className="absolute right-0 top-1/2 z-10 flex -translate-y-1/2 flex-col gap-2">
+          <CarouselPrevious />
+          <CarouselNext />
+        </div>
+      </Carousel>
+    </div>
+  );
+}

@@ -1,4 +1,5 @@
 import { ActivityCalendarSSR } from "@/components/dashboard/activity-calendar-ssr";
+import DashboardCarousel from "@/components/dashboard/dashboard-carousel";
 import { JournalCard } from "@/components/dashboard/journal";
 import { MoodChartSSR } from "@/components/dashboard/mood-chart-ssr";
 import { MoodCardSSR } from "@/components/dashboard/mood-ssr";
@@ -9,42 +10,28 @@ export const metadata = {
   title: "Dashboard"
 };
 
-const Page = () => {
+export default function Page() {
   return (
-    <div className="hide-scrollbar h-screen snap-y snap-mandatory overflow-y-scroll">
-      <section className="flex min-h-screen snap-start snap-always justify-center pt-6">
-        <div className="container mx-auto max-w-3xl">
-          <div className="space-y-6">
-            <h1 className="text-2xl font-bold">Tree</h1>
-            <TreeCard />
-          </div>
+    <DashboardCarousel>
+      <div className="space-y-6">
+        <h1 className="text-2xl font-bold">Tree</h1>
+        <TreeCard />
+      </div>
+      <div className="space-y-6">
+        <h1 className="text-2xl font-bold">Daily</h1>
+        <div className="grid gap-4 md:grid-cols-2">
+          <JournalCard />
+          <MoodCardSSR />
         </div>
-      </section>
-      <section className="flex min-h-screen snap-start snap-always justify-center pt-6">
-        <div className="container mx-auto max-w-3xl">
-          <div className="space-y-6">
-            <h1 className="text-2xl font-bold">Daily</h1>
-            <div className="grid gap-4 md:grid-cols-2">
-              <JournalCard />
-              <MoodCardSSR />
-            </div>
-            <TasksCardSSR />
-          </div>
+        <TasksCardSSR />
+      </div>
+      <div className="space-y-6">
+        <h1 className="text-2xl font-bold">Stats</h1>
+        <div className="space-y-4">
+          <ActivityCalendarSSR />
+          <MoodChartSSR />
         </div>
-      </section>
-      <section className="flex min-h-screen snap-start snap-always justify-center pt-6">
-        <div className="container mx-auto max-w-3xl">
-          <div className="space-y-6">
-            <h1 className="text-2xl font-bold">Stats</h1>
-            <div className="space-y-4">
-              <ActivityCalendarSSR />
-              <MoodChartSSR />
-            </div>
-          </div>
-        </div>
-      </section>
-    </div>
+      </div>
+    </DashboardCarousel>
   );
-};
-
-export default Page;
+}
