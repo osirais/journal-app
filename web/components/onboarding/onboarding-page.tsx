@@ -4,6 +4,7 @@ import { OnboardingStep1 } from "@/components/onboarding/onboarding-step1";
 import { OnboardingStep2 } from "@/components/onboarding/onboarding-step2";
 import { OnboardingStep3 } from "@/components/onboarding/onboarding-step3";
 import { OnboardingStep4 } from "@/components/onboarding/onboarding-step4";
+import { OnboardingStep5 } from "@/components/onboarding/onboarding-step5";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
@@ -15,7 +16,7 @@ import { useActionState } from "react";
 
 export function OnboardingPage() {
   const [currentStep, setCurrentStep] = React.useState(1);
-  const totalSteps = 4;
+  const totalSteps = 5;
 
   const router = useRouter();
 
@@ -58,6 +59,8 @@ export function OnboardingPage() {
         return <OnboardingStep3 />;
       case 4:
         return <OnboardingStep4 />;
+      case 5:
+        return <OnboardingStep5 />;
       default:
         return null;
     }
