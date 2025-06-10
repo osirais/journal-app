@@ -10,13 +10,15 @@ import {
 } from "@/components/ui/carousel";
 import { steps } from "@/constants/steps";
 import { useArrowKeyNavigation } from "@/hooks/useArrowKeyNavigation";
-import { NavigationAdapter, NextStep } from "nextstepjs";
+import { NavigationAdapter, NextStep, useNextStep } from "nextstepjs";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import ShadcnCustomCard from "../tour/tour-card";
 
 export default function DashboardCarousel({ children }: { children: React.ReactNode }) {
   const carouselRef = useRef<CarouselApi>(null);
   const lastScroll = useRef(0);
+
+  const { currentTour } = useNextStep();
 
   // block default scroll behavior
   useEffect(() => {
@@ -27,25 +29,29 @@ export default function DashboardCarousel({ children }: { children: React.ReactN
     };
   }, []);
 
-  const handleWheel = useCallback((e: React.WheelEvent<HTMLDivElement>) => {
-    if (!carouselRef.current) return;
+  const handleWheel = useCallback(
+    (e: React.WheelEvent<HTMLDivElement>) => {
+      if (!carouselRef.current || currentTour) return;
 
-    // prevent excessive scrolling
-    const now = Date.now();
-    if (now - lastScroll.current < 100) return;
+      // prevent excessive scrolling
+      const now = Date.now();
+      if (now - lastScroll.current < 100) return;
 
-    if (e.deltaY > 0) {
-      carouselRef.current.scrollNext();
-    } else if (e.deltaY < 0) {
-      carouselRef.current.scrollPrev();
-    }
+      if (e.deltaY > 0) {
+        carouselRef.current.scrollNext();
+      } else if (e.deltaY < 0) {
+        carouselRef.current.scrollPrev();
+      }
 
-    lastScroll.current = now;
-  }, []);
+      lastScroll.current = now;
+    },
+    [currentTour]
+  );
 
   useArrowKeyNavigation({
     onDown: () => carouselRef.current?.scrollNext(),
-    onUp: () => carouselRef.current?.scrollPrev()
+    onUp: () => carouselRef.current?.scrollPrev(),
+    enabled: !currentTour
   });
 
   function useCarouselNavAdapter(): NavigationAdapter {
