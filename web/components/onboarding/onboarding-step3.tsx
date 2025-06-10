@@ -50,6 +50,7 @@ export function OnboardingStep3({ journalName, onSuccess }: OnboardingStep3Props
             placeholder="Entry title"
             required
             disabled={isPending}
+            autoComplete="off"
           />
         </div>
         <div className="mx-auto mt-6 grid max-w-sm gap-4">

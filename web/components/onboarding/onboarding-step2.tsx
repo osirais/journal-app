@@ -47,6 +47,7 @@ export function OnboardingStep2({ onSuccess }: OnboardingStep2Props) {
             value={journalName}
             onChange={(e) => setJournalName(e.target.value)}
             placeholder="My Journal"
+            autoComplete="off"
           />
         </div>
         {error && <p className="text-sm text-red-500">{error}</p>}

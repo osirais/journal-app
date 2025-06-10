@@ -27,6 +27,7 @@ export function OnboardingStep7({ onSuccess }: OnboardingStep7Props) {
             value={reminder}
             onChange={(e) => setReminder(e.target.value)}
             placeholder=""
+            autoComplete="off"
           />
         </div>
       </div>
