@@ -65,7 +65,14 @@ export function OnboardingPage() {
           />
         );
       case 3:
-        return <OnboardingStep3 journalName={journalName} />;
+        return (
+          <OnboardingStep3
+            journalName={journalName!}
+            onSuccess={() => {
+              nextStep();
+            }}
+          />
+        );
       case 4:
         return <OnboardingStep4 />;
       case 5:

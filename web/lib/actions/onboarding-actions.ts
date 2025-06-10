@@ -22,7 +22,7 @@ export async function completeOnboarding() {
 }
 
 export async function createFirstJournal(form: { title: string; description?: string }) {
-  const { title, description } = form;
+  const { title } = form;
 
   if (!title || typeof title !== "string") {
     throw new Error("Title is required");
@@ -55,7 +55,7 @@ export async function createFirstJournal(form: { title: string; description?: st
       {
         author_id: user.id,
         title,
-        description: description ?? null
+        description: ""
       }
     ])
     .select()
@@ -66,4 +66,71 @@ export async function createFirstJournal(form: { title: string; description?: st
   }
 
   return journal;
+}
+
+export async function createFirstEntry(form: { title: string; content: string }) {
+  const { title, content } = form;
+
+  if (!title || typeof title !== "string") {
+    throw new Error("Title is required");
+  }
+  if (!content || typeof content !== "string") {
+    throw new Error("Content is required");
+  }
+
+  const supabase = await createClient();
+  const user = await getUserOrThrow(supabase);
+
+  const { data: journals, error: fetchError } = await supabase
+    .from("journal")
+    .select("id")
+    .eq("author_id", user.id)
+    .is("deleted_at", null);
+
+  if (fetchError) {
+    throw new Error(fetchError.message);
+  }
+
+  if (!journals || journals.length === 0) {
+    throw new Error("User does not have a journal");
+  }
+
+  if (journals.length > 1) {
+    throw new Error("User has more than one journal");
+  }
+
+  const journalId = journals[0].id;
+
+  const { data: existingEntry, error: entryFetchError } = await supabase
+    .from("entry")
+    .select("id")
+    .eq("journal_id", journalId)
+    .limit(1)
+    .single();
+
+  if (entryFetchError && entryFetchError.code !== "PGRST116") {
+    throw new Error(entryFetchError.message);
+  }
+
+  if (existingEntry) {
+    throw new Error("First entry already exists for this journal");
+  }
+
+  const { data: entry, error } = await supabase
+    .from("entry")
+    .insert([
+      {
+        journal_id: journalId,
+        title,
+        content
+      }
+    ])
+    .select()
+    .single();
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  return entry;
 }
