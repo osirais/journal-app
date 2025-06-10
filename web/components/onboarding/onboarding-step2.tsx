@@ -1,14 +1,35 @@
 "use client";
 
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useState } from "react";
+import { createJournal } from "@/lib/actions/onboarding-actions";
+import { useState, useTransition } from "react";
 
-export function OnboardingStep2() {
+interface Props {
+  onSuccess: () => void;
+}
+
+export function OnboardingStep2({ onSuccess }: Props) {
   const [journalName, setJournalName] = useState("");
+  const [isPending, startTransition] = useTransition();
+  const [error, setError] = useState<string | null>(null);
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    setError(null);
+    startTransition(async () => {
+      try {
+        const journal = await createJournal({ title: journalName });
+        onSuccess(); // go to next step
+      } catch (err) {
+        setError("Failed to create journal");
+      }
+    });
+  };
 
   return (
-    <div className="space-y-4 text-center">
+    <form onSubmit={handleSubmit} className="space-y-4 text-center">
       <h2 className="text-xl font-medium">Name Your Journal</h2>
       <p className="text-muted-foreground mx-auto max-w-md">
         Give your journal a name. You can change this later.
@@ -22,6 +43,14 @@ export function OnboardingStep2() {
           placeholder="My Journal"
         />
       </div>
-    </div>
+      {error && <p className="text-sm text-red-500">{error}</p>}
+      <Button
+        type="submit"
+        disabled={isPending || journalName.trim() === ""}
+        className="cursor-pointer"
+      >
+        {isPending ? "Creating..." : "Create Journal"}
+      </Button>
+    </form>
   );
 }

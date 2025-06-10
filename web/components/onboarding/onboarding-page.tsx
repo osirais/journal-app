@@ -54,7 +54,7 @@ export function OnboardingPage() {
       case 1:
         return <OnboardingStep1 />;
       case 2:
-        return <OnboardingStep2 />;
+        return <OnboardingStep2 onSuccess={nextStep} />;
       case 3:
         return <OnboardingStep3 />;
       case 4:
