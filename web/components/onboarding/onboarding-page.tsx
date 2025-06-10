@@ -4,6 +4,7 @@ import { OnboardingStep1 } from "@/components/onboarding/onboarding-step1";
 import { OnboardingStep2 } from "@/components/onboarding/onboarding-step2";
 import { OnboardingStep3 } from "@/components/onboarding/onboarding-step3";
 import { OnboardingStep4 } from "@/components/onboarding/onboarding-step4";
+import { OnboardingStep5 } from "@/components/onboarding/onboarding-step5";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { completeOnboarding } from "@/lib/actions/onboarding-actions";
@@ -58,7 +59,7 @@ export function OnboardingPage() {
       case 4:
         return <OnboardingStep4 />;
       case 5:
-        return <OnboardingStep4 />;
+        return <OnboardingStep5 />;
       default:
         return null;
     }
