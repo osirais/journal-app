@@ -5,6 +5,7 @@ import { OnboardingStep2 } from "@/components/onboarding/onboarding-step2";
 import { OnboardingStep3 } from "@/components/onboarding/onboarding-step3";
 import { OnboardingStep4 } from "@/components/onboarding/onboarding-step4";
 import { OnboardingStep5 } from "@/components/onboarding/onboarding-step5";
+import { OnboardingStep6 } from "@/components/onboarding/onboarding-step6";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { completeOnboarding } from "@/lib/actions/onboarding-actions";
@@ -15,7 +16,7 @@ import { useActionState } from "react";
 
 export function OnboardingPage() {
   const [currentStep, setCurrentStep] = React.useState(1);
-  const totalSteps = 5;
+  const totalSteps = 6;
 
   const router = useRouter();
 
@@ -60,6 +61,8 @@ export function OnboardingPage() {
         return <OnboardingStep4 />;
       case 5:
         return <OnboardingStep5 />;
+      case 6:
+        return <OnboardingStep6 />;
       default:
         return null;
     }
@@ -70,9 +73,6 @@ export function OnboardingPage() {
       <div className="flex-1 overflow-y-auto p-8 pt-20">
         <div className="mb-12 text-center">
           <h1 className="mb-2 text-3xl font-semibold">Welcome</h1>
-          <p className="text-muted-foreground">
-            Step {currentStep} of {totalSteps}
-          </p>
         </div>
         <div className="mx-auto flex w-full max-w-4xl items-center justify-center">
           <div className="w-full">{getStepComponent(currentStep)}</div>
@@ -87,7 +87,7 @@ export function OnboardingPage() {
             variant="outline"
             onClick={prevStep}
             disabled={currentStep === 1}
-            className="flex items-center gap-2"
+            className="flex cursor-pointer items-center gap-2"
           >
             <ChevronLeft className="h-4 w-4" />
             Back
@@ -111,7 +111,9 @@ export function OnboardingPage() {
         <div className="w-full max-w-4xl px-8 pb-20">
           <div className="text-muted-foreground mb-1 flex justify-between text-sm">
             <span>Progress</span>
-            <span>{Math.round(progress)}%</span>
+            <span>
+              {currentStep} / {totalSteps}
+            </span>
           </div>
           <Progress value={progress} className="h-2" />
         </div>
