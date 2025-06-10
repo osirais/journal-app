@@ -6,6 +6,8 @@ import { OnboardingStep3 } from "@/components/onboarding/onboarding-step3";
 import { OnboardingStep4 } from "@/components/onboarding/onboarding-step4";
 import { OnboardingStep5 } from "@/components/onboarding/onboarding-step5";
 import { OnboardingStep6 } from "@/components/onboarding/onboarding-step6";
+import { OnboardingStep7 } from "@/components/onboarding/onboarding-step7";
+import { OnboardingStep8 } from "@/components/onboarding/onboarding-step8";
 import { Progress } from "@/components/ui/progress";
 import { completeOnboarding } from "@/lib/actions/onboarding-actions";
 import { useRouter } from "next/navigation";
@@ -14,7 +16,7 @@ import { useActionState } from "react";
 
 export function OnboardingPage() {
   const [currentStep, setCurrentStep] = React.useState(1);
-  const totalSteps = 6;
+  const totalSteps = 8;
 
   const router = useRouter();
 
@@ -63,7 +65,11 @@ export function OnboardingPage() {
       case 5:
         return <OnboardingStep5 onSuccess={nextStep} />;
       case 6:
-        return <OnboardingStep6 onSuccess={handleFinish} />;
+        return <OnboardingStep6 onSuccess={nextStep} />;
+      case 7:
+        return <OnboardingStep7 onSuccess={nextStep} />;
+      case 8:
+        return <OnboardingStep8 onSuccess={handleFinish} />;
       default:
         return null;
     }

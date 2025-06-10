@@ -6,11 +6,11 @@ import { Label } from "@/components/ui/label";
 import { createFirstJournal } from "@/lib/actions/onboarding-actions";
 import { useState, useTransition } from "react";
 
-interface Props {
+interface OnboardingStep2Props {
   onSuccess: (journalName: string) => void;
 }
 
-export function OnboardingStep2({ onSuccess }: Props) {
+export function OnboardingStep2({ onSuccess }: OnboardingStep2Props) {
   const [journalName, setJournalName] = useState("");
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);

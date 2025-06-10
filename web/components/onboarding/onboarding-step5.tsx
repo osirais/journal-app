@@ -1,37 +1,79 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { useState } from "react";
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
+import { updateMood } from "@/lib/actions/mood-actions";
+import { useOptimistic, useState, useTransition } from "react";
+import { toast } from "sonner";
 
-interface Props {
+const moods = [
+  { emoji: "😢", label: "Very Sad", scale: 1 },
+  { emoji: "😕", label: "Sad", scale: 2 },
+  { emoji: "😐", label: "Neutral", scale: 3 },
+  { emoji: "🙂", label: "Happy", scale: 4 },
+  { emoji: "😄", label: "Very Happy", scale: 5 }
+] as const;
+
+interface OnboardingStep5Props {
   onSuccess: () => void;
 }
 
-export function OnboardingStep5({ onSuccess }: Props) {
-  const [reminder, setReminder] = useState("");
+export function OnboardingStep5({ onSuccess }: OnboardingStep5Props) {
+  const [isPending, startTransition] = useTransition();
+  const [optimisticMood, setOptimisticMood] = useOptimistic<number | null, number | null>(
+    null,
+    () => null
+  );
+  const [moodSaved, setMoodSaved] = useState(false);
+
+  const selectedMoodLabel = optimisticMood
+    ? moods.find((m) => m.scale === optimisticMood)?.label
+    : undefined;
+
+  const handleMoodChange = (moodLabel: string) => {
+    const mood = moods.find((m) => m.label === moodLabel);
+    if (!mood) return;
+
+    startTransition(async () => {
+      setOptimisticMood(mood.scale);
+      const result = await updateMood(mood.scale);
+
+      if (!result.success) {
+        setOptimisticMood(null);
+        toast.error(result.error || "Failed to update mood");
+      } else {
+        setMoodSaved(true);
+      }
+    });
+  };
 
   return (
     <div className="flex h-full w-full flex-col">
-      <div className="flex-grow space-y-4 px-8 text-center">
-        <h2 className="text-xl font-medium">Set Your Intention</h2>
-        <p className="text-muted-foreground mx-auto max-w-md">
-          Take a moment to write a personal reminder for why you started this journey. This message
-          will appear on your dashboard to keep you focused and inspired.
-        </p>
-        <div className="mx-auto max-w-sm space-y-2 text-left">
-          <Label htmlFor="reminder">Your Why</Label>
-          <Input
-            id="reminder"
-            value={reminder}
-            onChange={(e) => setReminder(e.target.value)}
-            placeholder=""
-          />
-        </div>
+      <div className="flex flex-grow flex-col items-center justify-center space-y-4 px-8 text-center">
+        <h2 className="text-xl font-medium">Mood</h2>
+        <p className="text-muted-foreground max-w-md">How are you feeling today?</p>
+        <ToggleGroup
+          type="single"
+          value={selectedMoodLabel}
+          onValueChange={handleMoodChange}
+          className="flex gap-3"
+          disabled={isPending}
+        >
+          {moods.map((mood) => (
+            <ToggleGroupItem
+              key={mood.label}
+              value={mood.label}
+              aria-label={mood.label}
+              className="data-[state=on]:border-primary hover:bg-accent hover:text-accent-foreground h-12 w-12 cursor-pointer rounded-lg border text-xl transition-colors disabled:opacity-50"
+            >
+              {mood.emoji}
+            </ToggleGroupItem>
+          ))}
+        </ToggleGroup>
       </div>
+
       <div className="flex justify-end p-4">
-        <Button onClick={onSuccess} disabled={reminder.trim() === ""} className="cursor-pointer">
+        <Button onClick={onSuccess} disabled={!moodSaved} className="cursor-pointer">
           Next
         </Button>
       </div>

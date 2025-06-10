@@ -7,12 +7,12 @@ import { Label } from "@/components/ui/label";
 import { createFirstEntry } from "@/lib/actions/onboarding-actions";
 import { useState, useTransition } from "react";
 
-interface Props {
+interface OnboardingStep3Props {
   journalName: string;
   onSuccess: () => void;
 }
 
-export function OnboardingStep3({ journalName, onSuccess }: Props) {
+export function OnboardingStep3({ journalName, onSuccess }: OnboardingStep3Props) {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [error, setError] = useState<string | null>(null);

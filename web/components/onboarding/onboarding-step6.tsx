@@ -1,21 +1,24 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
+import { Droplet } from "lucide-react";
 
-interface Props {
+interface OnboardingStep6Props {
   onSuccess: () => void;
 }
 
-export function OnboardingStep6({ onSuccess }: Props) {
+export function OnboardingStep6({ onSuccess }: OnboardingStep6Props) {
   return (
-    <div className="flex h-full w-full flex-col">
-      <div className="flex flex-grow flex-col items-center justify-center space-y-2 px-8 text-center">
-        <h2 className="text-xl font-medium">You're All Set!</h2>
-        <p className="text-muted-foreground max-w-md">Ready to start using the platform.</p>
+    <div className="flex h-full w-full flex-col justify-center px-8 text-center">
+      <div className="flex flex-grow flex-col items-center justify-center space-y-4">
+        <Droplet size={48} className="text-white" />
+        <p className="max-w-md text-white">
+          You also get +1 droplet for creating a mood entry every day.
+        </p>
       </div>
-      <div className="flex justify-end p-4">
+      <div className="flex justify-end">
         <Button onClick={onSuccess} className="cursor-pointer">
-          Finish
+          Next
         </Button>
       </div>
     </div>
