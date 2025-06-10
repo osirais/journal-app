@@ -1,5 +1,4 @@
 import { TasksCardCSR } from "@/components/dashboard/tasks-csr";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { getTasks } from "@/lib/actions/task-actions";
 import type { Task } from "@/types";
 import { createClient } from "@/utils/supabase/server";

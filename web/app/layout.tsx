@@ -1,12 +1,10 @@
 import { ThemeProvider } from "@/contexts/theme-context";
 import { Geist } from "next/font/google";
 import "./globals.css";
-import ShadcnCustomCard from "@/components/tour/tour-card";
 import { Toaster } from "@/components/ui/sonner";
-import { steps } from "@/constants/steps";
 import { defaultUrl } from "@/constants/url";
 import { headers } from "next/headers";
-import { NextStep, NextStepProvider } from "nextstepjs";
+import { NextStepProvider } from "nextstepjs";
 
 export const metadata = {
   metadataBase: new URL(defaultUrl),

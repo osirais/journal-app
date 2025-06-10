@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/carousel";
 import { steps } from "@/constants/steps";
 import { useArrowKeyNavigation } from "@/hooks/useArrowKeyNavigation";
-import { NavigationAdapter, NextStep, NextStepProvider, NextStepViewport } from "nextstepjs";
+import { NavigationAdapter, NextStep } from "nextstepjs";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import ShadcnCustomCard from "../tour/tour-card";
 
@@ -61,11 +61,9 @@ export default function DashboardCarousel({ children }: { children: React.ReactN
           carouselRef.current?.scrollPrev();
         }
 
-        console.log(carouselRef.current?.canScrollNext());
-
         setTimeout(() => {
           setPath(toPath);
-        }, 750);
+        }, 750); // fixed delay should ideally be replaced with a way to detect when scroll finishes
       },
       [path]
     );
