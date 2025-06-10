@@ -3,11 +3,11 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { createJournal } from "@/lib/actions/onboarding-actions";
+import { createFirstJournal } from "@/lib/actions/onboarding-actions";
 import { useState, useTransition } from "react";
 
 interface Props {
-  onSuccess: () => void;
+  onSuccess: (journalName: string) => void;
 }
 
 export function OnboardingStep2({ onSuccess }: Props) {
@@ -20,8 +20,8 @@ export function OnboardingStep2({ onSuccess }: Props) {
     setError(null);
     startTransition(async () => {
       try {
-        const journal = await createJournal({ title: journalName });
-        onSuccess(); // go to next step
+        const journal = await createFirstJournal({ title: journalName });
+        onSuccess(journal.title); // go to next step
       } catch (err) {
         setError("Failed to create journal");
       }

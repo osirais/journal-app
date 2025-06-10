@@ -37,6 +37,8 @@ export function OnboardingPage() {
   const [state, action, isPending] = useActionState(completeOnboarding, null);
   const [isTransitioning, startTransition] = React.useTransition();
 
+  const [journalName, setJournalName] = React.useState<string | null>(null);
+
   const handleFinish = () => {
     startTransition(() => {
       action();
@@ -54,9 +56,16 @@ export function OnboardingPage() {
       case 1:
         return <OnboardingStep1 />;
       case 2:
-        return <OnboardingStep2 onSuccess={nextStep} />;
+        return (
+          <OnboardingStep2
+            onSuccess={(name) => {
+              setJournalName(name);
+              nextStep();
+            }}
+          />
+        );
       case 3:
-        return <OnboardingStep3 />;
+        return <OnboardingStep3 journalName={journalName} />;
       case 4:
         return <OnboardingStep4 />;
       case 5:

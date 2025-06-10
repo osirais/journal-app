@@ -21,7 +21,7 @@ export async function completeOnboarding() {
   }
 }
 
-export async function createJournal(form: { title: string; description?: string }) {
+export async function createFirstJournal(form: { title: string; description?: string }) {
   const { title, description } = form;
 
   if (!title || typeof title !== "string") {
@@ -30,6 +30,24 @@ export async function createJournal(form: { title: string; description?: string 
 
   const supabase = await createClient();
   const user = await getUserOrThrow(supabase);
+
+  // check if user already has a journal (not deleted)
+  const { data: existingJournals, error: fetchError } = await supabase
+    .from("journal")
+    .select("id")
+    .eq("author_id", user.id)
+    .is("deleted_at", null)
+    .limit(1)
+    .single();
+
+  if (fetchError && fetchError.code !== "PGRST116") {
+    // PGRST116 means no rows found, so safe to ignore
+    throw new Error(fetchError.message);
+  }
+
+  if (existingJournals) {
+    throw new Error("User already has a journal");
+  }
 
   const { data: journal, error } = await supabase
     .from("journal")
