@@ -8,13 +8,15 @@ export const steps: Tour[] = [
         title: "Welcome",
         content: "This is your tree.",
         selector: "#tour-tree",
-        icon: ""
+        icon: "",
+        nextRoute: "2"
       },
       {
         title: "Your Journal",
         content: "Here you can view and manage your journal entries.",
         selector: "#tour-journal",
-        icon: ""
+        icon: "",
+        prevRoute: "1"
       },
       {
         title: "Add New Entry",
@@ -32,13 +34,15 @@ export const steps: Tour[] = [
         title: "Manage Tasks",
         content: "Use this button to add or edit your tasks.",
         selector: "#tour-tasks-manage-button",
-        icon: ""
+        icon: "",
+        nextRoute: "3"
       },
       {
         title: "Activity Calendar",
         content: "See your activity and progress on this calendar.",
         selector: "#tour-activity-calendar",
-        icon: ""
+        icon: "",
+        prevRoute: "2"
       },
       {
         title: "Mood Trends",

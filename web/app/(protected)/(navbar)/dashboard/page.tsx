@@ -15,28 +15,27 @@ export default function Page() {
   return (
     <>
       <TourDialog />
-      {/* find way to add this back in later */}
-      {/* <DashboardCarousel> */}
-      <div className="space-y-6">
-        <h1 className="text-2xl font-bold">Tree</h1>
-        <TreeCard />
-      </div>
-      <div className="space-y-6">
-        <h1 className="text-2xl font-bold">Daily</h1>
-        <div className="grid gap-4 md:grid-cols-2">
-          <JournalCard />
-          <MoodCardSSR />
+      <DashboardCarousel>
+        <div className="space-y-6">
+          <h1 className="text-2xl font-bold">Tree</h1>
+          <TreeCard />
         </div>
-        <TasksCardSSR />
-      </div>
-      <div className="space-y-6">
-        <h1 className="text-2xl font-bold">Stats</h1>
-        <div className="space-y-4">
-          <ActivityCalendarSSR />
-          <MoodChartSSR />
+        <div className="space-y-6">
+          <h1 className="text-2xl font-bold">Daily</h1>
+          <div className="grid gap-4 md:grid-cols-2">
+            <JournalCard />
+            <MoodCardSSR />
+          </div>
+          <TasksCardSSR />
         </div>
-      </div>
-      {/* </DashboardCarousel> */}
+        <div className="space-y-6">
+          <h1 className="text-2xl font-bold">Stats</h1>
+          <div className="space-y-4">
+            <ActivityCalendarSSR />
+            <MoodChartSSR />
+          </div>
+        </div>
+      </DashboardCarousel>
     </>
   );
 }

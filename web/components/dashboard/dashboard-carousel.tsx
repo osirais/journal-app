@@ -8,8 +8,11 @@ import {
   CarouselNext,
   CarouselPrevious
 } from "@/components/ui/carousel";
+import { steps } from "@/constants/steps";
 import { useArrowKeyNavigation } from "@/hooks/useArrowKeyNavigation";
-import React, { useCallback, useEffect, useRef } from "react";
+import { NavigationAdapter, NextStep, NextStepProvider, NextStepViewport } from "nextstepjs";
+import React, { useCallback, useEffect, useRef, useState } from "react";
+import ShadcnCustomCard from "../tour/tour-card";
 
 export default function DashboardCarousel({ children }: { children: React.ReactNode }) {
   const carouselRef = useRef<CarouselApi>(null);
@@ -45,6 +48,31 @@ export default function DashboardCarousel({ children }: { children: React.ReactN
     onUp: () => carouselRef.current?.scrollPrev()
   });
 
+  function useCarouselNavAdapter(): NavigationAdapter {
+    const [path, setPath] = useState(1);
+
+    const push = useCallback(
+      (to: string) => {
+        const toPath = Number(to);
+
+        if (toPath > path) {
+          carouselRef.current?.scrollNext();
+        } else if (toPath < path) {
+          carouselRef.current?.scrollPrev();
+        }
+
+        console.log(carouselRef.current?.canScrollNext());
+
+        setTimeout(() => {
+          setPath(toPath);
+        }, 750);
+      },
+      [path]
+    );
+
+    return { push, getCurrentPath: () => path.toString() };
+  }
+
   return (
     <div className="flex items-center justify-center" onWheel={handleWheel}>
       <Carousel
@@ -54,15 +82,26 @@ export default function DashboardCarousel({ children }: { children: React.ReactN
           carouselRef.current = api;
         }}
       >
-        <CarouselContent className="mx-8 h-screen pt-6">
-          {React.Children.map(children, (child, idx) => (
-            <CarouselItem key={idx}>{child}</CarouselItem>
-          ))}
-        </CarouselContent>
-        <div className="absolute right-0 top-1/2 z-10 flex -translate-y-1/2 flex-col gap-2">
-          <CarouselPrevious className="cursor-pointer" />
-          <CarouselNext className="cursor-pointer" />
-        </div>
+        <NextStep
+          steps={steps}
+          cardComponent={ShadcnCustomCard as any}
+          cardTransition={{
+            type: "spring",
+            stiffness: 300,
+            damping: 20
+          }}
+          navigationAdapter={useCarouselNavAdapter}
+        >
+          <CarouselContent className="mx-8 h-screen pt-6">
+            {React.Children.map(children, (child, idx) => (
+              <CarouselItem key={idx}>{child}</CarouselItem>
+            ))}
+          </CarouselContent>
+          <div className="absolute right-0 top-1/2 z-10 flex -translate-y-1/2 flex-col gap-2">
+            <CarouselPrevious className="cursor-pointer" />
+            <CarouselNext className="cursor-pointer" />
+          </div>
+        </NextStep>
       </Carousel>
     </div>
   );

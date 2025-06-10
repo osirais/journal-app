@@ -66,20 +66,8 @@ export default async function RootLayout({
           Skip to content
         </a>
         <ThemeProvider disableTransitionOnChange nonce={nonce}>
-          <NextStepProvider>
-            <NextStep
-              steps={steps}
-              cardComponent={ShadcnCustomCard as any}
-              cardTransition={{
-                type: "spring",
-                stiffness: 300,
-                damping: 20
-              }}
-            >
-              {children}
-              <Toaster />
-            </NextStep>
-          </NextStepProvider>
+          <NextStepProvider>{children}</NextStepProvider>
+          <Toaster />
         </ThemeProvider>
       </body>
     </html>
