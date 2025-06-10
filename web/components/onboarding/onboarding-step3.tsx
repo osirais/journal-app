@@ -27,7 +27,7 @@ export function OnboardingStep3({ journalName, onSuccess }: Props) {
         await createFirstEntry({ title, content });
         setTitle("");
         setContent("");
-        onSuccess(); // go to next step
+        onSuccess();
       } catch (err: any) {
         setError(err.message || "Failed to save entry");
       }
@@ -35,36 +35,42 @@ export function OnboardingStep3({ journalName, onSuccess }: Props) {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="mx-auto max-w-2xl space-y-6 text-left">
-      <h2 className="text-center text-xl font-medium">Add Entry to {journalName}</h2>
-      <p className="text-muted-foreground mx-auto max-w-md text-center">
-        Start writing anything that's on your mind. You can edit or delete it later.
-      </p>
-      <div className="grid gap-4">
-        <Label htmlFor="entryTitle">Entry Title</Label>
-        <Input
-          id="entryTitle"
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-          placeholder="Entry title"
-          required
-          disabled={isPending}
-        />
-      </div>
-      <div className="grid gap-4">
-        <Label htmlFor="entryContent">Entry Content</Label>
-        <div className="min-h-[160px] rounded-md border p-2">
-          <TiptapEditor
-            content={content}
-            onChange={setContent}
-            placeholder="Write your entry here..."
+    <form onSubmit={handleSubmit} className="mx-auto flex h-full w-full flex-col">
+      <div className="flex-grow overflow-auto px-8 py-6">
+        <h2 className="text-center text-xl font-medium">Add Entry to {journalName}</h2>
+        <p className="text-muted-foreground mx-auto max-w-md text-center">
+          Start writing anything that's on your mind. You can edit or delete it later.
+        </p>
+        <div className="mx-auto mt-6 grid max-w-sm gap-4">
+          <Label htmlFor="entryTitle">Entry Title</Label>
+          <Input
+            id="entryTitle"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            placeholder="Entry title"
+            required
+            disabled={isPending}
           />
         </div>
+        <div className="mx-auto mt-6 grid max-w-sm gap-4">
+          <Label htmlFor="entryContent">Entry Content</Label>
+          <div className="min-h-[160px] rounded-md border p-2">
+            <TiptapEditor
+              content={content}
+              onChange={setContent}
+              placeholder="Write your entry here..."
+            />
+          </div>
+        </div>
+        {error && <p className="mx-auto mt-2 max-w-sm text-sm text-red-500">{error}</p>}
       </div>
-      {error && <p className="text-sm text-red-500">{error}</p>}
-      <div className="text-center">
-        <Button type="submit" disabled={isPending || !title.trim() || !content.trim()}>
-          {isPending ? "Saving..." : "Save Entry"}
+      <div className="flex justify-end">
+        <Button
+          type="submit"
+          disabled={isPending || !title.trim() || !content.trim()}
+          className="cursor-pointer"
+        >
+          {isPending ? "Saving..." : "Next"}
         </Button>
       </div>
     </form>

@@ -21,36 +21,45 @@ export function OnboardingStep2({ onSuccess }: Props) {
     startTransition(async () => {
       try {
         const journal = await createFirstJournal({ title: journalName });
-        onSuccess(journal.title); // go to next step
-      } catch (err) {
+        onSuccess(journal.title);
+      } catch {
         setError("Failed to create journal");
       }
     });
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4 text-center">
-      <h2 className="text-xl font-medium">Name Your Journal</h2>
-      <p className="text-muted-foreground mx-auto max-w-md">
-        Give your journal a name. You can change this later.
-      </p>
-      <div className="mx-auto max-w-sm space-y-2 text-left">
-        <Label htmlFor="journalName">Journal Name</Label>
-        <Input
-          id="journalName"
-          value={journalName}
-          onChange={(e) => setJournalName(e.target.value)}
-          placeholder="My Journal"
-        />
+    <form
+      onSubmit={handleSubmit}
+      className="flex h-full w-full flex-col justify-center text-center"
+    >
+      <div className="flex flex-grow flex-col items-center justify-center space-y-4 px-8">
+        <div className="max-w-md space-y-2">
+          <h2 className="text-xl font-medium">Name Your Journal</h2>
+          <p className="text-muted-foreground">
+            Give your journal a name. You can change this later.
+          </p>
+        </div>
+        <div className="w-full max-w-sm space-y-2 text-left">
+          <Label htmlFor="journalName">Journal Name</Label>
+          <Input
+            id="journalName"
+            value={journalName}
+            onChange={(e) => setJournalName(e.target.value)}
+            placeholder="My Journal"
+          />
+        </div>
+        {error && <p className="text-sm text-red-500">{error}</p>}
       </div>
-      {error && <p className="text-sm text-red-500">{error}</p>}
-      <Button
-        type="submit"
-        disabled={isPending || journalName.trim() === ""}
-        className="cursor-pointer"
-      >
-        {isPending ? "Creating..." : "Create Journal"}
-      </Button>
+      <div className="flex justify-end">
+        <Button
+          type="submit"
+          disabled={isPending || journalName.trim() === ""}
+          className="cursor-pointer"
+        >
+          {isPending ? "Creating..." : "Next"}
+        </Button>
+      </div>
     </form>
   );
 }
