@@ -8,6 +8,7 @@ import { OnboardingStep5 } from "@/components/onboarding/onboarding-step5";
 import { OnboardingStep6 } from "@/components/onboarding/onboarding-step6";
 import { OnboardingStep7 } from "@/components/onboarding/onboarding-step7";
 import { OnboardingStep8 } from "@/components/onboarding/onboarding-step8";
+import { OnboardingStep9 } from "@/components/onboarding/onboarding-step9";
 import { Progress } from "@/components/ui/progress";
 import { completeOnboarding } from "@/lib/actions/onboarding-actions";
 import { AnimatePresence, motion } from "framer-motion";
@@ -68,7 +69,9 @@ export function OnboardingPage() {
       case 7:
         return <OnboardingStep7 onSuccess={nextStep} />;
       case 8:
-        return <OnboardingStep8 onSuccess={handleFinish} />;
+        return <OnboardingStep8 onSuccess={nextStep} />;
+      case 9:
+        return <OnboardingStep9 onSuccess={handleFinish} />;
       default:
         return null;
     }
