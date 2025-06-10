@@ -1,5 +1,9 @@
 "use client";
 
+import { OnboardingStep1 } from "@/components/onboarding/onboarding-step1";
+import { OnboardingStep2 } from "@/components/onboarding/onboarding-step2";
+import { OnboardingStep3 } from "@/components/onboarding/onboarding-step3";
+import { OnboardingStep4 } from "@/components/onboarding/onboarding-step4";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
@@ -44,6 +48,21 @@ export function OnboardingPage() {
     }
   }, [state, router]);
 
+  function getStepComponent(step: number) {
+    switch (step) {
+      case 1:
+        return <OnboardingStep1 />;
+      case 2:
+        return <OnboardingStep2 />;
+      case 3:
+        return <OnboardingStep3 />;
+      case 4:
+        return <OnboardingStep4 />;
+      default:
+        return null;
+    }
+  }
+
   return (
     <div className="bg-background flex min-h-screen items-center justify-center p-4">
       <div className="w-full max-w-2xl">
@@ -60,18 +79,7 @@ export function OnboardingPage() {
                 <div className="bg-primary/10 mx-auto flex h-16 w-16 items-center justify-center rounded-full">
                   <span className="text-primary text-2xl font-semibold">{currentStep}</span>
                 </div>
-                <h2 className="text-xl font-medium">
-                  {currentStep === 1 && "Getting Started"}
-                  {currentStep === 2 && "Setup Your Profile"}
-                  {currentStep === 3 && "Choose Preferences"}
-                  {currentStep === 4 && "You're All Set!"}
-                </h2>
-                <p className="text-muted-foreground max-w-md">
-                  {currentStep === 1 && "Let's begin your journey with us."}
-                  {currentStep === 2 && "Tell us a bit about yourself."}
-                  {currentStep === 3 && "Customize your experience."}
-                  {currentStep === 4 && "Ready to start using the platform."}
-                </p>
+                {getStepComponent(currentStep)}
               </div>
             </div>
             <div className="mb-6 flex items-center justify-between">
@@ -84,7 +92,6 @@ export function OnboardingPage() {
                 <ChevronLeft className="h-4 w-4" />
                 Back
               </Button>
-
               {currentStep < totalSteps ? (
                 <Button onClick={nextStep} className="flex cursor-pointer items-center gap-2">
                   Next
