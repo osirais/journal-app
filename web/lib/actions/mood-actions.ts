@@ -36,6 +36,10 @@ export async function updateMood(scale: number) {
   const startOfDay = `${today}T00:00:00.000Z`;
   const endOfDay = `${today}T23:59:59.999Z`;
 
+  if (typeof scale !== "number" || scale < 1 || scale > 5) {
+    throw new Error("Mood must be a number between 1 and 5");
+  }
+
   const { data: existingEntry } = await supabase
     .from("mood_entry")
     .select("id")

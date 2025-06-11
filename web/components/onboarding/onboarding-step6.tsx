@@ -2,7 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
-import { updateMood } from "@/lib/actions/mood-actions";
+import { createFirstMoodEntry } from "@/lib/actions/onboarding-actions";
 import { useOptimistic, useState, useTransition } from "react";
 import { toast } from "sonner";
 
@@ -36,13 +36,12 @@ export function OnboardingStep6({ onSuccess }: OnboardingStep6Props) {
 
     startTransition(async () => {
       setOptimisticMood(mood.scale);
-      const result = await updateMood(mood.scale);
-
-      if (!result.success) {
-        setOptimisticMood(null);
-        toast.error(result.error || "Failed to update mood");
-      } else {
+      try {
+        await createFirstMoodEntry(mood.scale);
         setMoodSaved(true);
+      } catch (err) {
+        setOptimisticMood(null);
+        toast.error((err as Error).message || "Failed to save mood");
       }
     });
   };

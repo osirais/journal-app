@@ -3,6 +3,7 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { createFirstReason } from "@/lib/actions/onboarding-actions";
 import { useState } from "react";
 
 interface OnboardingStep8Props {
@@ -11,6 +12,21 @@ interface OnboardingStep8Props {
 
 export function OnboardingStep8({ onSuccess }: OnboardingStep8Props) {
   const [reminder, setReminder] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  async function handleNext() {
+    setError(null);
+    setLoading(true);
+    try {
+      await createFirstReason(reminder.trim());
+      onSuccess();
+    } catch (err: any) {
+      setError(err.message || "Failed to create reason");
+    } finally {
+      setLoading(false);
+    }
+  }
 
   return (
     <div className="flex h-full w-full flex-col">
@@ -28,12 +44,18 @@ export function OnboardingStep8({ onSuccess }: OnboardingStep8Props) {
             onChange={(e) => setReminder(e.target.value)}
             placeholder=""
             autoComplete="off"
+            disabled={loading}
           />
+          {error && <p className="text-sm text-red-600">{error}</p>}
         </div>
       </div>
       <div className="flex justify-end p-4">
-        <Button onClick={onSuccess} disabled={reminder.trim() === ""} className="cursor-pointer">
-          Next
+        <Button
+          onClick={handleNext}
+          disabled={reminder.trim() === "" || loading}
+          className="cursor-pointer"
+        >
+          {loading ? "Saving..." : "Next"}
         </Button>
       </div>
     </div>

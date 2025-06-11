@@ -17,7 +17,7 @@ import { useActionState, useEffect, useState, useTransition } from "react";
 
 export function OnboardingPage() {
   const [currentStep, setCurrentStep] = useState(1);
-  const totalSteps = 8;
+  const totalSteps = 9;
   const router = useRouter();
 
   const nextStep = () => {

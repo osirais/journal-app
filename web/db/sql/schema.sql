@@ -186,3 +186,12 @@ BEGIN
     EXECUTE FUNCTION increment_user_entry_activity();
   END IF;
 END $$;
+
+CREATE TABLE IF NOT EXISTS reason (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v7(),
+    user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    text TEXT NOT NULL,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+    deleted_at TIMESTAMPTZ
+);
