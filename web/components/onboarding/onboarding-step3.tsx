@@ -55,7 +55,7 @@ export function OnboardingStep3({ journalName, onSuccess }: OnboardingStep3Props
         </div>
         <div className="mx-auto mt-6 grid max-w-sm gap-4">
           <Label htmlFor="entryContent">Entry Content</Label>
-          <div className="min-h-[160px] rounded-md border p-2">
+          <div className="min-h-[160px] rounded-md border p-2 text-left">
             <TiptapEditor
               content={content}
               onChange={setContent}

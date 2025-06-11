@@ -58,7 +58,7 @@ export function OnboardingStep2({ onSuccess }: OnboardingStep2Props) {
           disabled={isPending || journalName.trim() === ""}
           className="cursor-pointer"
         >
-          {isPending ? "Creating..." : "Next"}
+          {isPending ? "Saving..." : "Next"}
         </Button>
       </div>
     </form>
