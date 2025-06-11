@@ -82,6 +82,7 @@ export default function DashboardCarousel({ children }: { children: React.ReactN
       <Carousel
         className="relative w-full max-w-3xl"
         orientation="vertical"
+        opts={{ watchDrag: false }}
         setApi={(api) => {
           carouselRef.current = api;
         }}
