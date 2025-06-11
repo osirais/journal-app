@@ -40,7 +40,9 @@ export function GardenCard() {
             <div className="mb-2 text-right font-mono text-sm text-gray-700">
               {nextRequired ? `${droplets} / ${nextRequired}` : `${droplets} / —`} droplets
             </div>
-            <TreeProgressionDrawer droplets={droplets} />
+            <div className="ml-auto w-max">
+              <TreeProgressionDrawer droplets={droplets} />
+            </div>
           </div>
         </div>
       </CardContent>
