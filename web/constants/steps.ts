@@ -25,6 +25,12 @@ export const steps: Tour[] = [
         icon: ""
       },
       {
+        title: "Your Mood",
+        content: "Here you can log mood entries.",
+        selector: "#tour-mood",
+        icon: ""
+      },
+      {
         title: "Tasks Overview",
         content: "View your pending and completed tasks here.",
         selector: "#tour-tasks",

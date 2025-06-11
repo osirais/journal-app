@@ -90,7 +90,7 @@ export const MoodChartCSR = ({ data }: MoodChartCSRProps) => {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>
+        <CardTitle id="tour-mood-trend">
           Mood Trend <span className="text-muted-foreground text-sm">({currentMonth})</span>
         </CardTitle>
         <CardDescription>
