@@ -18,11 +18,14 @@ import { useActionState, useEffect, useState, useTransition } from "react";
 
 export function OnboardingPage() {
   const [currentStep, setCurrentStep] = useState(1);
-  const totalSteps = 9;
+  const totalSteps = 10;
   const router = useRouter();
+
+  const [direction, setDirection] = useState(0);
 
   const nextStep = () => {
     if (currentStep < totalSteps) {
+      setDirection(1);
       setCurrentStep((prev) => prev + 1);
     }
   };
@@ -100,11 +103,6 @@ export function OnboardingPage() {
       width: "100%"
     })
   };
-
-  const [direction, setDirection] = useState(0);
-  useEffect(() => {
-    setDirection((prev) => (currentStep > prev ? 1 : -1));
-  }, [currentStep]);
 
   return (
     <div className="bg-background text-foreground flex h-screen w-full flex-col overflow-hidden">
