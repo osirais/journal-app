@@ -4,6 +4,19 @@ import { useFrame } from "@react-three/fiber";
 import { useMemo, useRef } from "react";
 import { Group } from "three";
 
+const pastelColors = [
+  "#ffb3ba",
+  "#ffdfba",
+  "#ffffba",
+  "#baffc9",
+  "#bae1ff",
+  "#d7baff",
+  "#ffbaed",
+  "#baffd9",
+  "#ffd6ba",
+  "#c9baff"
+];
+
 // pseudo-random number generator
 function mulberry32(seed: number) {
   return function () {
@@ -14,25 +27,26 @@ function mulberry32(seed: number) {
   };
 }
 
-function generateFlowerPositions(count: number, seed = 42) {
+function generateFlowerData(count: number, seed = 42) {
   const rand = mulberry32(seed);
   const radius = 2.5;
-  const positions: [number, number, number][] = [];
+  const data: { position: [number, number, number]; color: string }[] = [];
 
   for (let i = 0; i < count; i++) {
     const angle = rand() * Math.PI * 2;
     const distance = radius + rand() * 1.5;
     const x = Math.cos(angle) * distance;
     const z = Math.sin(angle) * distance;
-    positions.push([x, -2.5, z]);
+    const color = pastelColors[Math.floor(rand() * pastelColors.length)];
+    data.push({ position: [x, -2.5, z], color });
   }
 
-  return positions;
+  return data;
 }
 
 export function Garden({
   modelPath,
-  flowerCount = 6 // placeholder count
+  flowerCount = 6
 }: {
   modelPath: string;
   flowerCount?: number;
@@ -45,7 +59,7 @@ export function Garden({
     }
   });
 
-  const flowerPositions = useMemo(() => generateFlowerPositions(flowerCount), [flowerCount]);
+  const flowerData = useMemo(() => generateFlowerData(flowerCount), [flowerCount]);
 
   return (
     <group ref={gardenRef}>
@@ -59,8 +73,8 @@ export function Garden({
       />
       <pointLight position={[0, 5, 5]} intensity={0.6} />
       <TreeModel modelPath={modelPath} position={[0, -2.5, 0]} />
-      {flowerPositions.map((pos, i) => (
-        <FlowerModel key={i} position={pos} />
+      {flowerData.map((data, i) => (
+        <FlowerModel key={i} position={data.position} color={data.color} />
       ))}
     </group>
   );

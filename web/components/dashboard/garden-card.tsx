@@ -3,7 +3,7 @@
 import { useDropletStore } from "@/app/stores/droplets-store";
 import { Garden } from "@/components/garden/garden";
 import { TreeProgressionDrawer } from "@/components/tree/tree-progression-drawer";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { getCurrentTreeStage, getNextRequiredDroplets } from "@/utils/tree-stage-utils";
 import { OrbitControls } from "@react-three/drei";
 import { Canvas } from "@react-three/fiber";
@@ -22,7 +22,7 @@ export function GardenCard() {
       <CardContent className="relative flex-1 overflow-hidden p-0">
         <div className="grid h-full grid-rows-[4fr_1fr]">
           <div className="relative h-full w-full">
-            <Canvas camera={{ position: [4.25, 1, 0] }} className="absolute inset-0">
+            <Canvas camera={{ position: [10, 1, 0] }} className="absolute inset-0">
               <ambientLight intensity={0.5} />
               <directionalLight position={[5, 5, 5]} intensity={1} />
               <Suspense fallback={null}>
