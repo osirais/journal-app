@@ -5,7 +5,7 @@ import { encodedRedirect } from "@/utils/utils";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 
-export async function registerAction(username: string, email: string, password: string) {
+export async function registerAction(email: string, password: string) {
   const supabase = await createClient();
   const origin = (await headers()).get("origin");
 
@@ -28,24 +28,6 @@ export async function registerAction(username: string, email: string, password: 
 
   if (!authData.user) {
     return encodedRedirect("error", "/register", "User creation failed");
-  }
-
-  const { error: profileError } = await supabase
-    .from("users")
-    .insert([{ id: authData.user.id, username, name: username }]);
-
-  if (profileError) {
-    console.error(profileError.code + " " + profileError.message);
-    return encodedRedirect("error", "/register", profileError.message);
-  }
-
-  const { error: balanceError } = await supabase
-    .from("user_balance")
-    .insert([{ user_id: authData.user.id, currency: "droplets" }]);
-
-  if (balanceError) {
-    console.error(balanceError.code + " " + balanceError.message);
-    return encodedRedirect("error", "/register", balanceError.message);
   }
 
   return encodedRedirect(
@@ -143,4 +125,33 @@ export async function signOutAction() {
   const supabase = await createClient();
   await supabase.auth.signOut();
   return redirect("/login");
+}
+
+export async function signInWithGoogleAction(response: any) {
+  const supabase = await createClient();
+
+  const { data: authData, error: authError } = await supabase.auth.signInWithIdToken({
+    provider: "google",
+    token: response.credential
+  });
+
+  if (authError) {
+    return encodedRedirect("error", "/register", authError.message);
+  }
+
+  if (!authData.user) {
+    return encodedRedirect("error", "/register", "User creation failed");
+  }
+
+  const { data: userData, error: userError } = await supabase
+    .from("users")
+    .select("id")
+    .eq("id", authData.user.id)
+    .maybeSingle();
+
+  if (userError) {
+    return encodedRedirect("error", "/register", userError.message);
+  }
+
+  return userData ? "/dashboard" : "/onboarding";
 }

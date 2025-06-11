@@ -4,6 +4,7 @@ import "./globals.css";
 import { Toaster } from "@/components/ui/sonner";
 import { defaultUrl } from "@/constants/url";
 import { headers } from "next/headers";
+import Script from "next/script";
 import { NextStepProvider } from "nextstepjs";
 
 export const metadata = {
@@ -57,6 +58,11 @@ export default async function RootLayout({
   return (
     <html lang="en" className={geistSans.className} suppressHydrationWarning>
       <body className="bg-background text-foreground">
+        <Script
+          src="https://accounts.google.com/gsi/client"
+          strategy="afterInteractive"
+          nonce={nonce}
+        />
         <a
           href="#main-content"
           className="bg-primary z-999 text-md text-primary-foreground sr-only rounded-br-md focus:not-sr-only focus:absolute focus:px-4 focus:py-2"

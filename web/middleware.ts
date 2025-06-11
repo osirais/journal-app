@@ -9,7 +9,7 @@ export async function middleware(request: NextRequest) {
     script-src 'self' 'nonce-${nonce}' 'strict-dynamic' https: http: ${
       process.env.NODE_ENV === "production" ? "" : `'unsafe-eval'`
     };
-    style-src 'self' 'unsafe-inline';
+    style-src 'self' 'unsafe-inline' https://accounts.google.com/gsi/style;
     img-src 'self' blob: data:;
     font-src 'self';
     object-src 'none';

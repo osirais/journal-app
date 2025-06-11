@@ -1,5 +1,6 @@
 "use client";
 
+import { OnboardProfile } from "@/components/onboarding/onboard-profile";
 import { OnboardingStep1 } from "@/components/onboarding/onboarding-step1";
 import { OnboardingStep2 } from "@/components/onboarding/onboarding-step2";
 import { OnboardingStep3 } from "@/components/onboarding/onboarding-step3";
@@ -50,6 +51,8 @@ export function OnboardingPage() {
       case 1:
         return <OnboardingStep1 onSuccess={nextStep} />;
       case 2:
+        return <OnboardProfile onSuccess={nextStep} />;
+      case 3:
         return (
           <OnboardingStep2
             onSuccess={(name) => {
@@ -58,19 +61,19 @@ export function OnboardingPage() {
             }}
           />
         );
-      case 3:
-        return <OnboardingStep3 journalName={journalName!} onSuccess={nextStep} />;
       case 4:
-        return <OnboardingStep4 onSuccess={nextStep} />;
+        return <OnboardingStep3 journalName={journalName!} onSuccess={nextStep} />;
       case 5:
-        return <OnboardingStep5 onSuccess={nextStep} />;
+        return <OnboardingStep4 onSuccess={nextStep} />;
       case 6:
-        return <OnboardingStep6 onSuccess={nextStep} />;
+        return <OnboardingStep5 onSuccess={nextStep} />;
       case 7:
-        return <OnboardingStep7 onSuccess={nextStep} />;
+        return <OnboardingStep6 onSuccess={nextStep} />;
       case 8:
-        return <OnboardingStep8 onSuccess={nextStep} />;
+        return <OnboardingStep7 onSuccess={nextStep} />;
       case 9:
+        return <OnboardingStep8 onSuccess={nextStep} />;
+      case 10:
         return <OnboardingStep9 onSuccess={handleFinish} />;
       default:
         return null;
