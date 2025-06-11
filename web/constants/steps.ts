@@ -6,8 +6,8 @@ export const steps: Tour[] = [
     steps: [
       {
         title: "Welcome",
-        content: "This is your tree.",
-        selector: "#tour-tree",
+        content: "This is your garden.",
+        selector: "#tour-garden",
         icon: "",
         nextRoute: "2"
       },

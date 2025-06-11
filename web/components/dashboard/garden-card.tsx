@@ -1,33 +1,15 @@
 "use client";
 
 import { useDropletStore } from "@/app/stores/droplets-store";
+import { Garden } from "@/components/garden/garden";
 import { TreeProgressionDrawer } from "@/components/tree/tree-progression-drawer";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { getCurrentTreeStage, getNextRequiredDroplets } from "@/utils/tree-stage-utils";
-import { OrbitControls, useGLTF } from "@react-three/drei";
-import { Canvas, useFrame } from "@react-three/fiber";
-import { Suspense, useRef } from "react";
-import type * as THREE from "three";
+import { OrbitControls } from "@react-three/drei";
+import { Canvas } from "@react-three/fiber";
+import { Suspense } from "react";
 
-function TreeModel({ modelPath }: { modelPath: string }) {
-  const fullPath = `/models/tree_stages_current/${modelPath}`;
-  const { scene } = useGLTF(fullPath);
-  const groupRef = useRef<THREE.Group>(null);
-
-  useFrame(() => {
-    if (groupRef.current) {
-      groupRef.current.rotation.y += 0.003;
-    }
-  });
-
-  return (
-    <group ref={groupRef} position={[0, -2.5, 0]}>
-      <primitive object={scene} />
-    </group>
-  );
-}
-
-export function TreeCard() {
+export function GardenCard() {
   const droplets = useDropletStore((state) => state.droplets) ?? 0;
   const currentStage = getCurrentTreeStage(droplets);
   const nextRequired = getNextRequiredDroplets(droplets);
@@ -35,8 +17,7 @@ export function TreeCard() {
   return (
     <Card className="flex h-[80vh] w-full flex-col pb-0">
       <CardHeader>
-        <CardTitle id="tour-tree">Tree</CardTitle>
-        <CardDescription>This feature is still under development.</CardDescription>
+        <CardTitle id="tour-garden">Garden</CardTitle>
       </CardHeader>
       <CardContent className="relative flex-1 overflow-hidden p-0">
         <div className="grid h-full grid-rows-[4fr_1fr]">
@@ -45,7 +26,7 @@ export function TreeCard() {
               <ambientLight intensity={0.5} />
               <directionalLight position={[5, 5, 5]} intensity={1} />
               <Suspense fallback={null}>
-                <TreeModel modelPath={currentStage.path} />
+                <Garden modelPath={currentStage.path} />
               </Suspense>
               <OrbitControls
                 enableZoom={false}
