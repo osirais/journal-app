@@ -126,32 +126,3 @@ export async function signOutAction() {
   await supabase.auth.signOut();
   return redirect("/login");
 }
-
-export async function signInWithGoogleAction(response: any) {
-  const supabase = await createClient();
-
-  const { data: authData, error: authError } = await supabase.auth.signInWithIdToken({
-    provider: "google",
-    token: response.credential
-  });
-
-  if (authError) {
-    return encodedRedirect("error", "/register", authError.message);
-  }
-
-  if (!authData.user) {
-    return encodedRedirect("error", "/register", "User creation failed");
-  }
-
-  const { data: userData, error: userError } = await supabase
-    .from("users")
-    .select("id")
-    .eq("id", authData.user.id)
-    .maybeSingle();
-
-  if (userError) {
-    return encodedRedirect("error", "/register", userError.message);
-  }
-
-  return userData ? "/dashboard" : "/onboarding";
-}

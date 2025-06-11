@@ -1,14 +1,17 @@
 "use client";
 
-import { loginAction, signInWithGoogleAction } from "@/app/actions";
+import { loginAction } from "@/app/actions";
 import { SubmitButton } from "@/components/submit-button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { CredentialResponse } from "google-one-tap";
+import { Separator } from "@/components/ui/separator";
+import { createClient } from "@/utils/supabase/client";
+import { encodedRedirect } from "@/utils/utils";
 import Link from "next/link";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import { Suspense, useState } from "react";
+import { Button } from "../ui/button";
 
 export function LoginCard() {
   return (
@@ -27,12 +30,17 @@ function LoginCardContent() {
 
   const canSubmit = email.trim() !== "" && password.trim() !== "";
 
-  const router = useRouter();
+  async function signInWithGoogle() {
+    const supabase = createClient();
 
-  (window as any).handleSignInWithGoogle = async (response: CredentialResponse) => {
-    const path = await signInWithGoogleAction(response);
-    router.push(path);
-  };
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: "google"
+    });
+
+    if (error) {
+      encodedRedirect("error", "/login", error.message);
+    }
+  }
 
   return (
     <>
@@ -68,35 +76,22 @@ function LoginCardContent() {
               onChange={(e) => setPassword(e.target.value)}
               required
             />
-            <div>
-              <div
-                id="g_id_onload"
-                data-client_id="716483514426-daok008f7m7ql7od8gio67tb9mmmutol.apps.googleusercontent.com"
-                data-context="signin"
-                data-ux_mode="popup"
-                data-callback="handleSignInWithGoogle"
-                data-nonce=""
-                data-itp_support="true"
-                data-use_fedcm_for_prompt="true"
-              ></div>
-
-              <div
-                className="g_id_signin"
-                data-type="standard"
-                data-shape="rectangular"
-                data-theme="outline"
-                data-text="signin_with"
-                data-size="large"
-                data-logo_alignment="left"
-              ></div>
+            <div className="flex flex-col gap-6">
+              <SubmitButton
+                pendingText="Signing In..."
+                formAction={loginAction}
+                disabled={!canSubmit}
+              >
+                Sign in
+              </SubmitButton>
+              <Separator />
+              <Button onClick={signInWithGoogle}>
+                <svg xmlns="http://www.w3.org/2000/svg" className="size-6" viewBox="0 0 24 24">
+                  <path d="M20.283 10.356h-8.327v3.451h4.792c-.446 2.193-2.313 3.453-4.792 3.453a5.27 5.27 0 0 1-5.279-5.28a5.27 5.27 0 0 1 5.279-5.279c1.259 0 2.397.447 3.29 1.178l2.6-2.599c-1.584-1.381-3.615-2.233-5.89-2.233a8.908 8.908 0 0 0-8.934 8.934a8.907 8.907 0 0 0 8.934 8.934c4.467 0 8.529-3.249 8.529-8.934c0-.528-.081-1.097-.202-1.625z" />
+                </svg>
+                Sign in with Google
+              </Button>
             </div>
-            <SubmitButton
-              pendingText="Signing In..."
-              formAction={loginAction}
-              disabled={!canSubmit}
-            >
-              Sign in
-            </SubmitButton>
             {error && (
               <div className="mt-4 rounded-md border border-red-500 bg-red-500/20 p-3 text-sm text-red-500">
                 {decodeURIComponent(error)}
