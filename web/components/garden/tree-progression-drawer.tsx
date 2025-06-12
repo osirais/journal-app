@@ -17,6 +17,16 @@ import { Canvas, useFrame } from "@react-three/fiber";
 import { useRef, useState } from "react";
 import type * as THREE from "three";
 
+const yPosMap: Record<string, number> = {
+  A: -1,
+  B: -1.5,
+  C: -2,
+  D: -2.5,
+  E: -3,
+  F: -3.5,
+  G: -4
+};
+
 function TreeModel({ letter }: { letter: string }) {
   const relativePath = TREE_PROGRESSION_STAGES.find((s) => s.letter === letter)?.path ?? "";
   const fullPath = `/models/tree_stages/${relativePath}`;
@@ -30,17 +40,29 @@ function TreeModel({ letter }: { letter: string }) {
   });
 
   return (
-    <group ref={groupRef} position={[0, -1.5, 0]}>
+    <group ref={groupRef} position={[0, yPosMap[letter], 0]}>
       <primitive object={scene} />
     </group>
   );
 }
 
+const cameraPositions: Record<string, [number, number, number]> = {
+  A: [0, 0, 4],
+  B: [0, -0.3, 5],
+  C: [0, -0.5, 6],
+  D: [0, -0.8, 7],
+  E: [0, -1.2, 8],
+  F: [0, -1.5, 9],
+  G: [0, -1.5, 10]
+};
+
 function TreeScene({ letter }: { letter: string }) {
+  const position = cameraPositions[letter];
+
   return (
-    <div className="h-16 w-16 overflow-hidden rounded-md border bg-transparent">
+    <div className="h-16 w-16 overflow-hidden rounded-md border bg-transparent md:h-24 md:w-24">
       <Canvas
-        camera={{ position: [0, 0, 4], fov: 75 }}
+        camera={{ position, fov: 75 }}
         gl={{ preserveDrawingBuffer: true, alpha: true }}
         style={{ background: "transparent" }}
       >
@@ -126,18 +148,7 @@ export function TreeProgressionDrawer({ droplets }: { droplets: number }) {
                       key={index}
                       className="flex min-w-[120px] flex-1 flex-col items-center space-y-4"
                     >
-                      <div className="h-24 w-24 overflow-hidden rounded-lg border bg-transparent">
-                        <Canvas
-                          camera={{ position: [0, 0, 5], fov: 75 }}
-                          gl={{ preserveDrawingBuffer: true, alpha: true }}
-                          style={{ background: "transparent" }}
-                        >
-                          <ambientLight intensity={0.5} />
-                          <directionalLight position={[3, 3, 3]} intensity={0.8} />
-                          <TreeModel letter={step.letter} />
-                        </Canvas>
-                      </div>
-
+                      <TreeScene letter={step.letter} />
                       <div className="border-primary bg-background relative z-10 h-4 w-4 rounded-full border-2">
                         {step.status === "completed" && (
                           <div className="absolute inset-0 rounded-full border-green-500 bg-green-500" />
@@ -146,7 +157,6 @@ export function TreeProgressionDrawer({ droplets }: { droplets: number }) {
                           <div className="bg-primary absolute left-0 top-0 h-full w-1/2 rounded-l-full" />
                         )}
                       </div>
-
                       <div className="space-y-2 text-center">
                         <div className="flex items-center justify-center gap-2">
                           <h4 className="text-sm font-medium">{step.name}</h4>
