@@ -260,60 +260,58 @@ function AuthCardContent() {
                     />
                   </div>
                 </div>
-                <div className="flex flex-col gap-3">
-                  <div className="flex flex-col gap-2">
-                    <Label htmlFor="password">Password</Label>
-                    <div className="relative flex items-center">
-                      <div className="text-muted-foreground absolute flex size-9 items-center justify-center">
-                        <Lock className="size-4" />
-                      </div>
-                      <Input
-                        className="pl-9"
-                        type={showPassword ? "text" : "password"}
-                        name="password"
-                        placeholder="••••••••"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        minLength={6}
-                        required
-                      />
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="icon"
-                        className="text-muted-foreground absolute right-0 cursor-pointer"
-                        onClick={() => setShowPassword(!showPassword)}
-                      >
-                        {showPassword ? <EyeOff /> : <Eye />}
-                      </Button>
+                <div className="flex flex-col gap-2">
+                  <Label htmlFor="password">Password</Label>
+                  <div className="relative flex items-center">
+                    <div className="text-muted-foreground absolute flex size-9 items-center justify-center">
+                      <Lock className="size-4" />
                     </div>
+                    <Input
+                      className="pl-9"
+                      type={showPassword ? "text" : "password"}
+                      name="password"
+                      placeholder="••••••••"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      minLength={6}
+                      required
+                    />
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      className="text-muted-foreground absolute right-0 cursor-pointer"
+                      onClick={() => setShowPassword(!showPassword)}
+                    >
+                      {showPassword ? <EyeOff /> : <Eye />}
+                    </Button>
                   </div>
-                  <div className="flex flex-col gap-2">
-                    <Label htmlFor="confirm-password">Confirm password</Label>
-                    <div className="relative flex items-center">
-                      <div className="text-muted-foreground absolute flex size-9 items-center justify-center">
-                        <Lock className="size-4" />
-                      </div>
-                      <Input
-                        className="pl-9"
-                        type={showPassword ? "text" : "password"}
-                        name="confirm-password"
-                        placeholder="••••••••"
-                        value={confirmPassword}
-                        onChange={(e) => setConfirmPassword(e.target.value)}
-                        minLength={6}
-                        required
-                      />
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="icon"
-                        className="text-muted-foreground absolute right-0 cursor-pointer"
-                        onClick={() => setShowPassword(!showPassword)}
-                      >
-                        {showPassword ? <EyeOff /> : <Eye />}
-                      </Button>
+                </div>
+                <div className="flex flex-col gap-2">
+                  <Label htmlFor="confirm-password">Confirm password</Label>
+                  <div className="relative flex items-center">
+                    <div className="text-muted-foreground absolute flex size-9 items-center justify-center">
+                      <Lock className="size-4" />
                     </div>
+                    <Input
+                      className="pl-9"
+                      type={showPassword ? "text" : "password"}
+                      name="confirm-password"
+                      placeholder="••••••••"
+                      value={confirmPassword}
+                      onChange={(e) => setConfirmPassword(e.target.value)}
+                      minLength={6}
+                      required
+                    />
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      className="text-muted-foreground absolute right-0 cursor-pointer"
+                      onClick={() => setShowPassword(!showPassword)}
+                    >
+                      {showPassword ? <EyeOff /> : <Eye />}
+                    </Button>
                   </div>
                 </div>
                 <SubmitButton
