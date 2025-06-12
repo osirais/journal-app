@@ -1,6 +1,5 @@
 "use client";
 
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   Drawer,
@@ -56,11 +55,11 @@ const cameraPositions: Record<string, [number, number, number]> = {
   G: [0, -1.5, 10]
 };
 
-function TreeScene({ letter }: { letter: string }) {
+function TreeScene({ letter, locked }: { letter: string; locked: boolean }) {
   const position = cameraPositions[letter];
 
   return (
-    <div className="h-16 w-16 overflow-hidden rounded-md border bg-transparent md:h-24 md:w-24">
+    <div className="relative h-16 w-16 overflow-hidden rounded-md border bg-transparent md:h-24 md:w-24">
       <Canvas
         camera={{ position, fov: 75 }}
         gl={{ preserveDrawingBuffer: true, alpha: true }}
@@ -70,6 +69,7 @@ function TreeScene({ letter }: { letter: string }) {
         <directionalLight position={[3, 3, 3]} intensity={0.8} />
         <TreeModel letter={letter} />
       </Canvas>
+      {locked && <div className="pointer-events-none absolute inset-0 rounded-md bg-black/50" />}
     </div>
   );
 }
@@ -121,22 +121,10 @@ export function TreeProgressionDrawer({ droplets }: { droplets: number }) {
             <div className="space-y-3 md:hidden">
               {stepsWithStatus.map((step, index) => (
                 <div key={index} className="flex items-center gap-3 rounded-lg border p-3">
-                  <TreeScene letter={step.letter} />
+                  <TreeScene letter={step.letter} locked={step.status === "upcoming"} />
                   <div className="min-w-0 flex-1">
                     <div className="mb-1 flex items-center gap-2">
                       <h4 className="truncate text-sm font-medium">{step.name}</h4>
-                      <Badge
-                        variant={
-                          step.status === "completed"
-                            ? "default"
-                            : step.status === "current"
-                              ? "secondary"
-                              : "outline"
-                        }
-                        className="shrink-0 text-xs"
-                      >
-                        {step.status === "completed" ? "✓" : step.status === "current" ? "→" : "○"}
-                      </Badge>
                     </div>
                     <div className="text-muted-foreground text-xs">
                       {droplets} / {step.required} droplets
@@ -154,7 +142,7 @@ export function TreeProgressionDrawer({ droplets }: { droplets: number }) {
                       key={index}
                       className="flex min-w-[120px] flex-1 flex-col items-center space-y-4"
                     >
-                      <TreeScene letter={step.letter} />
+                      <TreeScene letter={step.letter} locked={step.status === "upcoming"} />
                       <div className="border-primary bg-background relative z-10 h-4 w-4 rounded-full border-2">
                         {step.status === "completed" && (
                           <div className="absolute inset-0 rounded-full border-green-500 bg-green-500" />
@@ -166,22 +154,6 @@ export function TreeProgressionDrawer({ droplets }: { droplets: number }) {
                       <div className="space-y-2 text-center">
                         <div className="flex items-center justify-center gap-2">
                           <h4 className="text-sm font-medium">{step.name}</h4>
-                          <Badge
-                            variant={
-                              step.status === "completed"
-                                ? "default"
-                                : step.status === "current"
-                                  ? "secondary"
-                                  : "outline"
-                            }
-                            className="text-xs"
-                          >
-                            {step.status === "completed"
-                              ? "✓"
-                              : step.status === "current"
-                                ? "→"
-                                : "○"}
-                          </Badge>
                         </div>
                         <div className="text-muted-foreground text-xs">
                           {droplets} / {step.required}
@@ -202,7 +174,10 @@ export function TreeProgressionDrawer({ droplets }: { droplets: number }) {
               <Progress value={overallProgress} className="h-2" />
             </div>
             <DrawerClose asChild>
-              <Button variant="outline" className="w-full md:mx-auto md:block md:w-auto">
+              <Button
+                variant="outline"
+                className="w-full cursor-pointer md:mx-auto md:block md:w-auto"
+              >
                 Close
               </Button>
             </DrawerClose>
