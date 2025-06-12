@@ -77,6 +77,12 @@ function TreeScene({ letter }: { letter: string }) {
 export function TreeProgressionDrawer({ droplets }: { droplets: number }) {
   const [open, setOpen] = useState(false);
 
+  function handleOpenChange(value: boolean) {
+    setOpen(value);
+    (window as any).__IS_DRAWER_OPEN__ = value;
+    window.dispatchEvent(new Event("drawerToggle"));
+  }
+
   const stepsWithStatus = TREE_PROGRESSION_STAGES.map((step, index) => {
     if (droplets >= step.required) {
       return { ...step, status: "completed" };
@@ -97,7 +103,7 @@ export function TreeProgressionDrawer({ droplets }: { droplets: number }) {
   return (
     <>
       <Button
-        onClick={() => setOpen(true)}
+        onClick={() => handleOpenChange(true)}
         variant="outline"
         size="sm"
         className="md:size-default cursor-pointer"

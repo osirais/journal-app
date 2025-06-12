@@ -29,9 +29,22 @@ export default function DashboardCarousel({ children }: { children: React.ReactN
     };
   }, []);
 
+  const [drawerOpen, setDrawerOpen] = useState(false);
+
+  useEffect(() => {
+    function onDrawerToggle() {
+      setDrawerOpen(!!(window as any).__IS_DRAWER_OPEN__);
+    }
+
+    window.addEventListener("drawerToggle", onDrawerToggle);
+    setDrawerOpen(!!(window as any).__IS_DRAWER_OPEN__);
+
+    return () => window.removeEventListener("drawerToggle", onDrawerToggle);
+  }, []);
+
   const handleWheel = useCallback(
     (e: React.WheelEvent<HTMLDivElement>) => {
-      if (!carouselRef.current || currentTour) return;
+      if (!carouselRef.current || currentTour || drawerOpen) return;
 
       // prevent excessive scrolling
       const now = Date.now();
@@ -45,13 +58,13 @@ export default function DashboardCarousel({ children }: { children: React.ReactN
 
       lastScroll.current = now;
     },
-    [currentTour]
+    [currentTour, drawerOpen]
   );
 
   useArrowKeyNavigation({
     onDown: () => carouselRef.current?.scrollNext(),
     onUp: () => carouselRef.current?.scrollPrev(),
-    enabled: !currentTour
+    enabled: !currentTour && !drawerOpen
   });
 
   function useCarouselNavAdapter(): NavigationAdapter {
