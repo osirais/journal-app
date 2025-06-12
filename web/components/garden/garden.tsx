@@ -1,39 +1,81 @@
 import { FlowerModel } from "@/components/garden/flower-model";
 import { TreeModel } from "@/components/garden/tree-model";
 import { FLOWER_COLORS } from "@/constants/flower-colors";
+import { FLOWER_PROGRESSION_STAGES } from "@/constants/flower-stages";
 import { useFrame } from "@react-three/fiber";
 import { useMemo, useRef } from "react";
 import { Group } from "three";
 
-function getAllFlowerColors() {
-  const dailyColors = Object.values(FLOWER_COLORS.daily);
-  const streakColors = Object.values(FLOWER_COLORS.streak);
-  return [...dailyColors, ...streakColors];
+function getFlowerStageForCount(count: number) {
+  let stage = undefined;
+  for (const s of FLOWER_PROGRESSION_STAGES) {
+    if (count >= s.required) stage = s;
+  }
+
+  // for when less than min requirement
+  return (
+    stage ?? {
+      name: "",
+      letter: "",
+      required: 0
+    }
+  );
 }
 
-function generateFlowerData() {
+function generateFlowerData(dailyData: Record<string, number>, streakData: Record<string, number>) {
   const radius = 4;
   const height = 1;
-  const colors = getAllFlowerColors();
+
+  type Category = "journal" | "mood" | "tasks";
+  const categories: Category[] = ["journal", "mood", "tasks"];
+  const totalFlowers = categories.length * 2;
 
   const data: { position: [number, number, number]; color: string; letter: string }[] = [];
-  const totalCount = colors.length;
 
-  for (let i = 0; i < totalCount; i++) {
-    const angle = (i / totalCount) * Math.PI * 2;
-    const x = Math.cos(angle) * radius;
-    const z = Math.sin(angle) * radius;
+  categories.forEach((key, i) => {
+    // index for daily flower
+    const dailyIndex = i * 2;
+    const dailyCount = dailyData[key];
+    const dailyStage = getFlowerStageForCount(dailyCount);
 
-    const color = colors[i % colors.length];
-    const letter = "C"; // constant (temporary)
+    const dailyAngle = (dailyIndex / totalFlowers) * Math.PI * 2;
+    const dailyX = Math.cos(dailyAngle) * radius;
+    const dailyZ = Math.sin(dailyAngle) * radius;
 
-    data.push({ position: [x, height, z], color, letter });
-  }
+    data.push({
+      position: [dailyX, height, dailyZ],
+      color: FLOWER_COLORS.daily[key],
+      letter: dailyStage.letter
+    });
+
+    // index for streak flower
+    const streakIndex = dailyIndex + 1;
+    const streakCount = streakData[key];
+    const streakStage = getFlowerStageForCount(streakCount);
+
+    const streakAngle = (streakIndex / totalFlowers) * Math.PI * 2;
+    const streakX = Math.cos(streakAngle) * radius;
+    const streakZ = Math.sin(streakAngle) * radius;
+
+    data.push({
+      position: [streakX, height, streakZ],
+      color: FLOWER_COLORS.streak[key],
+      letter: streakStage.letter
+    });
+  });
 
   return data;
 }
 
-export function Garden({ modelPath }: { modelPath: string }) {
+export function Garden({
+  modelPath,
+  dailyData,
+  streakData
+}: {
+  modelPath: string;
+  dailyData: Record<string, number>;
+  streakData: Record<string, number>;
+}) {
   const gardenRef = useRef<Group>(null);
 
   useFrame(() => {
@@ -42,7 +84,10 @@ export function Garden({ modelPath }: { modelPath: string }) {
     }
   });
 
-  const flowerData = useMemo(() => generateFlowerData(), []);
+  const flowerData = useMemo(
+    () => generateFlowerData(dailyData, streakData),
+    [dailyData, streakData]
+  );
 
   return (
     <group ref={gardenRef} position={[0, -3, 0]}>

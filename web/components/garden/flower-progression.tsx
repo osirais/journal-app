@@ -31,14 +31,15 @@ function FlowerScene({
 }
 
 export function FlowerProgression({ progress, color }: { progress: number; color: string }) {
-  const maxRequired = FLOWER_PROGRESSION_STAGES[FLOWER_PROGRESSION_STAGES.length - 1].required;
+  const stages = FLOWER_PROGRESSION_STAGES;
+  const maxRequired = stages[stages.length - 1].required;
   const progressAmount = (progress / 100) * maxRequired;
 
-  const stepsWithStatus = FLOWER_PROGRESSION_STAGES.map((step, index) => {
+  const stepsWithStatus = stages.map((step, index) => {
     if (progressAmount >= step.required) {
       return { ...step, status: "completed" };
     }
-    const previous = FLOWER_PROGRESSION_STAGES[index - 1];
+    const previous = stages[index - 1];
     if (previous && progressAmount >= previous.required && progressAmount < step.required) {
       return { ...step, status: "current" };
     }
@@ -48,8 +49,8 @@ export function FlowerProgression({ progress, color }: { progress: number; color
     return { ...step, status: "upcoming" };
   });
 
-  const completed = stepsWithStatus.filter((s) => s.status === "completed").length;
-  const overallProgress = (completed / FLOWER_PROGRESSION_STAGES.length) * 100;
+  const completedCount = stepsWithStatus.filter((s) => s.status === "completed").length;
+  const overallProgress = (completedCount / stages.length) * 100;
 
   return (
     <div className="rounded-xl border p-4 md:p-6">

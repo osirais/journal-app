@@ -10,7 +10,12 @@ import { OrbitControls } from "@react-three/drei";
 import { Canvas } from "@react-three/fiber";
 import { Suspense } from "react";
 
-export function GardenCard() {
+interface GardenCardProps {
+  dailyData: Record<string, number>;
+  streakData: Record<string, number>;
+}
+
+export function GardenCard({ dailyData, streakData }: GardenCardProps) {
   const droplets = useDropletStore((state) => state.droplets) ?? 0;
   const currentStage = getCurrentTreeStage(droplets);
   const nextRequired = getNextRequiredDroplets(droplets);
@@ -29,7 +34,11 @@ export function GardenCard() {
               <ambientLight intensity={0.5} />
               <directionalLight position={[5, 5, 5]} intensity={1} />
               <Suspense fallback={null}>
-                <Garden modelPath={currentStage.path} />
+                <Garden
+                  modelPath={currentStage.path}
+                  dailyData={dailyData}
+                  streakData={streakData}
+                />
               </Suspense>
               <OrbitControls
                 enableZoom={false}

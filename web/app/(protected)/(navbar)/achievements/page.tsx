@@ -1,24 +1,15 @@
 import { FlowerProgression } from "@/components/garden/flower-progression";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { FLOWER_COLORS } from "@/constants/flower-colors";
+import { getUserAchievementsData } from "@/lib/actions/achievement-actions";
 
 export const metadata = {
   title: "Achievements"
 };
 
-const dailyData = {
-  journal: 10,
-  mood: 5,
-  tasks: 8
-};
+const Page = async () => {
+  const { dailyData, streakData } = await getUserAchievementsData();
 
-const streakData = {
-  journal: 4,
-  mood: 3,
-  tasks: 6
-};
-
-const Page = () => {
   return (
     <div className="mx-auto max-w-3xl px-6 py-20">
       <Tabs defaultValue="daily" className="w-full">

@@ -6,19 +6,22 @@ import { MoodChartSSR } from "@/components/dashboard/mood-chart-ssr";
 import { MoodCardSSR } from "@/components/dashboard/mood-ssr";
 import { TasksCardSSR } from "@/components/dashboard/tasks-ssr";
 import TourDialog from "@/components/tour/tour-dialog";
+import { getUserAchievementsData } from "@/lib/actions/achievement-actions";
 
 export const metadata = {
   title: "Dashboard"
 };
 
-export default function Page() {
+export default async function Page() {
+  const { dailyData, streakData } = await getUserAchievementsData();
+
   return (
     <>
       <TourDialog />
       <DashboardCarousel>
         <div className="space-y-6">
           <h1 className="text-2xl font-bold">Garden</h1>
-          <GardenCard />
+          <GardenCard dailyData={dailyData} streakData={streakData} />
         </div>
         <div className="space-y-6">
           <h1 className="text-2xl font-bold">Daily</h1>

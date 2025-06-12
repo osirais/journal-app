@@ -2,7 +2,7 @@ export const FLOWER_PROGRESSION_STAGES = [
   {
     name: "Seed",
     letter: "A",
-    required: 0,
+    required: 5,
     gltf: "A/Grass_2_A_Color1.gltf"
   },
   {
@@ -14,13 +14,13 @@ export const FLOWER_PROGRESSION_STAGES = [
   {
     name: "Flower",
     letter: "C",
-    required: 25,
+    required: 20,
     obj: "C/cartoon_flower.obj",
     mtl: "C/cartoon_flower.mtl"
   },
   {
     name: "Flower Patch",
     letter: "D",
-    required: 50
+    required: 40
   }
 ];
