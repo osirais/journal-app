@@ -3,7 +3,7 @@ import { UserActionsDropdown } from "@/components/navbar/user-actions-dropdown";
 import { Button } from "@/components/ui/button";
 import { hasEnvVars } from "@/utils/supabase/check-env-vars";
 import { createClient } from "@/utils/supabase/server";
-import { Badge } from "lucide-react";
+import { Badge, LogIn } from "lucide-react";
 import Link from "next/link";
 
 export default async function AuthButton() {
@@ -25,14 +25,12 @@ export default async function AuthButton() {
 
   if (!user) {
     return (
-      <div className="flex gap-2">
-        <Button asChild size="sm" variant="ghost">
-          <Link href="/login">Sign in</Link>
-        </Button>
-        <Button asChild size="sm" variant="ghost">
-          <Link href="/register">Sign up</Link>
-        </Button>
-      </div>
+      <Button asChild size="icon" variant="ghost">
+        <Link href="/login">
+          <span className="sr-only">Log in</span>
+          <LogIn className="size-4" />
+        </Link>
+      </Button>
     );
   }
 
