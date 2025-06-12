@@ -9,7 +9,8 @@ export function FlowerModel({ letter, color }: { letter: string; color: string }
   const stage = FLOWER_PROGRESSION_STAGES.find((s) => s.letter === letter);
   const groupRef = useRef<Group>(null);
 
-  const gltf = stage?.gltf ? useGLTF(`/models/flower_stages/${stage.gltf}`) : null;
+  const gltfPath = stage?.gltf ? `/models/flower_stages/${stage.gltf}` : null;
+  const gltf = useGLTF(gltfPath ?? "");
 
   const clonedScene = useMemo(() => {
     if (!gltf) return null;
