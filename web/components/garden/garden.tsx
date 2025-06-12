@@ -58,11 +58,11 @@ export function Garden({ modelPath }: { modelPath: string }) {
       <mesh
         rotation={[-Math.PI / 2, 0, 0]}
         receiveShadow
-        position={[0, -10, 0]}
-        scale={[5, 5, 1]} // flatten vertically
+        position={[0, 0, 0]}
+        scale={[0.5, 0.5, 1]}
       >
-        <sphereGeometry args={[10, 32, 32]} />
-        <meshStandardMaterial color="#4caf50" />
+        <circleGeometry args={[10, 128]} />
+        <meshStandardMaterial color="#4caf50" wireframe={false} />
       </mesh>
       <TreeModel modelPath={modelPath} position={[0, 0.1, 0]} />
       {flowerData.map((data, i) => (
