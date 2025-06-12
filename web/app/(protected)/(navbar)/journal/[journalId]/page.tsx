@@ -15,7 +15,6 @@ export async function generateMetadata({
     .from("journal")
     .select("title")
     .eq("id", journalId)
-    .is("deleted_at", null)
     .single();
 
   return {

@@ -25,8 +25,7 @@ export async function updateJournal(journalId: string, formData: FormData) {
         updated_at: new Date().toISOString()
       })
       .eq("id", journalId)
-      .eq("author_id", user.id)
-      .is("deleted_at", null);
+      .eq("author_id", user.id);
 
     if (error) {
       console.error("Error updating journal:", error);
@@ -56,8 +55,7 @@ export async function deleteJournal(journalId: string) {
         deleted_at: new Date().toISOString()
       })
       .eq("id", journalId)
-      .eq("author_id", user.id)
-      .is("deleted_at", null);
+      .eq("author_id", user.id);
 
     if (error) {
       console.error("Error deleting journal:", error);

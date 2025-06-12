@@ -40,8 +40,7 @@ export async function TasksCardSSR() {
     .select("task_id")
     .eq("user_id", user.id)
     .gte("completed_at", startOfDay)
-    .lt("completed_at", endOfDay)
-    .is("deleted_at", null);
+    .lt("completed_at", endOfDay);
 
   const completedTaskIds = completedTasks?.map((completion) => completion.task_id) || [];
 

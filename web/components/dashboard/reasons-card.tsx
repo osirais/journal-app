@@ -13,7 +13,6 @@ export async function ReasonsCard() {
     .from("reason")
     .select("id, text, created_at")
     .eq("user_id", user.id)
-    .is("deleted_at", null)
     .order("created_at", { ascending: false });
 
   return (

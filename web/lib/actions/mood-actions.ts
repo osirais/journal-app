@@ -14,7 +14,6 @@ export async function getCurrentMood() {
     .from("mood_entry")
     .select("scale")
     .eq("user_id", user.id)
-    .is("deleted_at", null)
     .order("created_at", { ascending: false })
     .limit(1)
     .single();
@@ -46,7 +45,6 @@ export async function updateMood(scale: number) {
     .eq("user_id", user.id)
     .gte("created_at", startOfDay)
     .lt("created_at", endOfDay)
-    .is("deleted_at", null)
     .maybeSingle();
 
   let result;
@@ -191,7 +189,6 @@ export async function getMoodHistory() {
     .from("mood_entry")
     .select("scale, created_at")
     .eq("user_id", user.id)
-    .is("deleted_at", null)
     .gte("created_at", thirtyDaysAgo.toISOString())
     .order("created_at", { ascending: true });
 

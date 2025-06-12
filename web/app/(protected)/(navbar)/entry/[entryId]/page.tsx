@@ -15,7 +15,6 @@ export async function generateMetadata({
     .from("entry")
     .select("title, journal_id")
     .eq("id", entryId)
-    .is("deleted_at", null)
     .single();
 
   if (!entry) {
@@ -26,7 +25,6 @@ export async function generateMetadata({
     .from("journal")
     .select("title")
     .eq("id", entry.journal_id)
-    .is("deleted_at", null)
     .single();
 
   return {

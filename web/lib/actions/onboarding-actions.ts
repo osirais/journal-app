@@ -37,7 +37,6 @@ export async function createFirstJournal(form: { title: string; description?: st
     .from("journal")
     .select("id")
     .eq("author_id", user.id)
-    .is("deleted_at", null)
     .limit(1)
     .single();
 
@@ -259,7 +258,6 @@ export async function createFirstReason(text: string) {
     .from("reason")
     .select("id")
     .eq("user_id", user.id)
-    .is("deleted_at", null)
     .limit(1)
     .maybeSingle();
 
