@@ -1,7 +1,6 @@
 "use client";
 
 import { FlowerModel } from "@/components/garden/flower-model";
-import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { FLOWER_PROGRESSION_STAGES } from "@/constants/flower-stages";
 import { Canvas } from "@react-three/fiber";

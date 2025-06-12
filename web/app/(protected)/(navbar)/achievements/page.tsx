@@ -20,7 +20,7 @@ const streakData = {
 
 const Page = () => {
   return (
-    <div className="mx-auto max-w-3xl py-20">
+    <div className="mx-auto max-w-3xl px-6 py-20">
       <Tabs defaultValue="daily" className="w-full">
         <TabsList className="mb-4">
           <TabsTrigger value="daily" className="cursor-pointer">
