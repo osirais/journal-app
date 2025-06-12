@@ -10,7 +10,7 @@ export function FlowerModel({ letter, color }: { letter: string; color: string }
   const groupRef = useRef<Group>(null);
 
   const gltfPath = stage?.gltf ? `/models/flower_stages/${stage.gltf}` : null;
-  const gltf = useGLTF(gltfPath ?? "");
+  const gltf = useGLTF(gltfPath ?? "/models/flower_stages/A/Grass_2_A_Color1.gltf");
 
   const clonedScene = useMemo(() => {
     if (!gltf) return null;
