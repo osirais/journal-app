@@ -2,7 +2,7 @@
 
 import { useDropletStore } from "@/app/stores/droplets-store";
 import { Garden } from "@/components/garden/garden";
-import { TreeProgressionDrawer } from "@/components/tree/tree-progression-drawer";
+import { TreeProgressionDrawer } from "@/components/garden/tree-progression-drawer";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { getCurrentTreeStage, getNextRequiredDroplets } from "@/utils/tree-stage-utils";
 import { OrbitControls } from "@react-three/drei";

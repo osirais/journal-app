@@ -1,44 +1,39 @@
 import { FlowerModel } from "@/components/garden/flower-model";
 import { TreeModel } from "@/components/garden/tree-model";
+import { FLOWER_COLORS } from "@/constants/flower-colors";
 import { useFrame } from "@react-three/fiber";
 import { useMemo, useRef } from "react";
 import { Group } from "three";
 
-const pastelColors = [
-  "#ffb3ba",
-  "#ffdfba",
-  "#ffffba",
-  "#baffc9",
-  "#bae1ff",
-  "#d7baff",
-  "#ffbaed",
-  "#baffd9",
-  "#ffd6ba",
-  "#c9baff"
-];
+function getAllFlowerColors() {
+  const dailyColors = Object.values(FLOWER_COLORS.daily);
+  const streakColors = Object.values(FLOWER_COLORS.streak);
+  return [...dailyColors, ...streakColors];
+}
 
-function generateFlowerData(count: number) {
-  const radius = 3;
-  const data: { position: [number, number, number]; color: string }[] = [];
+function generateFlowerData() {
+  const radius = 4;
+  const height = 1;
+  const colors = getAllFlowerColors();
 
-  for (let i = 0; i < count; i++) {
-    const angle = (i / count) * Math.PI * 2;
+  const data: { position: [number, number, number]; color: string; letter: string }[] = [];
+  const totalCount = colors.length;
+
+  for (let i = 0; i < totalCount; i++) {
+    const angle = (i / totalCount) * Math.PI * 2;
     const x = Math.cos(angle) * radius;
     const z = Math.sin(angle) * radius;
-    const color = pastelColors[i % pastelColors.length];
-    data.push({ position: [x, -2.5, z], color });
+
+    const color = colors[i % colors.length];
+    const letter = "C"; // constant (temporary)
+
+    data.push({ position: [x, height, z], color, letter });
   }
 
   return data;
 }
 
-export function Garden({
-  modelPath,
-  flowerCount = 6
-}: {
-  modelPath: string;
-  flowerCount?: number;
-}) {
+export function Garden({ modelPath }: { modelPath: string }) {
   const gardenRef = useRef<Group>(null);
 
   useFrame(() => {
@@ -47,10 +42,10 @@ export function Garden({
     }
   });
 
-  const flowerData = useMemo(() => generateFlowerData(flowerCount), [flowerCount]);
+  const flowerData = useMemo(() => generateFlowerData(), []);
 
   return (
-    <group ref={gardenRef}>
+    <group ref={gardenRef} position={[0, -3, 0]}>
       <ambientLight intensity={0.4} />
       <directionalLight
         position={[5, 10, 7]}
@@ -60,9 +55,20 @@ export function Garden({
         shadow-mapSize-height={1024}
       />
       <pointLight position={[0, 5, 5]} intensity={0.6} />
-      <TreeModel modelPath={modelPath} position={[0, -2.5, 0]} />
+      <mesh
+        rotation={[-Math.PI / 2, 0, 0]}
+        receiveShadow
+        position={[0, -10, 0]}
+        scale={[5, 5, 1]} // flatten vertically
+      >
+        <sphereGeometry args={[10, 32, 32]} />
+        <meshStandardMaterial color="#4caf50" />
+      </mesh>
+      <TreeModel modelPath={modelPath} position={[0, 0.1, 0]} />
       {flowerData.map((data, i) => (
-        <FlowerModel key={i} position={data.position} color={data.color} />
+        <group key={i} position={data.position}>
+          <FlowerModel letter={data.letter} color={data.color} />
+        </group>
       ))}
     </group>
   );
