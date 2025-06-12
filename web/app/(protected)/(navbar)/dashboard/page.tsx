@@ -4,6 +4,7 @@ import { GardenCard } from "@/components/dashboard/garden-card";
 import { JournalCard } from "@/components/dashboard/journal";
 import { MoodChartSSR } from "@/components/dashboard/mood-chart-ssr";
 import { MoodCardSSR } from "@/components/dashboard/mood-ssr";
+import { ReasonsCard } from "@/components/dashboard/reasons-card";
 import { TasksCardSSR } from "@/components/dashboard/tasks-ssr";
 import TourDialog from "@/components/tour/tour-dialog";
 import { getUserAchievementsData } from "@/lib/actions/achievement-actions";
@@ -25,6 +26,7 @@ export default async function Page() {
         </div>
         <div className="space-y-6">
           <h1 className="text-2xl font-bold">Daily</h1>
+          <ReasonsCard />
           <div className="grid gap-4 md:grid-cols-2">
             <JournalCard />
             <MoodCardSSR />
