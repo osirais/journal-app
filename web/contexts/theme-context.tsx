@@ -96,7 +96,7 @@ async function fetchTheme(): Promise<Theme> {
     .from("user_settings")
     .select("theme")
     .eq("user_id", user.id)
-    .single();
+    .maybeSingle();
 
   if (!data?.theme) {
     throw new Error("Theme not found for user");
