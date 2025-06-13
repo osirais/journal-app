@@ -13,15 +13,9 @@ export async function GET(request: Request) {
     next = "/";
   }
 
-  console.log({ code });
-
   if (code) {
     const supabase = await createClient();
-    const { data, error } = await supabase.auth.exchangeCodeForSession(code);
-
-    console.log("OAuth exchange data:", data);
-    console.log("ERROR", error);
-    console.log("GET_USER_OR_THROW", await getUserOrThrow(supabase));
+    const { error } = await supabase.auth.exchangeCodeForSession(code);
 
     if (!error) {
       const forwardedHost = request.headers.get("x-forwarded-host");

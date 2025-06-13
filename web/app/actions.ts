@@ -78,8 +78,6 @@ export async function loginActionWithOAuth(provider: Provider) {
     }
   });
 
-  console.log({ data, error });
-
   if (error) {
     return encodedRedirect("error", "/login", error.message);
   }
