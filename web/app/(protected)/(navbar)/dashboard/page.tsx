@@ -8,6 +8,8 @@ import { ReasonsCard } from "@/components/dashboard/reasons-card";
 import { TasksCardSSR } from "@/components/dashboard/tasks-ssr";
 import TourDialog from "@/components/tour/tour-dialog";
 import { getUserAchievementsData } from "@/lib/actions/achievement-actions";
+import { getUserOrThrow } from "@/utils/get-user-throw";
+import { createClient } from "@/utils/supabase/server";
 
 export const metadata = {
   title: "Dashboard"
@@ -16,9 +18,18 @@ export const metadata = {
 export default async function Page() {
   const { dailyData, streakData } = await getUserAchievementsData();
 
+  const supabase = await createClient();
+  const user = await getUserOrThrow(supabase);
+
+  const { data: profile } = await supabase
+    .from("users")
+    .select("completed_tour")
+    .eq("id", user.id)
+    .single();
+
   return (
     <>
-      <TourDialog />
+      <TourDialog completedTour={profile?.completed_tour} />
       <DashboardCarousel>
         <div className="space-y-6">
           <h1 className="text-2xl font-bold">Garden</h1>
