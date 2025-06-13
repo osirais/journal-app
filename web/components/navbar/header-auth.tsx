@@ -25,10 +25,15 @@ export default async function AuthButton() {
 
   if (!user) {
     return (
-      <Button asChild size="icon" variant="ghost">
+      <Button
+        variant="ghost"
+        className="hover:text-foreground flex cursor-pointer items-center gap-2 hover:bg-white/20"
+      >
         <Link href="/login">
-          <span className="sr-only">Log in</span>
-          <LogIn className="size-4" />
+          <div className="flex items-center gap-1">
+            <LogIn size={16} />
+            <span>Sign In</span>
+          </div>
         </Link>
       </Button>
     );

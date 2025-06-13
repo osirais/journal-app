@@ -27,16 +27,14 @@ interface UserActionsDropdownProps {
 }
 
 export const UserActionsDropdown: FC<UserActionsDropdownProps> = ({ username }) => {
-  const [isPending, startTransition] = useTransition();
-  const hoverBgClass = "hover:bg-white/20";
-  const cursorPointer = "cursor-pointer";
+  const [_, startTransition] = useTransition();
 
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button
           variant="ghost"
-          className={`flex items-center gap-2 ${hoverBgClass} ${cursorPointer}`}
+          className="hover:text-foreground flex cursor-pointer items-center gap-2 hover:bg-white/20"
         >
           <div className="flex items-center gap-1">
             <User size={16} />
