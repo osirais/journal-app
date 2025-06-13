@@ -12,6 +12,13 @@ export const steps: Tour[] = [
         nextRoute: "2"
       },
       {
+        title: "Your Reasons",
+        content: "Here you can manage your reasons.",
+        selector: "#tour-reasons",
+        icon: "",
+        prevRoute: "0"
+      },
+      {
         title: "Your Journal",
         content: "Here you can view and manage your journal entries.",
         selector: "#tour-journal",
@@ -22,7 +29,8 @@ export const steps: Tour[] = [
         title: "Add New Entry",
         content: "Click here to add a new journal entry.",
         selector: "#tour-journal-entry-button",
-        icon: ""
+        icon: "",
+        prevRoute: "1"
       },
       {
         title: "Your Mood",
