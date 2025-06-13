@@ -1,7 +1,9 @@
 "use server";
 
+import { defaultUrl } from "@/constants/url";
 import { createClient } from "@/utils/supabase/server";
 import { encodedRedirect } from "@/utils/utils";
+import { Provider } from "@supabase/supabase-js";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 
@@ -64,6 +66,25 @@ export async function loginAction(formData: FormData) {
   const onboarded = userData.onboarded;
 
   return redirect(onboarded ? "/dashboard" : "/onboarding");
+}
+
+export async function loginActionWithOAuth(provider: Provider) {
+  const supabase = await createClient();
+
+  const { data, error } = await supabase.auth.signInWithOAuth({
+    provider,
+    options: {
+      redirectTo: `${defaultUrl}/auth/callback`
+    }
+  });
+
+  console.log({ data, error });
+
+  if (error) {
+    return encodedRedirect("error", "/login", error.message);
+  }
+
+  return redirect(data.url);
 }
 
 export async function forgotPasswordAction(formData: FormData) {

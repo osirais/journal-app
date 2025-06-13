@@ -1,6 +1,6 @@
 "use client";
 
-import { loginAction, registerAction } from "@/app/actions";
+import { loginAction, loginActionWithOAuth, registerAction } from "@/app/actions";
 import { SubmitButton } from "@/components/submit-button";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -8,14 +8,12 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { createClient } from "@/utils/supabase/client";
-import { encodedRedirect } from "@/utils/utils";
 import { Provider } from "@supabase/supabase-js";
 import { motion } from "framer-motion";
 import { Eye, EyeOff, Lock, Mail, MailCheck } from "lucide-react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Suspense, useEffect, useState } from "react";
+import { Suspense, useEffect, useState, useTransition } from "react";
 
 export function AuthCard() {
   return (
@@ -27,17 +25,12 @@ export function AuthCard() {
 
 function SocialLogins() {
   const [hoveredProvider, setHoveredProvider] = useState<string | null>("google");
+  const [_, startTransition] = useTransition();
 
-  async function signInWithOAuth(provider: Provider) {
-    const supabase = createClient();
-
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider: provider
+  function handleOAuthLogin(provider: Provider) {
+    startTransition(() => {
+      loginActionWithOAuth(provider);
     });
-
-    if (error) {
-      encodedRedirect("error", "/login", error.message);
-    }
   }
 
   return (
@@ -48,7 +41,7 @@ function SocialLogins() {
         onMouseEnter={() => setHoveredProvider("google")}
       >
         <Button
-          onClick={() => signInWithOAuth("google")}
+          onClick={() => handleOAuthLogin("google")}
           size="icon"
           className="flex w-full cursor-pointer items-center justify-start gap-2 overflow-hidden px-2"
         >
@@ -88,7 +81,7 @@ function SocialLogins() {
         onMouseEnter={() => setHoveredProvider("github")}
       >
         <Button
-          onClick={() => signInWithOAuth("github")}
+          onClick={() => handleOAuthLogin("github")}
           size="icon"
           className="flex w-full cursor-pointer items-center justify-start gap-2 overflow-hidden px-[6px]"
         >
