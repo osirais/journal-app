@@ -1,5 +1,4 @@
 // The client you created from the Server-Side Auth instructions
-import { getUserOrThrow } from "@/utils/get-user-throw";
 import { createClient } from "@/utils/supabase/server";
 import { NextResponse } from "next/server";
 
