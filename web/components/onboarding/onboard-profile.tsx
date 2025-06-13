@@ -123,7 +123,7 @@ export function OnboardProfile({ onSuccess }: { onSuccess: () => void }) {
       className="flex h-full w-full flex-col justify-center text-center"
     >
       {hasProfile ? (
-        <div className="bg-card flex flex-col items-center space-y-4 rounded-lg px-8 py-12 shadow-md">
+        <div className="bg-card flex flex-col items-center space-y-4 rounded-lg px-8 py-12">
           <Check className="size-8 text-green-500" />
           <h2 className="text-xl font-semibold">You already have a profile, great!</h2>
           <p className="text-muted-foreground">You're all set to continue.</p>
