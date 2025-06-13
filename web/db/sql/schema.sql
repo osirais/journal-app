@@ -16,7 +16,7 @@ CREATE TABLE IF NOT EXISTS users (
 
 CREATE TABLE IF NOT EXISTS journal (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v7(),
-    author_id UUID REFERENCES users(id) ON DELETE SET NULL,
+    author_id UUID REFERENCES users(id) ON DELETE CASCADE,
     title TEXT NOT NULL,
     description TEXT,
     thumbnail_url TEXT,
