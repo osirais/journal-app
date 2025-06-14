@@ -1,6 +1,5 @@
 "use server";
 
-import { defaultUrl } from "@/constants/url";
 import { createClient } from "@/utils/supabase/server";
 import { encodedRedirect } from "@/utils/utils";
 import { Provider } from "@supabase/supabase-js";
