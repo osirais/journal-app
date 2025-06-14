@@ -1,6 +1,6 @@
 "use client";
 
-import { getSearchActions } from "@/components/search/search-actions";
+import { useSearchActions } from "@/components/search/search-actions";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { Search, X } from "lucide-react";
@@ -11,7 +11,7 @@ export function SearchDialog() {
   const [query, setQuery] = useState("");
   const [selectedIndex, setSelectedIndex] = useState(0);
 
-  const searchActions = getSearchActions();
+  const searchActions = useSearchActions();
 
   const filteredActions =
     query === ""

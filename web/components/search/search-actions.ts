@@ -1,7 +1,7 @@
 import { ClipboardList, LayoutDashboard, NotebookPen, Trophy, UserCog } from "lucide-react";
 import { useRouter } from "next/navigation";
 
-export function getSearchActions() {
+export function useSearchActions() {
   const router = useRouter();
 
   return [
