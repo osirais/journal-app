@@ -13,7 +13,6 @@ export default function EntryEditor({
   onCreate?: (editor: Editor) => void;
 }) {
   const editor = useEditor({
-    // @ts-expect-error
     extensions: [StarterKit, Markdown, Typography, HeadingWithId],
     content: content,
     editorProps: {
