@@ -41,7 +41,7 @@ export default async function AuthButton() {
 
   const { data } = await supabase
     .from("users_with_droplets")
-    .select("username")
+    .select("name")
     .eq("id", user.id)
     .single();
 
@@ -50,7 +50,7 @@ export default async function AuthButton() {
   return (
     <div className="flex items-center gap-3">
       <div className="grid grid-cols-[repeat(3,max-content)] place-items-center gap-2">
-        <UserActionsDropdown username={data.username} />
+        <UserActionsDropdown username={data.name} />
         <DropletCountSSR userId={user.id} />
       </div>
     </div>
