@@ -15,21 +15,25 @@ export async function ReasonsCard() {
     .eq("user_id", user.id)
     .order("created_at", { ascending: false });
 
+  const firstReason = reasons?.[0];
+  const extraCount = reasons && reasons.length > 1 ? reasons.length - 1 : 0;
+
   return (
     <Card className="flex max-h-[400px] w-full flex-col">
       <CardHeader>
         <CardTitle id="tour-reasons">Reasons</CardTitle>
       </CardHeader>
       <CardContent className="relative flex-1 space-y-4 overflow-y-auto">
-        {reasons && reasons.length > 0 ? (
-          reasons.map((reason) => (
-            <div key={reason.id} className="rounded-lg border p-3 shadow-sm">
-              <p className="text-sm">{reason.text}</p>
+        {firstReason ? (
+          <>
+            <div key={firstReason.id} className="rounded-lg border p-3 shadow-sm">
+              <p className="text-sm">{firstReason.text}</p>
               <div className="text-muted-foreground mt-2 text-sm">
-                <span>{format(new Date(reason.created_at), "MMM d, yyyy h:mm a")}</span>
+                <span>{format(new Date(firstReason.created_at), "MMM d, yyyy h:mm a")}</span>
               </div>
             </div>
-          ))
+            {extraCount > 0 && <p className="text-muted-foreground text-sm">+{extraCount} more</p>}
+          </>
         ) : (
           <p className="text-muted-foreground text-sm">No reasons provided yet.</p>
         )}
