@@ -1,18 +1,9 @@
 "use client";
 
+import { getSearchActions } from "@/components/search/search-actions";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
-import {
-  ClipboardList,
-  LayoutDashboard,
-  LogOut,
-  NotebookPen,
-  Search,
-  Trophy,
-  UserCog,
-  X
-} from "lucide-react";
-import { useRouter } from "next/navigation";
+import { Search, X } from "lucide-react";
 import { useEffect, useState } from "react";
 
 export function SearchDialog() {
@@ -20,38 +11,12 @@ export function SearchDialog() {
   const [query, setQuery] = useState("");
   const [selectedIndex, setSelectedIndex] = useState(0);
 
-  const actions = [
-    {
-      name: "Dashboard",
-      url: "/dashboard",
-      icon: LayoutDashboard
-    },
-    {
-      name: "Journals",
-      url: "/journals",
-      icon: NotebookPen
-    },
-    {
-      name: "Tasks",
-      url: "/tasks",
-      icon: ClipboardList
-    },
-    {
-      name: "Achievements",
-      url: "/achievements",
-      icon: Trophy
-    },
-    {
-      name: "Manage Account",
-      url: "/manage-account",
-      icon: UserCog
-    }
-  ];
+  const searchActions = getSearchActions();
 
   const filteredActions =
     query === ""
-      ? actions
-      : actions.filter((action) => action.name.toLowerCase().includes(query.toLowerCase()));
+      ? searchActions
+      : searchActions.filter((action) => action.name.toLowerCase().includes(query.toLowerCase()));
 
   useEffect(() => {
     setSelectedIndex(0);
@@ -96,10 +61,8 @@ export function SearchDialog() {
     return () => window.removeEventListener("keydown", onKeyDown);
   }, [open, filteredActions, selectedIndex]);
 
-  const router = useRouter();
-
-  const executeAction = (action: (typeof actions)[0]) => {
-    router.push(action.url);
+  const executeAction = (action: (typeof searchActions)[0]) => {
+    action.action();
     setOpen(false);
     setQuery("");
   };
