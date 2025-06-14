@@ -55,7 +55,7 @@ export async function loginAction(formData: FormData) {
 
   const { user } = authData;
 
-  let { data: userData, error: userError } = await supabase
+  const { data: userData, error: userError } = await supabase
     .from("users")
     .select("onboarded")
     .eq("id", user.id)
