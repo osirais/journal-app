@@ -85,11 +85,12 @@ export async function loginAction(formData: FormData) {
 
 export async function loginActionWithOAuth(provider: Provider) {
   const supabase = await createClient();
+  const origin = (await headers()).get("origin");
 
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider,
     options: {
-      redirectTo: `${defaultUrl}/auth/callback`
+      redirectTo: `${origin}/auth/callback`
     }
   });
 
