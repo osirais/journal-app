@@ -79,8 +79,7 @@ export async function createFirstEntry(form: { title: string; content: string })
   const { data: journals, error: fetchError } = await supabase
     .from("journal")
     .select("id")
-    .eq("author_id", user.id)
-    .is("deleted_at", null);
+    .eq("author_id", user.id);
 
   if (fetchError) throw new Error(fetchError.message);
   if (!journals || journals.length === 0) throw new Error("User does not have a journal");

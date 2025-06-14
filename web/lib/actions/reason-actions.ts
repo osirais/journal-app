@@ -26,11 +26,7 @@ export async function deleteReason(id: string) {
   const supabase = await createClient();
   const user = await getUserOrThrow(supabase);
 
-  const { error } = await supabase
-    .from("reason")
-    .update({ deleted_at: new Date().toISOString() })
-    .eq("id", id)
-    .eq("user_id", user.id);
+  const { error } = await supabase.from("reason").delete().eq("id", id).eq("user_id", user.id);
 
   if (error) throw new Error(error.message);
 

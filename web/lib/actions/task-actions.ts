@@ -179,8 +179,7 @@ export async function completeTask(taskId: string) {
     .select("task_id")
     .eq("user_id", user.id)
     .gte("completed_at", startOfDay)
-    .lt("completed_at", endOfDay)
-    .is("deleted_at", null);
+    .lt("completed_at", endOfDay);
 
   if (completedTasksError) {
     return { success: false, error: completedTasksError.message };

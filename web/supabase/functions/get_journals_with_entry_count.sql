@@ -7,7 +7,6 @@ RETURNS TABLE (
   thumbnail_url TEXT,
   created_at TIMESTAMPTZ,
   updated_at TIMESTAMPTZ,
-  deleted_at TIMESTAMPTZ,
   entries INTEGER
 )
 AS $$
@@ -19,12 +18,11 @@ AS $$
     j.thumbnail_url,
     j.created_at,
     j.updated_at,
-    j.deleted_at,
     COUNT(e.id)::INT AS entries
   FROM journal j
   LEFT JOIN entry e
-    ON e.journal_id = j.id AND e.deleted_at IS NULL
-  WHERE j.author_id = uid AND j.deleted_at IS NULL
+    ON e.journal_id = j.id
+  WHERE j.author_id = uid
   GROUP BY j.id,
            j.author_id,
            j.title,
@@ -32,7 +30,6 @@ AS $$
            j.thumbnail_url,
            j.created_at,
            j.updated_at,
-           j.deleted_at
   ORDER BY j.created_at DESC
 $$ LANGUAGE SQL STABLE;
 

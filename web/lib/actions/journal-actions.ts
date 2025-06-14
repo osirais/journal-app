@@ -51,9 +51,7 @@ export async function deleteJournal(journalId: string) {
     // Soft delete the journal
     const { error } = await supabase
       .from("journal")
-      .update({
-        deleted_at: new Date().toISOString()
-      })
+      .delete()
       .eq("id", journalId)
       .eq("author_id", user.id);
 

@@ -1,5 +1,23 @@
 CREATE EXTENSION IF NOT EXISTS citext SCHEMA extensions;
 
+DROP TABLE IF EXISTS entry_tag;
+DROP TABLE IF EXISTS tag;
+DROP TABLE IF EXISTS balance_transaction;
+DROP VIEW IF EXISTS users_with_droplets;
+DROP TABLE IF EXISTS user_balance;
+DROP TABLE IF EXISTS task_completion;
+DROP TABLE IF EXISTS task;
+DROP TABLE IF EXISTS reason;
+DROP TABLE IF EXISTS streak;
+DROP TABLE IF EXISTS user_activity_summary;
+DROP TABLE IF EXISTS user_settings;
+DROP TABLE IF EXISTS mood_entry;
+DROP TABLE IF EXISTS entry;
+DROP TABLE IF EXISTS journal;
+DROP TABLE IF EXISTS users;
+DROP TABLE IF EXISTS journal;
+DROP TABLE IF EXISTS users;
+
 CREATE TABLE IF NOT EXISTS users (
     id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
     username CITEXT,
@@ -9,7 +27,6 @@ CREATE TABLE IF NOT EXISTS users (
     completed_tour BOOLEAN NOT NULL DEFAULT false,
     created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
-    deleted_at TIMESTAMPTZ,
     CONSTRAINT username_length CHECK (
         username IS NULL OR length(username) BETWEEN 3 AND 32
     ),
@@ -26,8 +43,7 @@ CREATE TABLE IF NOT EXISTS journal (
     thumbnail_url TEXT,
     color_hex CHAR(7),
     created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
-    updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
-    deleted_at TIMESTAMPTZ
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
 CREATE TABLE IF NOT EXISTS entry (
@@ -36,8 +52,7 @@ CREATE TABLE IF NOT EXISTS entry (
     title TEXT NOT NULL,
     content TEXT NOT NULL,
     created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
-    updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
-    deleted_at TIMESTAMPTZ
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
 CREATE TABLE IF NOT EXISTS tag (
@@ -46,7 +61,6 @@ CREATE TABLE IF NOT EXISTS tag (
     name CITEXT NOT NULL,
     created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
-    deleted_at TIMESTAMPTZ,
     UNIQUE (user_id, name)
 );
 
@@ -62,7 +76,6 @@ CREATE TABLE IF NOT EXISTS user_balance (
     balance INT8 NOT NULL DEFAULT 0,
     created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
-    deleted_at TIMESTAMPTZ,
     PRIMARY KEY (user_id, currency)
 );
 
@@ -113,24 +126,21 @@ CREATE TABLE IF NOT EXISTS mood_entry (
     user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
     scale INT NOT NULL CHECK (scale BETWEEN 1 AND 5),
     created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
-    updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
-    deleted_at TIMESTAMPTZ
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
 CREATE TABLE IF NOT EXISTS task_completion (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v7(),
     user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
     task_id UUID NOT NULL REFERENCES task(id) ON DELETE CASCADE,
-    completed_at TIMESTAMPTZ NOT NULL DEFAULT now(),
-    deleted_at TIMESTAMPTZ
+    completed_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
 CREATE TABLE IF NOT EXISTS user_settings (
     user_id UUID PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE,
     theme JSONB NOT NULL DEFAULT '{}'::JSONB,
     created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
-    updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
-    deleted_at TIMESTAMPTZ
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
 DO $$ BEGIN
@@ -150,7 +160,6 @@ CREATE TABLE IF NOT EXISTS streak (
     last_completed_date DATE,
     created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
-    deleted_at TIMESTAMPTZ,
     CONSTRAINT user_category_unique UNIQUE(user_id, category)
 );
 
@@ -187,7 +196,6 @@ BEGIN
     CREATE TRIGGER trigger_increment_user_entry_activity
     AFTER INSERT ON entry
     FOR EACH ROW
-    WHEN (NEW.deleted_at IS NULL)
     EXECUTE FUNCTION increment_user_entry_activity();
   END IF;
 END $$;
@@ -197,6 +205,5 @@ CREATE TABLE IF NOT EXISTS reason (
     user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
     text TEXT NOT NULL,
     created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
-    updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
-    deleted_at TIMESTAMPTZ
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );

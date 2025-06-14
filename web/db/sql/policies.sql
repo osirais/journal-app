@@ -8,36 +8,37 @@ ALTER TABLE balance_transaction ENABLE ROW LEVEL SECURITY;
 ALTER TABLE user_settings ENABLE ROW LEVEL SECURITY;
 ALTER TABLE reason ENABLE ROW LEVEL SECURITY;
 
-CREATE POLICY "Users can access their own non-deleted user row"
+DROP POLICY IF EXISTS "Users can access their own user row" ON users;
+CREATE POLICY "Users can access their own user row"
   ON users FOR ALL
   USING (
     id = (SELECT auth.uid())
-    AND deleted_at IS NULL
   );
 
-CREATE POLICY "Users can access their own non-deleted journals"
+DROP POLICY IF EXISTS "Users can access their own journals" ON journal;
+CREATE POLICY "Users can access their own journals"
   ON journal FOR ALL
   USING (
     author_id = (SELECT auth.uid())
-    AND deleted_at IS NULL
   );
 
-CREATE POLICY "Users can access their own non-deleted entries"
+DROP POLICY IF EXISTS "Users can access their own entries" ON entry;
+CREATE POLICY "Users can access their own entries"
   ON entry FOR ALL
   USING (
     journal_id IN (
       SELECT id FROM journal WHERE author_id = (SELECT auth.uid())
     )
-    AND deleted_at IS NULL
   );
 
-CREATE POLICY "Users can access their own non-deleted tags"
+DROP POLICY IF EXISTS "Users can access their own tags" ON tag;
+CREATE POLICY "Users can access their own tags"
   ON tag FOR ALL
   USING (
     user_id = (SELECT auth.uid())
-    AND deleted_at IS NULL
   );
 
+DROP POLICY IF EXISTS "Users can access entry_tag of their own entries" ON entry_tag;
 CREATE POLICY "Users can access entry_tag of their own entries"
   ON entry_tag FOR ALL
   USING (
@@ -49,41 +50,42 @@ CREATE POLICY "Users can access entry_tag of their own entries"
     )
   );
 
-CREATE POLICY "Users can access their own non-deleted balances"
+DROP POLICY IF EXISTS "Users can access their own user balances" ON user_balance;
+CREATE POLICY "Users can access their own balances"
   ON user_balance FOR ALL
   USING (
     user_id = (SELECT auth.uid())
-    AND deleted_at IS NULL
   );
 
+DROP POLICY IF EXISTS "Users can access their own balance transactions" ON balance_transaction;
 CREATE POLICY "Users can access their own balance transactions"
   ON balance_transaction FOR ALL
   USING (user_id = (SELECT auth.uid()));
 
-CREATE POLICY "Users can access their own non-deleted settings"
+DROP POLICY IF EXISTS "Users can access their own settings" ON user_settings;
+CREATE POLICY "Users can access their own settings"
   ON user_settings FOR ALL
   USING (
     user_id = (SELECT auth.uid())
-    AND deleted_at IS NULL
   );
 
-CREATE POLICY "Users can access their own non-deleted reasons"
+DROP POLICY IF EXISTS "Users can access their own reasons" ON reason;
+CREATE POLICY "Users can access their own reasons"
   ON reason FOR ALL
   USING (
     user_id = (SELECT auth.uid())
-    AND deleted_at IS NULL
   );
 
-CREATE POLICY "Users can access their own non-deleted mood entries"
+DROP POLICY IF EXISTS "Users can access their own mood entries" ON mood_entry;
+CREATE POLICY "Users can access their own mood entries"
   ON mood_entry FOR ALL
   USING (
     user_id = (SELECT auth.uid())
-    AND deleted_at IS NULL
   );
 
-CREATE POLICY "Users can access their own non-deleted streaks"
+DROP POLICY IF EXISTS "Users can access their own streaks" ON streak;
+CREATE POLICY "Users can access their own streaks"
   ON streak FOR ALL
   USING (
     user_id = (SELECT auth.uid())
-    AND deleted_at IS NULL
   );

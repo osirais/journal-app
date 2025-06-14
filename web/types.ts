@@ -6,7 +6,6 @@ export type Journal = {
   thumbnail_url: string | null;
   created_at: string;
   updated_at: string;
-  deleted_at: string | null;
 };
 
 export type JournalWithEntryCount = Journal & {
@@ -18,7 +17,6 @@ export type TagType = {
   name: string;
   created_at?: string;
   updated_at?: string;
-  deleted_at?: string | null;
 };
 
 export type Task = {
@@ -37,5 +35,4 @@ export type Reason = {
   text: string;
   created_at?: string;
   updated_at?: string;
-  deleted_at?: string | null;
 };
