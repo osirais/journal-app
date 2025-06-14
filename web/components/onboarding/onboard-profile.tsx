@@ -2,100 +2,91 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { getUserOrThrow } from "@/utils/get-user-throw";
 import { createClient } from "@/utils/supabase/client";
-import { Check, LoaderCircle, X } from "lucide-react";
+import { Check, LoaderCircle } from "lucide-react";
 import { useEffect, useState, useTransition } from "react";
 
 export function OnboardProfile({ onSuccess }: { onSuccess: () => void }) {
   const supabase = createClient();
 
-  const [hasProfile, setHasProfile] = useState<boolean | null>(null);
-
+  const [hasProfileWithUsername, setHasProfileWithUsername] = useState<boolean | null>(null);
   const [username, setUsername] = useState("");
-
-  const [isCheckingUsername, setIsCheckingUsername] = useState<boolean | null>(null);
-  const [isUsernameAvailable, setIsUsernameAvailable] = useState<boolean | null>(null);
-
   const [isPending, startTransition] = useTransition();
 
   useEffect(() => {
-    setHasProfile(null);
+    setHasProfileWithUsername(null);
     (async () => {
       const user = await getUserOrThrow(supabase);
       if (!user) {
-        setHasProfile(false);
+        setHasProfileWithUsername(false);
         return;
       }
 
       const { data: profile } = await supabase
         .from("users")
-        .select("id")
+        .select("username")
         .eq("id", user.id)
         .maybeSingle();
 
-      setHasProfile(!!profile);
+      setHasProfileWithUsername(!!profile?.username);
     })();
   }, [supabase]);
 
-  useEffect(() => {
-    setIsUsernameAvailable(null);
-
-    if (username) {
-      if (!/^[a-zA-Z0-9._-]{3,32}$/.test(username)) {
-        setIsCheckingUsername(false);
-        return;
-      }
-
-      setIsCheckingUsername(true);
-
-      const checkUsername = async () => {
-        const { data, error } = await supabase
-          .from("users")
-          .select("username")
-          .eq("username", username)
-          .maybeSingle();
-
-        if (error) {
-          console.error("Error checking username:", error);
-          setIsUsernameAvailable(false);
-        } else {
-          setIsUsernameAvailable(!data);
-        }
-
-        setIsCheckingUsername(false);
-      };
-
-      const timeoutId = setTimeout(checkUsername, 500);
-      return () => clearTimeout(timeoutId);
-    }
-  }, [username, supabase]);
+  function isUsernameValid(name: string) {
+    return /^[a-zA-Z0-9._-]{3,32}$/.test(name);
+  }
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
 
-    if (hasProfile) onSuccess();
+    if (hasProfileWithUsername) {
+      onSuccess();
+      return;
+    }
 
-    if (!isUsernameAvailable) return;
+    if (!username || !isUsernameValid(username)) return;
 
     startTransition(async () => {
       const user = await getUserOrThrow(supabase);
-
       if (!user) return;
 
-      const { error: profileError } = await supabase.from("users").insert({
-        id: user.id,
-        username,
-        name: user.user_metadata?.name || username,
-        avatar_url: user.user_metadata?.avatar_url
-      });
+      const { data: existingProfile, error: fetchError } = await supabase
+        .from("users")
+        .select("id")
+        .eq("id", user.id)
+        .maybeSingle();
 
-      if (profileError) {
-        console.error(profileError);
+      if (fetchError) {
+        console.error(fetchError);
         return;
+      }
+
+      if (existingProfile) {
+        const { error: updateError } = await supabase
+          .from("users")
+          .update({ username })
+          .eq("id", user.id);
+
+        if (updateError) {
+          console.error(updateError);
+          return;
+        }
+      } else {
+        const { error: insertError } = await supabase.from("users").insert({
+          id: user.id,
+          username,
+          name: user.user_metadata?.name || username,
+          avatar_url: user.user_metadata?.avatar_url
+        });
+
+        if (insertError) {
+          console.error(insertError);
+          return;
+        }
       }
 
       const { error: balanceError } = await supabase
         .from("user_balance")
-        .insert({ user_id: user.id, currency: "droplets" });
+        .upsert({ user_id: user.id, currency: "droplets" }, { onConflict: "user_id,currency" });
 
       if (balanceError) {
         console.error(balanceError);
@@ -106,7 +97,7 @@ export function OnboardProfile({ onSuccess }: { onSuccess: () => void }) {
     });
   }
 
-  if (hasProfile === null) {
+  if (hasProfileWithUsername === null) {
     return (
       <div className="flex h-full w-full flex-col items-center justify-center text-center">
         <div className="bg-card flex flex-col items-center space-y-4 rounded-lg px-8 py-12 shadow-md">
@@ -122,7 +113,7 @@ export function OnboardProfile({ onSuccess }: { onSuccess: () => void }) {
       onSubmit={handleSubmit}
       className="flex h-full w-full flex-col justify-center text-center"
     >
-      {hasProfile ? (
+      {hasProfileWithUsername ? (
         <div className="bg-card flex flex-col items-center space-y-4 rounded-lg px-8 py-12">
           <Check className="size-8 text-green-500" />
           <h2 className="text-xl font-semibold">You already have a profile, great!</h2>
@@ -144,45 +135,38 @@ export function OnboardProfile({ onSuccess }: { onSuccess: () => void }) {
                 placeholder="Your username"
                 required
                 className={`${
-                  isUsernameAvailable
+                  username && isUsernameValid(username)
                     ? "not-focus-visible:border-green-500 focus-visible:ring-green-500"
-                    : !isUsernameAvailable && isCheckingUsername === false
+                    : username && !isUsernameValid(username)
                       ? "not-focus-visible:border-red-500 focus-visible:ring-red-500"
                       : ""
                 }`}
               />
-              {username && (
-                <div className="absolute right-3 top-1/2 -translate-y-1/2 transform">
-                  {isCheckingUsername ? (
-                    <LoaderCircle className="text-muted-foreground size-4 animate-spin" />
-                  ) : isUsernameAvailable ? (
-                    <Check className="size-4 text-green-500" />
-                  ) : !isUsernameAvailable && isCheckingUsername === false ? (
-                    <X className="size-4 text-red-500" />
-                  ) : null}
-                </div>
+            </div>
+            <div className="mt-1 text-left text-xs text-red-500">
+              {!username && <p>Please pick a username</p>}
+              {username && !isUsernameValid(username) && (
+                <>
+                  {(username.length < 3 || username.length > 32) && (
+                    <p>Username must be 3-32 characters</p>
+                  )}
+                  {!/^[a-zA-Z0-9._-]*$/.test(username) && (
+                    <p>
+                      Username can only contain letters, numbers, underscores, periods, and hyphens
+                    </p>
+                  )}
+                </>
               )}
             </div>
-            {isCheckingUsername !== null && (
-              <div className="mt-1 text-left text-xs text-red-500">
-                {(username.length < 3 || username.length > 32) && (
-                  <p>Username must be 3-32 characters</p>
-                )}
-                {!/^[a-zA-Z0-9._-]*$/.test(username) && (
-                  <p>
-                    Username can only contain letters, numbers, underscores, periods, and hyphens
-                  </p>
-                )}
-                {isUsernameAvailable === false && <p>Username is already taken</p>}
-              </div>
-            )}
           </div>
         </div>
       )}
       <div className="flex justify-end">
         <Button
           type="submit"
-          disabled={!hasProfile && (!isUsernameAvailable || isPending)}
+          disabled={
+            !hasProfileWithUsername && (!username || !isUsernameValid(username) || isPending)
+          }
           className="cursor-pointer"
         >
           {isPending ? "Saving..." : "Next"}

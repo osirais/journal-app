@@ -2,6 +2,7 @@ CREATE EXTENSION IF NOT EXISTS citext SCHEMA extensions;
 
 CREATE TABLE IF NOT EXISTS users (
     id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
+    username CITEXT,
     name TEXT NOT NULL,
     avatar_url TEXT,
     onboarded BOOLEAN NOT NULL DEFAULT false,
@@ -9,8 +10,12 @@ CREATE TABLE IF NOT EXISTS users (
     created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
     deleted_at TIMESTAMPTZ,
-    CONSTRAINT username_length CHECK (length(username) BETWEEN 3 and 32),
-    CONSTRAINT username_allowed_chars CHECK (username ~* '^[a-z0-9._-]*$')
+    CONSTRAINT username_length CHECK (
+        username IS NULL OR length(username) BETWEEN 3 AND 32
+    ),
+    CONSTRAINT username_allowed_chars CHECK (
+        username IS NULL OR username ~* '^[a-z0-9._-]*$'
+    )
 );
 
 CREATE TABLE IF NOT EXISTS journal (
