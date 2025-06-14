@@ -29,7 +29,7 @@ AS $$
            j.description,
            j.thumbnail_url,
            j.created_at,
-           j.updated_at,
+           j.updated_at
   ORDER BY j.created_at DESC
 $$ LANGUAGE SQL STABLE;
 
