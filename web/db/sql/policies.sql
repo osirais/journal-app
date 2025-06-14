@@ -73,3 +73,17 @@ CREATE POLICY "Users can access their own non-deleted reasons"
     user_id = (SELECT auth.uid())
     AND deleted_at IS NULL
   );
+
+CREATE POLICY "Users can access their own non-deleted mood entries"
+  ON mood_entry FOR ALL
+  USING (
+    user_id = (SELECT auth.uid())
+    AND deleted_at IS NULL
+  );
+
+CREATE POLICY "Users can access their own non-deleted streaks"
+  ON streak FOR ALL
+  USING (
+    user_id = (SELECT auth.uid())
+    AND deleted_at IS NULL
+  );
