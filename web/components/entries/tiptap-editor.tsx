@@ -38,7 +38,6 @@ export const TiptapEditor: FC<TiptapEditorProps> = ({
   const [listType, setListType] = useState<string[]>([]);
 
   const editor = useEditor({
-    // @ts-expect-error
     extensions: [StarterKit, Markdown],
     content,
     onUpdate: ({ editor }) => {
