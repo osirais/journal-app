@@ -2,7 +2,6 @@ CREATE EXTENSION IF NOT EXISTS citext SCHEMA extensions;
 
 CREATE TABLE IF NOT EXISTS users (
     id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
-    username CITEXT UNIQUE NOT NULL,
     name TEXT NOT NULL,
     avatar_url TEXT,
     onboarded BOOLEAN NOT NULL DEFAULT false,

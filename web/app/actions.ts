@@ -53,19 +53,34 @@ export async function loginAction(formData: FormData) {
     return encodedRedirect("error", "/login", error.message);
   }
 
-  const { data: userData, error: userError } = await supabase
+  const { user } = authData;
+
+  let { data: userData, error: userError } = await supabase
     .from("users")
     .select("onboarded")
-    .eq("id", authData.user.id)
+    .eq("id", user.id)
     .single();
+
+  if (userError && userError.code === "PGRST116") {
+    // user might not exist yet since they are only in auth.users -> create new user
+    const { error: insertError } = await supabase.from("users").insert({
+      id: user.id,
+      name: user.user_metadata.full_name || user.email,
+      avatar_url: user.user_metadata.avatar_url || null
+    });
+
+    if (insertError) {
+      return encodedRedirect("error", "/login", insertError.message);
+    }
+
+    return redirect("/onboarding");
+  }
 
   if (userError) {
     return encodedRedirect("error", "/login", userError.message);
   }
 
-  const onboarded = userData.onboarded;
-
-  return redirect(onboarded ? "/dashboard" : "/onboarding");
+  return redirect(userData?.onboarded ? "/dashboard" : "/onboarding");
 }
 
 export async function loginActionWithOAuth(provider: Provider) {
