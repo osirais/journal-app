@@ -78,10 +78,15 @@ export function ActivityCalendarCSR({ data }: ActivityCalendarCSRProps) {
                   margin: "0 auto"
                 }}
                 theme={
-                  colors && {
-                    light: [colors.subAlt, colors.main],
-                    dark: [colors.subAlt, colors.main]
-                  }
+                  colors
+                    ? {
+                        light: [colors.subAlt, colors.main],
+                        dark: [colors.subAlt, colors.main]
+                      }
+                    : {
+                        light: ["var(--muted)", "var(--primary)"],
+                        dark: ["var(--muted)", "var(--primary)"]
+                      }
                 }
               />
             </div>
