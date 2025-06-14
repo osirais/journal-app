@@ -1,5 +1,4 @@
 import { Navbar } from "@/components/navbar/navbar";
-import { SearchDialog } from "@/components/search/search-dialog";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -19,7 +18,6 @@ const Page = async () => {
   return (
     <div className="bg-background min-h-screen">
       <Navbar />
-      <SearchDialog />
       <main id="main-content" className="container mx-auto px-4 py-16 md:py-24">
         <div className="mx-auto max-w-4xl space-y-8 text-center">
           <div className="space-y-4">
