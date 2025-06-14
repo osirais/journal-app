@@ -6,6 +6,7 @@ ALTER TABLE entry_tag ENABLE ROW LEVEL SECURITY;
 ALTER TABLE user_balance ENABLE ROW LEVEL SECURITY;
 ALTER TABLE balance_transaction ENABLE ROW LEVEL SECURITY;
 ALTER TABLE user_settings ENABLE ROW LEVEL SECURITY;
+ALTER TABLE reason ENABLE ROW LEVEL SECURITY;
 
 CREATE POLICY "Users can access their own non-deleted user row"
   ON users FOR ALL
@@ -61,6 +62,13 @@ CREATE POLICY "Users can access their own balance transactions"
 
 CREATE POLICY "Users can access their own non-deleted settings"
   ON user_settings FOR ALL
+  USING (
+    user_id = (SELECT auth.uid())
+    AND deleted_at IS NULL
+  );
+
+CREATE POLICY "Users can access their own non-deleted reasons"
+  ON reason FOR ALL
   USING (
     user_id = (SELECT auth.uid())
     AND deleted_at IS NULL
