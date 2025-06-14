@@ -2,6 +2,7 @@
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { ChartContainer, ChartTooltip, type ChartConfig } from "@/components/ui/chart";
+import { useTheme } from "@/contexts/theme-context";
 import { Area, AreaChart, CartesianGrid, XAxis, YAxis } from "recharts";
 
 interface MoodData {
@@ -54,6 +55,9 @@ const getCurrentMonthDates = () => {
 };
 
 export const MoodChartCSR = ({ data }: MoodChartCSRProps) => {
+  const { theme } = useTheme();
+  const colors = theme.palette?.colors;
+
   const currentMonth = new Date().toLocaleString("default", { month: "long" });
 
   const dateMap = new Map(data.map((item) => [item.date, item]));
@@ -137,12 +141,12 @@ export const MoodChartCSR = ({ data }: MoodChartCSRProps) => {
               <Area
                 dataKey="mood"
                 type="monotone"
-                fill="var(--color-mood)"
+                fill={colors && colors.main}
                 fillOpacity={0.4}
-                stroke="var(--color-mood)"
+                stroke={colors && colors.main}
                 strokeWidth={2}
                 dot={{
-                  fill: "var(--color-mood)",
+                  fill: colors && colors.main,
                   strokeWidth: 2,
                   r: 4
                 }}
