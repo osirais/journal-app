@@ -25,6 +25,8 @@ type EntryWithTags = Entry & {
   tags: TagType[];
 };
 
+type SortOption = "newest" | "oldest";
+
 export default function EntriesPage() {
   const { journalId } = useParams();
 
@@ -40,10 +42,13 @@ export default function EntriesPage() {
   const [journalInfo, setJournalInfo] = useState<JournalWithEntryCount | null>(null);
   const [journalLoading, setJournalLoading] = useState(true);
 
+  const [sort, setSort] = useState<"newest" | "oldest">("newest");
+
   useEffect(() => {
     if (!journalId) return;
 
-    const fetchString = `/api/entries?journalId=${journalId}${tagId ? `&tag=${tagId}` : ""}`;
+    let fetchString = `/api/entries?journalId=${journalId}&sort=${sort}`;
+    if (tagId) fetchString += `&tag=${tagId}`;
 
     if (tagId) {
       axios
@@ -80,11 +85,15 @@ export default function EntriesPage() {
         console.error("Failed to load journal info", err);
         setJournalLoading(false);
       });
-  }, [journalId, tagId]);
+  }, [journalId, tagId, sort]);
 
   if (!journalId) {
     return <div className="container mx-auto max-w-3xl py-8">No journal selected.</div>;
   }
+
+  const handleSortChange = (sortBy: SortOption) => {
+    setSort(sortBy);
+  };
 
   return (
     <div className="container mx-auto max-w-3xl py-8">
@@ -138,7 +147,7 @@ export default function EntriesPage() {
       />
 
       <div className="mb-6">
-        <EntriesSortDropdown onSortChange={() => {}} defaultSort="newest" />
+        <EntriesSortDropdown onSortChange={handleSortChange} defaultSort={sort} />
       </div>
 
       <div className="space-y-3">

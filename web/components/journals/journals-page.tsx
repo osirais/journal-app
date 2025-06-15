@@ -8,7 +8,13 @@ import type { JournalWithEntryCount } from "@/types";
 import axios from "axios";
 import { useEffect, useState } from "react";
 
-type SortOption = "newest" | "oldest" | "most-updated" | "least-updated" | "most-entries";
+type SortOption =
+  | "newest"
+  | "oldest"
+  | "most-updated"
+  | "least-updated"
+  | "most-entries"
+  | "least-entries";
 
 export function JournalsPage() {
   const [journals, setJournals] = useState<JournalWithEntryCount[]>([]);

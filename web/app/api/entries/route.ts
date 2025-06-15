@@ -12,6 +12,7 @@ export async function GET(req: Request) {
   const searchParams = new URL(req.url).searchParams;
   const tagId = searchParams.get("tag");
   const journalId = searchParams.get("journalId");
+  const sortBy = searchParams.get("sort") ?? "newest";
 
   const user = await getUserOrThrow(supabase);
 
@@ -19,42 +20,27 @@ export async function GET(req: Request) {
     return NextResponse.json({ error: "journalId query parameter required" }, { status: 400 });
   }
 
-  const { data: journal, error: journalError } = await supabase
-    .from("journal")
-    .select("id")
-    .eq("id", journalId)
-    .eq("author_id", user.id)
-    .single();
-
-  if (journalError || !journal) {
-    return NextResponse.json({ error: "Journal not found or access denied" }, { status: 404 });
-  }
-
-  const { data: entries, error } = await supabase
-    .from("entry")
-    .select(
-      `
-      *,
-      entry_tag (
-        tag:tag_id (id, name)
-      )
-    `
-    )
-    .eq("journal_id", journalId)
-    .order("created_at", { ascending: false });
+  const { data: rawEntries, error } = await supabase.rpc("get_entries_by_journal", {
+    uid: user.id,
+    journal_id_param: journalId,
+    sort_by: sortBy
+  });
 
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 
-  const transformedEntries = entries.map((entry) => ({
+  // ensures tags is not null
+  const entries = rawEntries.map((entry: any) => ({
     ...entry,
-    tags: entry.entry_tag?.map((et: any) => et.tag).filter(Boolean) || []
+    tags: Array.isArray(entry.tags) ? entry.tags : []
   }));
 
   const filteredEntries = tagId
-    ? transformedEntries.filter((entry) => entry.tags.some((tag: TagType) => tag.id === tagId))
-    : transformedEntries;
+    ? entries.filter((entry: any) => {
+        return entry.entry_tags?.some((tag: any) => tag.id === tagId);
+      })
+    : entries;
 
   return NextResponse.json({ entries: filteredEntries });
 }
