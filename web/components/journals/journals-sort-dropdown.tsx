@@ -33,7 +33,7 @@ export const JournalsSortDropdown: FC<JournalsSortDropdownProps> = ({
 
   const handleSortChange = (sortBy: SortOption) => {
     setSelectedSort(sortBy);
-    onSortChange?.(sortBy);
+    onSortChange(sortBy);
   };
 
   const selectedOption = sortOptions.find((option) => option.value === selectedSort);

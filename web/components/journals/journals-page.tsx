@@ -8,23 +8,34 @@ import type { JournalWithEntryCount } from "@/types";
 import axios from "axios";
 import { useEffect, useState } from "react";
 
+type SortOption = "newest" | "oldest" | "most-updated" | "least-updated" | "most-entries";
+
 export function JournalsPage() {
   const [journals, setJournals] = useState<JournalWithEntryCount[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [sort, setSort] = useState<SortOption>("newest");
+
+  const fetchJournals = async (sortBy: SortOption) => {
+    setLoading(true);
+    setError(null);
+    try {
+      const res = await axios.get(`/api/journals?sort=${sortBy}`);
+      setJournals(res.data || []);
+    } catch (err: any) {
+      setError(err.response?.data?.error || "Failed to load journals");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    axios
-      .get("/api/journals")
-      .then((res) => {
-        setJournals(res.data || []);
-        setLoading(false);
-      })
-      .catch((err) => {
-        setError(err.response?.data?.error || "Failed to load journals");
-        setLoading(false);
-      });
-  }, []);
+    fetchJournals(sort);
+  }, [sort]);
+
+  const handleSortChange = (sortBy: SortOption) => {
+    setSort(sortBy);
+  };
 
   const handleJournalCreated = (journal: JournalWithEntryCount) => {
     setJournals((prev) => [journal, ...prev]);
@@ -38,7 +49,6 @@ export function JournalsPage() {
     <div className="container mx-auto max-w-3xl py-8">
       <h1 className="mb-2 text-3xl font-bold">Journals</h1>
       <p className="text-muted-foreground mb-6">Your collection of journals</p>
-
       {error && (
         <div className="mb-6 rounded border border-red-200 bg-red-50 px-4 py-3 text-red-700">
           {error}
@@ -46,7 +56,7 @@ export function JournalsPage() {
       )}
       <CreateJournalDialog onJournalCreated={handleJournalCreated} />
       <div className="mb-6">
-        <JournalsSortDropdown onSortChange={() => {}} defaultSort="newest" />
+        <JournalsSortDropdown onSortChange={handleSortChange} defaultSort={sort} />
       </div>
       {loading ? (
         <div className="grid gap-3 md:grid-cols-2">

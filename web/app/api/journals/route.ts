@@ -5,12 +5,18 @@ import { NextResponse } from "next/server";
 
 export const dynamic = "force-dynamic";
 
-export async function GET() {
+export async function GET(req: Request) {
   const supabase = await createClient();
 
   const user = await getUserOrThrow(supabase);
 
-  const { data, error } = await supabase.rpc("get_journals_with_entry_count", { uid: user.id });
+  const searchParams = new URL(req.url).searchParams;
+  const sortBy = searchParams.get("sort");
+
+  const { data, error } = await supabase.rpc("get_journals_with_entry_count", {
+    uid: user.id,
+    sort_by: sortBy
+  });
 
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 500 });
