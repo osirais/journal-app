@@ -26,6 +26,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { zodResolver } from "@hookform/resolvers/zod";
 import axios from "axios";
+import { Plus } from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -64,7 +65,6 @@ export function CreateJournalDialog({ onJournalCreated }: CreateJournalDialogPro
       const journal = res.data.journal;
 
       toast.success("Journal created");
-
       onJournalCreated(journal);
 
       form.reset();
@@ -77,60 +77,66 @@ export function CreateJournalDialog({ onJournalCreated }: CreateJournalDialogPro
   }
 
   return (
-    <AlertDialog open={open} onOpenChange={setOpen}>
-      <AlertDialogTrigger asChild>
-        <Button variant="outline">Create Journal</Button>
-      </AlertDialogTrigger>
-      <AlertDialogContent>
-        <AlertDialogHeader>
-          <AlertDialogTitle>Create a new journal</AlertDialogTitle>
-          <AlertDialogDescription>Add a new journal to your collection.</AlertDialogDescription>
-        </AlertDialogHeader>
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(handleCreate)} className="space-y-6">
-            <FormField
-              control={form.control}
-              name="title"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Title</FormLabel>
-                  <FormControl>
-                    <Input placeholder="My awesome journal" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+    <div className="mb-6 flex items-center justify-between">
+      <h2 className="text-lg font-semibold">Create New Journal</h2>
+      <AlertDialog open={open} onOpenChange={setOpen}>
+        <AlertDialogTrigger asChild>
+          <Button size="sm" className="size-9 cursor-pointer rounded-full p-0">
+            <Plus className="size-4" />
+            <span className="sr-only">Create entry</span>
+          </Button>
+        </AlertDialogTrigger>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Create a new journal</AlertDialogTitle>
+            <AlertDialogDescription>Add a new journal to your collection.</AlertDialogDescription>
+          </AlertDialogHeader>
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(handleCreate)} className="space-y-6">
+              <FormField
+                control={form.control}
+                name="title"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Title</FormLabel>
+                    <FormControl>
+                      <Input placeholder="My awesome journal" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
-            <FormField
-              control={form.control}
-              name="description"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Description</FormLabel>
-                  <FormControl>
-                    <Textarea
-                      placeholder="A brief description of what this journal is about"
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+              <FormField
+                control={form.control}
+                name="description"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Description</FormLabel>
+                    <FormControl>
+                      <Textarea
+                        placeholder="A brief description of what this journal is about"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
-            <div>
-              <Label htmlFor="color">Color</Label>
-              <ColorPicker selectedColor={color} onColorChange={setColor} />
-            </div>
+              <div>
+                <Label htmlFor="color">Color</Label>
+                <ColorPicker selectedColor={color} onColorChange={setColor} />
+              </div>
 
-            <AlertDialogFooter>
-              <AlertDialogCancel>Cancel</AlertDialogCancel>
-              <AlertDialogAction type="submit">Create</AlertDialogAction>
-            </AlertDialogFooter>
-          </form>
-        </Form>
-      </AlertDialogContent>
-    </AlertDialog>
+              <AlertDialogFooter>
+                <AlertDialogCancel type="button">Cancel</AlertDialogCancel>
+                <AlertDialogAction type="submit">Create</AlertDialogAction>
+              </AlertDialogFooter>
+            </form>
+          </Form>
+        </AlertDialogContent>
+      </AlertDialog>
+    </div>
   );
 }
