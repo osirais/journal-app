@@ -61,7 +61,6 @@ export async function GET(req: Request) {
 
 export async function POST(req: Request) {
   const supabase = await createClient();
-
   const user = await getUserOrThrow(supabase);
 
   const body = await req.json();
@@ -109,6 +108,8 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 
+  let attachedTags = [];
+
   if (tags && tags.length > 0) {
     const normalizedTags = Array.from(
       new Set(tags.map((tag: string) => tag.toLowerCase().trim()))
@@ -142,6 +143,7 @@ export async function POST(req: Request) {
     }
 
     const allTags = [...(existingTags ?? []), ...newTags];
+    attachedTags = allTags;
 
     const entryTagRelations = allTags.map((tag) => ({
       entry_id: entry.id,
@@ -157,7 +159,17 @@ export async function POST(req: Request) {
 
   const { reward, streak } = await handleDailyEntryReward(supabase, user.id);
 
-  return NextResponse.json({ entry, reward, streak }, { status: 201 });
+  return NextResponse.json(
+    {
+      entry: {
+        ...entry,
+        tags: attachedTags
+      },
+      reward,
+      streak
+    },
+    { status: 201 }
+  );
 }
 
 async function handleDailyEntryReward(

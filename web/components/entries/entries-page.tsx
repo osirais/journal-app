@@ -1,30 +1,17 @@
 "use client";
 
+import { CreateEntryDialog } from "@/components/entries/create-entry-dialog";
 import { EntryCard } from "@/components/entries/entry-card";
-import { TiptapEditor } from "@/components/entries/tiptap-editor";
 import { SortDropdown } from "@/components/sort-dropdown";
 import { TagComponent } from "@/components/tag-component";
-import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger
-} from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
 import type { JournalWithEntryCount, TagType } from "@/types";
 import { formatDateAgo } from "@/utils/format-date-ago";
-import { receiveReward } from "@/utils/receive-reward";
 import axios from "axios";
 import { CalendarIcon, FileText, Plus } from "lucide-react";
 import { useParams, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
-import { WithContext as ReactTags, SEPARATORS, type Tag } from "react-tag-input";
 
 type Entry = {
   id: string;
@@ -33,8 +20,6 @@ type Entry = {
   created_at: string;
   updated_at: string;
 };
-
-const separators = [SEPARATORS.COMMA, SEPARATORS.ENTER, SEPARATORS.SEMICOLON, SEPARATORS.TAB];
 
 type EntryWithTags = Entry & {
   tags: TagType[];
@@ -50,18 +35,10 @@ export default function EntriesPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const [title, setTitle] = useState("");
-  const [content, setContent] = useState("");
-  const [creating, setCreating] = useState(false);
-  const [createError, setCreateError] = useState<string | null>(null);
   const [tagName, setTagName] = useState<string | null>(null);
-
-  const [tags, setTags] = useState<Tag[]>([]);
 
   const [journalInfo, setJournalInfo] = useState<JournalWithEntryCount | null>(null);
   const [journalLoading, setJournalLoading] = useState(true);
-
-  const [dialogOpen, setDialogOpen] = useState(false);
 
   useEffect(() => {
     if (!journalId) return;
@@ -104,69 +81,6 @@ export default function EntriesPage() {
         setJournalLoading(false);
       });
   }, [journalId, tagId]);
-
-  const handleCreate = async () => {
-    if (!title.trim()) {
-      setCreateError("Title is required");
-      return;
-    }
-    if (!content.trim()) {
-      setCreateError("Content is required");
-      return;
-    }
-
-    setCreating(true);
-    setCreateError(null);
-
-    try {
-      const response = await axios.post("/api/entries", {
-        journalId,
-        title,
-        content,
-        tags: tags.map((tag) => tag.text.toLowerCase())
-      });
-
-      const { reward, streak } = response.data;
-
-      if (reward) {
-        receiveReward(`Daily journal entry reward: +${reward} droplets!`, streak);
-      }
-
-      setEntries((prev) => [
-        {
-          id: "temp_" + Math.random(),
-          title,
-          content,
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString(),
-          tags: []
-        },
-        ...prev
-      ]);
-      setTitle("");
-      setContent("");
-      setTags([]);
-
-      axios.get(`/api/entries?journalId=${journalId}`).then((res) => {
-        setEntries(res.data.entries || []);
-      });
-
-      setDialogOpen(false);
-    } catch (err: any) {
-      setCreateError(err.response?.data?.error || "Failed to create entry");
-    } finally {
-      setCreating(false);
-    }
-  };
-
-  const handleDeleteTag = (i: number) => {
-    setTags(tags.filter((_, index) => index !== i));
-  };
-
-  const handleAdditionTag = (tag: Tag) => {
-    if (tags.some((t) => t.text.toLowerCase() === tag.text.toLowerCase())) return;
-    setTags([...tags, tag]);
-  };
 
   if (!journalId) {
     return <div className="container mx-auto max-w-3xl py-8">No journal selected.</div>;
@@ -214,72 +128,14 @@ export default function EntriesPage() {
         )
       )}
 
-      <div className="mb-6 flex items-center justify-between">
-        <h2 className="text-lg font-semibold">Create New Entry</h2>
-        <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-          <DialogTrigger asChild>
-            <Button size="sm" className="size-9 cursor-pointer rounded-full p-0">
-              <Plus className="size-4" />
-              <span className="sr-only">Create entry</span>
-            </Button>
-          </DialogTrigger>
-          <DialogContent className="sm:max-w-xl">
-            <DialogHeader>
-              <DialogTitle>Create Entry</DialogTitle>
-              <DialogDescription>Add a new entry to your journal</DialogDescription>
-            </DialogHeader>
-
-            <div className="grid grid-flow-row gap-4">
-              <Label htmlFor="title">Title</Label>
-              <Input
-                id="title"
-                placeholder="Enter entry title"
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
-                disabled={creating}
-                required
-              />
-              <Label htmlFor="content">Content</Label>
-              <TiptapEditor
-                content={content}
-                onChange={(newContent) => setContent(newContent)}
-                placeholder="Add content..."
-              />
-
-              <Label htmlFor="tags">Tags</Label>
-              <Card className="p-2">
-                <ReactTags
-                  tags={tags}
-                  handleDelete={handleDeleteTag}
-                  handleAddition={handleAdditionTag}
-                  separators={separators}
-                  inputFieldPosition="top"
-                  autocomplete
-                  placeholder="Add new tag"
-                  allowDragDrop={false}
-                  readOnly={creating}
-                  classNames={{
-                    tags: "flex flex-wrap gap-2 mt-2",
-                    tag: "rounded-full px-2 py-0.5 text-xs text-muted-foreground bg-black/20 dark:bg-white/20",
-                    tagInput: "w-full",
-                    tagInputField: "w-full focus:outline-none text-sm",
-                    selected: "flex flex-wrap gap-2",
-                    remove: "ml-2 text-xs cursor-pointer text-destructive hover:underline"
-                  }}
-                />
-              </Card>
-              {createError && (
-                <div className="bg-destructive/10 text-destructive rounded-md p-3 text-sm">
-                  {createError}
-                </div>
-              )}
-              <Button onClick={handleCreate} disabled={creating} className="cursor-pointer">
-                {creating ? "Creating..." : "Create"}
-              </Button>
-            </div>
-          </DialogContent>
-        </Dialog>
-      </div>
+      <CreateEntryDialog
+        journalId={journalId as string}
+        onEntryCreated={(entry) => {
+          axios.get(`/api/entries?journalId=${journalId}`).then((res) => {
+            setEntries([entry, ...entries]);
+          });
+        }}
+      />
 
       <div className="mb-6">
         <SortDropdown onSortChange={() => {}} defaultSort="work-in-progress" />
