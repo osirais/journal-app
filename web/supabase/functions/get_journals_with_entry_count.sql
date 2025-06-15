@@ -28,6 +28,8 @@ BEGIN
       order_clause := 'j.updated_at ASC';
     WHEN 'most-entries' THEN
       order_clause := 'entries DESC';
+    WHEN 'least-entries' THEN
+      order_clause := 'entries ASC';
     ELSE
       RAISE EXCEPTION 'Invalid sort option: %', sort_by;
   END CASE;

@@ -10,7 +10,13 @@ import {
 import { ChevronDown } from "lucide-react";
 import { FC, useState } from "react";
 
-type SortOption = "newest" | "oldest" | "most-updated" | "least-updated" | "most-entries";
+type SortOption =
+  | "newest"
+  | "oldest"
+  | "most-updated"
+  | "least-updated"
+  | "most-entries"
+  | "least-entries";
 
 type JournalsSortDropdownProps = {
   onSortChange: (sortBy: SortOption) => void;
@@ -22,7 +28,8 @@ const sortOptions = [
   { value: "oldest" as const, label: "Oldest Created" },
   { value: "most-updated" as const, label: "Most Recently Updated" },
   { value: "least-updated" as const, label: "Least Recently Updated" },
-  { value: "most-entries" as const, label: "Most Entries" }
+  { value: "most-entries" as const, label: "Most Entries" },
+  { value: "least-entries" as const, label: "Least Entries" }
 ];
 
 export const JournalsSortDropdown: FC<JournalsSortDropdownProps> = ({
