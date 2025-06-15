@@ -10,22 +10,21 @@ import {
 import { ChevronDown } from "lucide-react";
 import { FC, useState } from "react";
 
-type SortOption = "most-recent" | "least-recent" | "work-in-progress";
+type SortOption = "newest" | "oldest";
 
-type SortDropdownProps = {
+type EntriesSortDropdownProps = {
   onSortChange: (sortBy: SortOption) => void;
   defaultSort: SortOption;
 };
 
 const sortOptions = [
-  { value: "work-in-progress" as const, label: "Feature (WIP)" },
-  { value: "most-recent" as const, label: "Most Recent Updates" },
-  { value: "least-recent" as const, label: "Least Recent Updates" }
+  { value: "newest" as const, label: "Newest Created" },
+  { value: "oldest" as const, label: "Oldest Created" }
 ];
 
-export const SortDropdown: FC<SortDropdownProps> = ({
+export const EntriesSortDropdown: FC<EntriesSortDropdownProps> = ({
   onSortChange,
-  defaultSort = "most-recent"
+  defaultSort = "newest"
 }) => {
   const [selectedSort, setSelectedSort] = useState<SortOption>(defaultSort);
 
@@ -39,7 +38,6 @@ export const SortDropdown: FC<SortDropdownProps> = ({
   return (
     <div className="flex w-full items-center justify-between">
       <span className="text-muted-foreground text-sm font-medium">Sort By</span>
-
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button variant="outline" size="sm" className="h-8 cursor-pointer gap-1">

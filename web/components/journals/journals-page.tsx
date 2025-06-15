@@ -3,7 +3,7 @@
 import { CreateJournalDialog } from "@/components/journals/create-journal-dialog";
 import { JournalCard } from "@/components/journals/journal-card";
 import { JournalCardSkeleton } from "@/components/journals/journal-card-skeleton";
-import { SortDropdown } from "@/components/sort-dropdown";
+import { JournalsSortDropdown } from "@/components/journals/journals-sort-dropdown";
 import type { JournalWithEntryCount } from "@/types";
 import axios from "axios";
 import { useEffect, useState } from "react";
@@ -46,7 +46,7 @@ export function JournalsPage() {
       )}
       <CreateJournalDialog onJournalCreated={handleJournalCreated} />
       <div className="mb-6">
-        <SortDropdown onSortChange={() => {}} defaultSort="work-in-progress" />
+        <JournalsSortDropdown onSortChange={() => {}} defaultSort="newest" />
       </div>
       {loading ? (
         <div className="grid gap-3 md:grid-cols-2">

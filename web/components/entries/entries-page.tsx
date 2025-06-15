@@ -1,8 +1,8 @@
 "use client";
 
 import { CreateEntryDialog } from "@/components/entries/create-entry-dialog";
+import { EntriesSortDropdown } from "@/components/entries/entries-sort-dropdown";
 import { EntryCard } from "@/components/entries/entry-card";
-import { SortDropdown } from "@/components/sort-dropdown";
 import { TagComponent } from "@/components/tag-component";
 import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -138,7 +138,7 @@ export default function EntriesPage() {
       />
 
       <div className="mb-6">
-        <SortDropdown onSortChange={() => {}} defaultSort="work-in-progress" />
+        <EntriesSortDropdown onSortChange={() => {}} defaultSort="newest" />
       </div>
 
       <div className="space-y-3">
