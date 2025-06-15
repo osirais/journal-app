@@ -1,25 +1,45 @@
 "use client";
 
 import { TiptapEditor } from "@/components/entries/tiptap-editor";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger
+} from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger
-} from "@/components/ui/dialog";
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage
+} from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { receiveReward } from "@/utils/receive-reward";
+import { zodResolver } from "@hookform/resolvers/zod";
 import axios from "axios";
 import { Plus } from "lucide-react";
 import { useState } from "react";
+import { useForm } from "react-hook-form";
 import { WithContext as ReactTags, SEPARATORS, type Tag } from "react-tag-input";
+import { toast } from "sonner";
+import * as z from "zod";
 
 const separators = [SEPARATORS.COMMA, SEPARATORS.ENTER, SEPARATORS.SEMICOLON, SEPARATORS.TAB];
+
+const formSchema = z.object({
+  title: z.string().nonempty({ message: "Title is required" }),
+  content: z.string().nonempty({ message: "Content is required" })
+});
 
 type CreateEntryDialogProps = {
   journalId: string;
@@ -28,11 +48,16 @@ type CreateEntryDialogProps = {
 
 export function CreateEntryDialog({ journalId, onEntryCreated }: CreateEntryDialogProps) {
   const [open, setOpen] = useState(false);
-  const [title, setTitle] = useState("");
-  const [content, setContent] = useState("");
   const [tags, setTags] = useState<Tag[]>([]);
   const [creating, setCreating] = useState(false);
-  const [createError, setCreateError] = useState<string | null>(null);
+
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      title: "",
+      content: ""
+    }
+  });
 
   const handleDeleteTag = (index: number) => {
     setTags(tags.filter((_, i) => i !== index));
@@ -43,18 +68,13 @@ export function CreateEntryDialog({ journalId, onEntryCreated }: CreateEntryDial
     setTags([...tags, tag]);
   };
 
-  const handleCreate = async () => {
-    if (!title.trim()) return setCreateError("Title is required");
-    if (!content.trim()) return setCreateError("Content is required");
-
+  const handleCreate = async (values: z.infer<typeof formSchema>) => {
     setCreating(true);
-    setCreateError(null);
-
     try {
       const res = await axios.post("/api/entries", {
         journalId,
-        title,
-        content,
+        title: values.title,
+        content: values.content,
         tags: tags.map((t) => t.text.toLowerCase())
       });
 
@@ -63,16 +83,14 @@ export function CreateEntryDialog({ journalId, onEntryCreated }: CreateEntryDial
         receiveReward(`Daily journal entry reward: +${reward} droplets!`, streak);
       }
 
-      setTitle("");
-      setContent("");
+      toast.success("Entry created");
+      onEntryCreated(res.data.entry);
+
+      form.reset();
       setTags([]);
       setOpen(false);
-
-      console.log(res.data);
-
-      onEntryCreated(res.data.entry);
     } catch (err: any) {
-      setCreateError(err.response?.data?.error || "Failed to create entry");
+      toast.error(err.response?.data?.error || "Failed to create entry");
     } finally {
       setCreating(false);
     }
@@ -81,62 +99,89 @@ export function CreateEntryDialog({ journalId, onEntryCreated }: CreateEntryDial
   return (
     <div className="mb-6 flex items-center justify-between">
       <h2 className="text-lg font-semibold">Create New Entry</h2>
-      <Dialog open={open} onOpenChange={setOpen}>
-        <DialogTrigger asChild>
+      <AlertDialog open={open} onOpenChange={setOpen}>
+        <AlertDialogTrigger asChild>
           <Button size="sm" className="size-9 cursor-pointer rounded-full p-0">
             <Plus className="size-4" />
             <span className="sr-only">Create entry</span>
           </Button>
-        </DialogTrigger>
-        <DialogContent className="sm:max-w-xl">
-          <DialogHeader>
-            <DialogTitle>Create Entry</DialogTitle>
-            <DialogDescription>Add a new entry to your journal</DialogDescription>
-          </DialogHeader>
-          <div className="grid grid-flow-row gap-4">
-            <Label htmlFor="title">Title</Label>
-            <Input
-              id="title"
-              placeholder="Enter entry title"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              disabled={creating}
-            />
-            <Label htmlFor="content">Content</Label>
-            <TiptapEditor content={content} onChange={setContent} placeholder="Add content..." />
-            <Label htmlFor="tags">Tags</Label>
-            <Card className="p-2">
-              <ReactTags
-                tags={tags}
-                handleDelete={handleDeleteTag}
-                handleAddition={handleAdditionTag}
-                separators={separators}
-                inputFieldPosition="top"
-                autocomplete
-                placeholder="Add new tag"
-                allowDragDrop={false}
-                readOnly={creating}
-                classNames={{
-                  tags: "flex flex-wrap gap-2 mt-2",
-                  tag: "rounded-full px-2 py-0.5 text-xs text-muted-foreground bg-black/20 dark:bg-white/20",
-                  tagInput: "w-full",
-                  tagInputField: "w-full focus:outline-none text-sm",
-                  selected: "flex flex-wrap gap-2",
-                  remove: "ml-2 text-xs cursor-pointer text-destructive hover:underline"
-                }}
+        </AlertDialogTrigger>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Create a new entry</AlertDialogTitle>
+            <AlertDialogDescription>Add a new entry to your journal.</AlertDialogDescription>
+          </AlertDialogHeader>
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(handleCreate)} className="space-y-6">
+              <FormField
+                control={form.control}
+                name="title"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Title</FormLabel>
+                    <FormControl>
+                      <Input placeholder="My journal entry title" {...field} disabled={creating} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
               />
-            </Card>
-            {createError && (
-              <div className="bg-destructive/10 text-destructive rounded-md p-3 text-sm">
-                {createError}
+
+              <FormField
+                control={form.control}
+                name="content"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Content</FormLabel>
+                    <FormControl>
+                      <TiptapEditor
+                        content={field.value}
+                        onChange={field.onChange}
+                        placeholder="Write your entry..."
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <div>
+                <Label htmlFor="tags">Tags</Label>
+                <Card className="p-2">
+                  <ReactTags
+                    tags={tags}
+                    handleDelete={handleDeleteTag}
+                    handleAddition={handleAdditionTag}
+                    separators={separators}
+                    inputFieldPosition="top"
+                    autocomplete
+                    placeholder="Add new tag"
+                    allowDragDrop={false}
+                    readOnly={creating}
+                    classNames={{
+                      tags: "flex flex-wrap gap-2 mt-2",
+                      tag: "rounded-full px-2 py-0.5 text-xs text-muted-foreground bg-black/20 dark:bg-white/20",
+                      tagInput: "w-full",
+                      tagInputField: "w-full focus:outline-none text-sm",
+                      selected: "flex flex-wrap gap-2",
+                      remove: "ml-2 text-xs cursor-pointer text-destructive hover:underline"
+                    }}
+                  />
+                </Card>
               </div>
-            )}
-            <Button onClick={handleCreate} disabled={creating} className="cursor-pointer">
-              {creating ? "Creating..." : "Create"}
-            </Button>
-          </div>
-        </DialogContent>
-      </Dialog>
+
+              <AlertDialogFooter>
+                <AlertDialogCancel type="button" className="cursor-pointer">
+                  Cancel
+                </AlertDialogCancel>
+                <AlertDialogAction type="submit" className="cursor-pointer" disabled={creating}>
+                  {creating ? "Creating..." : "Create"}
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </form>
+          </Form>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
