@@ -103,7 +103,7 @@ export const JournalCard: FC<JournalCardProps> = ({
           </div>
           <div className="mt-auto pt-4">
             <div className="flex h-full items-center justify-between gap-2">
-              <Button asChild size="sm" variant="outline" className="flex-1">
+              <Button asChild size="sm" variant="outline" className="h-full flex-1">
                 <Link href={`/journal/${journal.id}`}>Open</Link>
               </Button>
               <DropdownMenu>
