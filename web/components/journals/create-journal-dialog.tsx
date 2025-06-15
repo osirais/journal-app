@@ -130,8 +130,12 @@ export function CreateJournalDialog({ onJournalCreated }: CreateJournalDialogPro
               </div>
 
               <AlertDialogFooter>
-                <AlertDialogCancel type="button">Cancel</AlertDialogCancel>
-                <AlertDialogAction type="submit">Create</AlertDialogAction>
+                <AlertDialogCancel type="button" className="cursor-pointer">
+                  Cancel
+                </AlertDialogCancel>
+                <AlertDialogAction type="submit" className="cursor-pointer">
+                  Create
+                </AlertDialogAction>
               </AlertDialogFooter>
             </form>
           </Form>

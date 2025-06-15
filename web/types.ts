@@ -4,6 +4,7 @@ export type Journal = {
   title: string;
   description: string;
   thumbnail_url: string | null;
+  color_hex: string;
   created_at: string;
   updated_at: string;
 };

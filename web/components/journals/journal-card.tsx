@@ -13,8 +13,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import type { JournalWithEntryCount } from "@/types";
 import { formatDateAgo } from "@/utils/format-date-ago";
-import { CalendarIcon, Clock, Edit, FileEdit, MoreVertical, Trash2 } from "lucide-react";
-import Image from "next/image";
+import { CalendarIcon, Clock, Edit, MoreVertical, Trash2 } from "lucide-react";
 import Link from "next/link";
 import type React from "react";
 import type { FC } from "react";
@@ -59,19 +58,10 @@ export const JournalCard: FC<JournalCardProps> = ({
       <Card className="group relative w-full max-w-sm overflow-hidden transition-all duration-200 hover:-translate-y-1 hover:shadow-lg hover:shadow-black/5">
         <CardContent className="flex h-full flex-col p-4">
           <div className="flex items-start gap-4">
-            {journal.thumbnail_url ? (
-              <div className="bg-muted size-20 flex-shrink-0 overflow-hidden rounded-lg border">
-                <Image
-                  src={journal.thumbnail_url || "/placeholder.svg"}
-                  alt={journal.title}
-                  className="h-full w-full object-cover"
-                />
-              </div>
-            ) : (
-              <div className="bg-muted flex size-20 flex-shrink-0 items-center justify-center rounded-lg border">
-                <FileEdit className="text-muted-foreground size-8" />
-              </div>
-            )}
+            <div
+              style={{ backgroundColor: journal.color_hex }}
+              className="size-20 flex-shrink-0 overflow-hidden rounded-lg border"
+            ></div>
             <div className="flex flex-1 flex-col overflow-hidden">
               <h3 className="line-clamp-2 text-base font-semibold leading-tight">
                 {journal.title}

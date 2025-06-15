@@ -5,6 +5,7 @@ RETURNS TABLE (
   title TEXT,
   description TEXT,
   thumbnail_url TEXT,
+  color_hex CHAR(7),
   created_at TIMESTAMPTZ,
   updated_at TIMESTAMPTZ,
   entries INTEGER
@@ -16,6 +17,7 @@ AS $$
     j.title,
     j.description,
     j.thumbnail_url,
+    j.color_hex,
     j.created_at,
     j.updated_at,
     COUNT(e.id)::INT AS entries
@@ -28,6 +30,7 @@ AS $$
            j.title,
            j.description,
            j.thumbnail_url,
+           j.color_hex,
            j.created_at,
            j.updated_at
   ORDER BY j.created_at DESC
