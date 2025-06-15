@@ -1,106 +1,136 @@
 "use client";
 
+import { ColorPicker } from "@/components/journals/color-picker";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger
+} from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import {
-  Dialog,
-  DialogContent,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger
-} from "@/components/ui/dialog";
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage
+} from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import type { JournalWithEntryCount } from "@/types";
+import { zodResolver } from "@hookform/resolvers/zod";
 import axios from "axios";
-import { Plus } from "lucide-react";
 import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { toast } from "sonner";
+import * as z from "zod";
+
+const formSchema = z.object({
+  title: z.string().nonempty({ message: "Title is required" }),
+  description: z.string().optional()
+});
 
 interface CreateJournalDialogProps {
-  onJournalCreated: (journal: JournalWithEntryCount) => void;
+  onJournalCreated: (journal: any) => void;
 }
 
 export function CreateJournalDialog({ onJournalCreated }: CreateJournalDialogProps) {
-  const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
-  const [creating, setCreating] = useState(false);
-  const [createError, setCreateError] = useState<string | null>(null);
-  const [dialogOpen, setDialogOpen] = useState(false);
+  const [open, setOpen] = useState(false);
+  const [color, setColor] = useState("#99aab5");
 
-  const handleCreate = async () => {
-    if (!title.trim()) {
-      setCreateError("Title is required");
-      return;
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      title: "",
+      description: ""
     }
+  });
 
-    setCreating(true);
-    setCreateError(null);
-
+  async function handleCreate(values: z.infer<typeof formSchema>) {
+    const { title, description } = values;
     try {
-      const res = await axios.post("/api/journals", { title, description });
-      onJournalCreated(res.data.journal);
-      setTitle("");
-      setDescription("");
-      setDialogOpen(false);
+      const res = await axios.post("/api/journals", {
+        title,
+        description,
+        color
+      });
+
+      const journal = res.data.journal;
+
+      toast.success("Journal created");
+
+      onJournalCreated(journal);
+
+      form.reset();
+      setColor("#99aab5");
+      setOpen(false);
     } catch (err: any) {
-      setCreateError(err.response?.data?.error || "Failed to create journal");
-    } finally {
-      setCreating(false);
+      toast.error("Failed to create journal");
+      console.error(err);
     }
-  };
+  }
 
   return (
-    <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-      <div className="mb-6 flex items-center justify-between">
-        <h2 className="text-lg font-semibold">Create New Journal</h2>
-        <DialogTrigger asChild>
-          <Button
-            size="sm"
-            className="size-9 cursor-pointer rounded-full p-0"
-            onClick={() => setDialogOpen(true)}
-          >
-            <Plus className="size-4" />
-            <span className="sr-only">Open create journal dialog</span>
-          </Button>
-        </DialogTrigger>
-      </div>
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>Create New Journal</DialogTitle>
-        </DialogHeader>
-        <div className="grid grid-flow-row gap-4">
-          <Label htmlFor="title">Title</Label>
-          <Input
-            id="title"
-            placeholder="Enter journal title"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            disabled={creating}
-            required
-          />
-          <Label htmlFor="description">Description (optional)</Label>
-          <Textarea
-            id="description"
-            placeholder="Enter journal description"
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-            disabled={creating}
-            className="resize-none"
-            rows={3}
-          />
-          {createError && (
-            <div className="bg-destructive/10 text-destructive rounded-md p-3 text-sm">
-              {createError}
+    <AlertDialog open={open} onOpenChange={setOpen}>
+      <AlertDialogTrigger asChild>
+        <Button variant="outline">Create Journal</Button>
+      </AlertDialogTrigger>
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle>Create a new journal</AlertDialogTitle>
+          <AlertDialogDescription>Add a new journal to your collection.</AlertDialogDescription>
+        </AlertDialogHeader>
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(handleCreate)} className="space-y-6">
+            <FormField
+              control={form.control}
+              name="title"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Title</FormLabel>
+                  <FormControl>
+                    <Input placeholder="My awesome journal" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="description"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Description</FormLabel>
+                  <FormControl>
+                    <Textarea
+                      placeholder="A brief description of what this journal is about"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <div>
+              <Label htmlFor="color">Color</Label>
+              <ColorPicker selectedColor={color} onColorChange={setColor} />
             </div>
-          )}
-        </div>
-        <DialogFooter className="mt-4">
-          <Button onClick={handleCreate} disabled={creating} className="cursor-pointer">
-            {creating ? "Creating..." : "Create"}
-          </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+
+            <AlertDialogFooter>
+              <AlertDialogCancel>Cancel</AlertDialogCancel>
+              <AlertDialogAction type="submit">Create</AlertDialogAction>
+            </AlertDialogFooter>
+          </form>
+        </Form>
+      </AlertDialogContent>
+    </AlertDialog>
   );
 }

@@ -21,14 +21,17 @@ export async function GET() {
 
 export async function POST(req: Request) {
   const supabase = await createClient();
-
   const user = await getUserOrThrow(supabase);
 
   const body = await req.json();
-  const { title, description } = body;
+  const { title, description, color } = body;
 
   if (!title || typeof title !== "string") {
     return NextResponse.json({ error: "Title is required" }, { status: 400 });
+  }
+
+  if (!color || typeof color !== "string") {
+    return NextResponse.json({ error: "Color is required" }, { status: 400 });
   }
 
   const { data: journal, error } = await supabase
@@ -37,7 +40,8 @@ export async function POST(req: Request) {
       {
         author_id: user.id,
         title,
-        description
+        description,
+        color_hex: color
       }
     ])
     .select()
