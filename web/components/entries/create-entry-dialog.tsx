@@ -26,6 +26,7 @@ import { useDialogStore } from "@/hooks/use-dialog-store";
 import { receiveReward } from "@/utils/receive-reward";
 import { zodResolver } from "@hookform/resolvers/zod";
 import axios from "axios";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { WithContext as ReactTags, SEPARATORS, type Tag } from "react-tag-input";
@@ -45,6 +46,8 @@ type CreateEntryDialogProps = {
 };
 
 export function CreateEntryDialog({ journalId, onEntryCreated }: CreateEntryDialogProps) {
+  const router = useRouter();
+
   const [tags, setTags] = useState<Tag[]>([]);
   const [creating, setCreating] = useState(false);
 
@@ -92,6 +95,8 @@ export function CreateEntryDialog({ journalId, onEntryCreated }: CreateEntryDial
       form.reset();
       setTags([]);
       dialog.close();
+
+      router.push(`/entry/${res.data.entry.id}`);
     } catch (err: any) {
       toast.error(err.response?.data?.error || "Failed to create entry");
     } finally {
