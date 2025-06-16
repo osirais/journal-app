@@ -1,8 +1,9 @@
 "use client";
 
 import { EntryDrawer } from "@/components/entries/entry-drawer";
-import EntryEditor from "@/components/entries/entry-editor";
 import { OutlineCombobox } from "@/components/entries/outline-combobox";
+import { TiptapEditor } from "@/components/entries/tiptap-editor";
+import { Markdown } from "@/components/markdown";
 import { TagComponent } from "@/components/tag-component";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -329,12 +330,15 @@ function EntryContent() {
           )}
         </div>
 
-        <div className="border-input bg-background rounded-md border p-4">
-          <EntryEditor
+        {isEditing ? (
+          <TiptapEditor
             content={entry.content}
             onCreate={(editor) => (editorRef.current = editor)}
           />
-        </div>
+        ) : (
+          <Markdown>{entry.content}</Markdown>
+        )}
+
         {isEditing && (
           <div className="flex gap-2">
             <Button

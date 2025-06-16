@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { cn } from "@/lib/utils";
-import { BubbleMenu, EditorContent, useEditor } from "@tiptap/react";
+import { BubbleMenu, Editor, EditorContent, useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import {
   Bold,
@@ -22,6 +22,7 @@ import { FC, useEffect, useState } from "react";
 import { Markdown } from "tiptap-markdown";
 
 interface TiptapEditorProps {
+  onCreate?: (editor: Editor) => void;
   content?: string;
   onChange?: (content: string) => void;
   placeholder?: string;
@@ -30,6 +31,7 @@ interface TiptapEditorProps {
 export const TiptapEditor: FC<TiptapEditorProps> = ({
   content = "<p>Start writing...</p>",
   onChange,
+  onCreate,
   placeholder = ""
 }) => {
   const [isFocused, setIsFocused] = useState(false);
@@ -111,6 +113,8 @@ export const TiptapEditor: FC<TiptapEditorProps> = ({
     if (!editor.getText().trim()) {
       editor.commands.setContent(content || "");
     }
+
+    if (onCreate) onCreate(editor);
   }, [editor]);
 
   if (!editor) {
