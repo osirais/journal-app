@@ -1,6 +1,7 @@
 import { ThemeProvider } from "@/contexts/theme-context";
 import { Geist } from "next/font/google";
 import "./globals.css";
+import { DialogProvider } from "@/components/dialog/dialog-provider";
 import { SearchDialog } from "@/components/search/search-dialog";
 import { Toaster } from "@/components/ui/sonner";
 import { defaultUrl } from "@/constants/url";
@@ -71,7 +72,7 @@ export default async function RootLayout({
           Skip to content
         </a>
         <ThemeProvider disableTransitionOnChange nonce={nonce}>
-          <SearchDialog />
+          <DialogProvider />
           <NextStepProvider>{children}</NextStepProvider>
           <Toaster />
         </ThemeProvider>
