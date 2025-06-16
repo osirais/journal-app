@@ -82,7 +82,7 @@ export function JournalsPage() {
           className="size-9 cursor-pointer rounded-full p-0"
         >
           <Plus className="size-4" />
-          <span className="sr-only">Create entry</span>
+          <span className="sr-only">Create journal</span>
         </Button>
       </div>
 

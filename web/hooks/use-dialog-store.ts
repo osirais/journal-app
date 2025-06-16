@@ -1,8 +1,12 @@
 import { create } from "zustand";
 
-export type DialogType = "search" | "create-journal";
+export type DialogType = "search" | "create-journal" | "create-entry";
 
-interface DialogData {}
+interface DialogData {
+  createEntryData?: {
+    journalId: string;
+  };
+}
 
 interface DialogStore {
   type: DialogType | null;

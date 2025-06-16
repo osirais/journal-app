@@ -4,8 +4,10 @@ import { CreateEntryDialog } from "@/components/entries/create-entry-dialog";
 import { EntriesSortDropdown } from "@/components/entries/entries-sort-dropdown";
 import { EntryCard } from "@/components/entries/entry-card";
 import { TagComponent } from "@/components/tag-component";
+import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useDialogStore } from "@/hooks/use-dialog-store";
 import type { JournalWithEntryCount, TagType } from "@/types";
 import { formatDateAgo } from "@/utils/format-date-ago";
 import axios from "axios";
@@ -43,6 +45,8 @@ export default function EntriesPage() {
   const [journalLoading, setJournalLoading] = useState(true);
 
   const [sort, setSort] = useState<"newest" | "oldest">("newest");
+
+  const dialog = useDialogStore();
 
   useEffect(() => {
     if (!journalId) return;
@@ -137,14 +141,22 @@ export default function EntriesPage() {
         )
       )}
 
-      <CreateEntryDialog
-        journalId={journalId as string}
-        onEntryCreated={(entry) => {
-          axios.get(`/api/entries?journalId=${journalId}`).then((res) => {
-            setEntries([entry, ...entries]);
-          });
-        }}
-      />
+      <div className="mb-6 flex items-center justify-between">
+        <h2 className="text-lg font-semibold">Create New Entry</h2>
+        <Button
+          onClick={() => {
+            dialog.open("create-entry", {
+              ...dialog.data,
+              createEntryData: { journalId: journalId as string }
+            });
+          }}
+          size="sm"
+          className="size-9 cursor-pointer rounded-full p-0"
+        >
+          <Plus className="size-4" />
+          <span className="sr-only">Create entry</span>
+        </Button>
+      </div>
 
       <div className="mb-6">
         <EntriesSortDropdown onSortChange={handleSortChange} defaultSort={sort} />
