@@ -1,6 +1,7 @@
 "use client";
 
 import { CreateEntryDialog } from "@/components/entries/create-entry-dialog";
+import { PickJournalDialog } from "@/components/entries/pick-journal-dialog";
 import { CreateJournalDialog } from "@/components/journals/create-journal-dialog";
 import { SearchDialog } from "@/components/search/search-dialog";
 import { useDialogStore } from "@/hooks/use-dialog-store";
@@ -26,6 +27,7 @@ export const DialogProvider = () => {
     <>
       <SearchDialog />
       <CreateJournalDialog onJournalCreated={onJournalCreated} />
+      <PickJournalDialog />
       <CreateEntryDialog
         journalId={dialogStore.data.createEntryData?.journalId ?? ""}
         onEntryCreated={onEntryCreated}

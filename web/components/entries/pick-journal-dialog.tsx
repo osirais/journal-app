@@ -1,44 +1,44 @@
 "use client";
 
-import { useSearchActions } from "@/components/search/search-actions";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { useDialogStore } from "@/hooks/use-dialog-store";
-import { Search, X } from "lucide-react";
+import { BookOpen, Search, X } from "lucide-react";
 import { useEffect, useState } from "react";
 
-export function SearchDialog() {
+export function PickJournalDialog() {
   const dialog = useDialogStore();
-
-  const isDialogOpen = dialog.isOpen && dialog.type === "search";
+  const isDialogOpen = dialog.isOpen && dialog.type === "pick-journal";
 
   const [query, setQuery] = useState("");
   const [selectedIndex, setSelectedIndex] = useState(0);
+  const [journals, setJournals] = useState<{ id: string; title: string }[]>([]);
 
-  const searchActions = useSearchActions();
+  useEffect(() => {
+    const loadJournals = async () => {
+      const res = await fetch("/api/journal-names-ids");
+      const { journals } = await res.json();
+      setJournals(journals);
+    };
+    loadJournals();
+  }, []);
 
-  const filteredActions =
-    query === ""
-      ? searchActions
-      : searchActions.filter((action) => action.name.toLowerCase().includes(query.toLowerCase()));
+  const filteredJournals = journals.filter((j) =>
+    j.title.toLowerCase().includes(query.toLowerCase())
+  );
 
   useEffect(() => {
     setSelectedIndex(0);
-  }, [query]);
+  }, [query, filteredJournals.length]);
 
-  const executeAction = (action: (typeof searchActions)[0]) => {
-    action.action();
+  const handleSelect = (journal: { id: string; title: string }) => {
+    dialog.open("create-entry", { ...dialog.data, createEntryData: { journalId: journal.id } });
+
     setQuery("");
   };
 
   useEffect(() => {
     function onKeyDown(e: KeyboardEvent) {
-      if (e.ctrlKey && e.key.toLowerCase() === "k") {
-        e.preventDefault();
-        dialog.open("search");
-        return;
-      }
-
       // needed so doesn't interrupt other dialogs
       if (!isDialogOpen) return;
 
@@ -50,27 +50,32 @@ export function SearchDialog() {
 
       if (e.key === "ArrowDown") {
         e.preventDefault();
-        setSelectedIndex((prev) => (prev + 1) % filteredActions.length);
+        setSelectedIndex((prev) => (prev + 1) % filteredJournals.length);
         return;
       }
 
       if (e.key === "ArrowUp") {
         e.preventDefault();
-        setSelectedIndex((prev) => (prev - 1 + filteredActions.length) % filteredActions.length);
+        setSelectedIndex((prev) => (prev - 1 + filteredJournals.length) % filteredJournals.length);
         return;
       }
 
-      if (e.key === "Enter" && filteredActions[selectedIndex]) {
+      if (e.key === "Enter") {
         e.preventDefault();
-        const action = filteredActions[selectedIndex];
-        executeAction(action);
+        const journal = filteredJournals[selectedIndex];
+        if (journal) {
+          console.log("Selected Journal", journal);
+          handleSelect(journal);
+        }
         return;
       }
+
+      console.log("Key pressed:", e.key);
     }
 
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
-  }, [open, filteredActions, selectedIndex, dialog, executeAction]);
+  }, [isDialogOpen, filteredJournals, selectedIndex]);
 
   return (
     <Dialog open={isDialogOpen} onOpenChange={dialog.close}>
@@ -81,7 +86,7 @@ export function SearchDialog() {
             <Search className="text-muted-foreground h-4 w-4" />
             <input
               type="text"
-              placeholder="Search"
+              placeholder="Search journals"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               autoFocus
@@ -97,28 +102,28 @@ export function SearchDialog() {
             </Button>
           </div>
           <div className="max-h-80 overflow-y-auto">
-            {filteredActions.length > 0 ? (
+            {filteredJournals.length > 0 ? (
               <div className="p-1">
-                {filteredActions.map((action, index) => (
+                {filteredJournals.map((journal, index) => (
                   <button
-                    key={index}
+                    key={journal.id}
                     className={`flex w-full items-center gap-2 rounded p-2 text-left text-sm transition-colors ${
                       index === selectedIndex
                         ? "bg-accent text-accent-foreground"
                         : "hover:bg-muted"
                     }`}
-                    onClick={() => executeAction(action)}
+                    onClick={() => handleSelect(journal)}
                     onMouseEnter={() => setSelectedIndex(index)}
                   >
-                    <action.icon className="text-muted-foreground h-4 w-4" />
-                    <span>{action.name}</span>
+                    <BookOpen className="text-muted-foreground h-4 w-4" />
+                    <span>{journal.title}</span>
                   </button>
                 ))}
               </div>
             ) : (
               <div className="py-8 text-center">
                 <Search className="text-muted-foreground mx-auto mb-2 h-8 w-8" />
-                <p className="text-muted-foreground text-sm">No results found</p>
+                <p className="text-muted-foreground text-sm">No journals found</p>
               </div>
             )}
           </div>
