@@ -82,8 +82,6 @@ export function CreateEntryDialog({ journalId, onEntryCreated }: CreateEntryDial
         tags: tags.map((t) => t.text.toLowerCase())
       });
 
-      console.log(values);
-
       const { reward, streak } = res.data;
       if (reward) {
         receiveReward(`Daily journal entry reward: +${reward} droplets!`, streak);

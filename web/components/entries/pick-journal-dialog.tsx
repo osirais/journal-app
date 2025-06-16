@@ -63,13 +63,10 @@ export function PickJournalDialog() {
         e.preventDefault();
         const journal = filteredJournals[selectedIndex];
         if (journal) {
-          console.log("Selected Journal", journal);
           handleSelect(journal);
         }
         return;
       }
-
-      console.log("Key pressed:", e.key);
     }
 
     window.addEventListener("keydown", onKeyDown);
