@@ -4,6 +4,7 @@ import { useSearchActions } from "@/components/search/search-actions";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { useDialogStore } from "@/hooks/use-dialog-store";
+import { fuzzyFind } from "@/utils/fuzzy-find";
 import { Search, X } from "lucide-react";
 import { useEffect, useState } from "react";
 
@@ -17,10 +18,7 @@ export function SearchDialog() {
 
   const searchActions = useSearchActions();
 
-  const filteredActions =
-    query === ""
-      ? searchActions
-      : searchActions.filter((action) => action.name.toLowerCase().includes(query.toLowerCase()));
+  const filteredActions = query === "" ? searchActions : fuzzyFind(searchActions, "name", query);
 
   useEffect(() => {
     setSelectedIndex(0);

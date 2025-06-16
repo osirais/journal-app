@@ -3,6 +3,7 @@
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { useDialogStore } from "@/hooks/use-dialog-store";
+import { fuzzyFind } from "@/utils/fuzzy-find";
 import { BookOpen, Search, X } from "lucide-react";
 import { useEffect, useState } from "react";
 
@@ -23,9 +24,7 @@ export function PickJournalDialog() {
     loadJournals();
   }, []);
 
-  const filteredJournals = journals.filter((j) =>
-    j.title.toLowerCase().includes(query.toLowerCase())
-  );
+  const filteredJournals = query === "" ? journals : fuzzyFind(journals, "title", query);
 
   useEffect(() => {
     setSelectedIndex(0);
