@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import type { JournalWithEntryCount } from "@/types";
 import { formatDateAgo } from "@/utils/format-date-ago";
-import { CalendarIcon, Clock, Edit, MoreVertical, Trash2 } from "lucide-react";
+import { CalendarIcon, Clock, Edit, MoreVertical, NotebookPen, Trash2 } from "lucide-react";
 import Link from "next/link";
 import type React from "react";
 import type { FC } from "react";
@@ -60,8 +60,10 @@ export const JournalCard: FC<JournalCardProps> = ({
           <div className="flex items-start gap-4">
             <div
               style={{ backgroundColor: journal.color_hex }}
-              className="size-20 flex-shrink-0 overflow-hidden rounded-lg border"
-            ></div>
+              className="grid size-20 place-content-center rounded-lg border"
+            >
+              <NotebookPen className="text-white/50" size={48} />
+            </div>
             <div className="flex flex-1 flex-col overflow-hidden">
               <h3 className="line-clamp-2 text-base font-semibold leading-tight">
                 {journal.title}
