@@ -1,6 +1,7 @@
 "use client";
 
 import { OnboardProfile } from "@/components/onboarding/onboard-profile";
+import { OnboardTheme } from "@/components/onboarding/onboard-theme";
 import { OnboardingStep1 } from "@/components/onboarding/onboarding-step1";
 import { OnboardingStep2 } from "@/components/onboarding/onboarding-step2";
 import { OnboardingStep3 } from "@/components/onboarding/onboarding-step3";
@@ -18,7 +19,7 @@ import { useActionState, useEffect, useState, useTransition } from "react";
 
 export function OnboardingPage() {
   const [currentStep, setCurrentStep] = useState(1);
-  const totalSteps = 10;
+  const totalSteps = 11;
   const router = useRouter();
 
   const [direction, setDirection] = useState(0);
@@ -56,6 +57,8 @@ export function OnboardingPage() {
       case 2:
         return <OnboardProfile onSuccess={nextStep} />;
       case 3:
+        return <OnboardTheme onSuccess={nextStep} />;
+      case 4:
         return (
           <OnboardingStep2
             onSuccess={(name) => {
@@ -64,19 +67,19 @@ export function OnboardingPage() {
             }}
           />
         );
-      case 4:
-        return <OnboardingStep3 journalName={journalName!} onSuccess={nextStep} />;
       case 5:
-        return <OnboardingStep4 onSuccess={nextStep} />;
+        return <OnboardingStep3 journalName={journalName!} onSuccess={nextStep} />;
       case 6:
-        return <OnboardingStep5 onSuccess={nextStep} />;
+        return <OnboardingStep4 onSuccess={nextStep} />;
       case 7:
-        return <OnboardingStep6 onSuccess={nextStep} />;
+        return <OnboardingStep5 onSuccess={nextStep} />;
       case 8:
-        return <OnboardingStep7 onSuccess={nextStep} />;
+        return <OnboardingStep6 onSuccess={nextStep} />;
       case 9:
-        return <OnboardingStep8 onSuccess={nextStep} />;
+        return <OnboardingStep7 onSuccess={nextStep} />;
       case 10:
+        return <OnboardingStep8 onSuccess={nextStep} />;
+      case 11:
         return <OnboardingStep9 onSuccess={handleFinish} />;
       default:
         return null;
@@ -110,7 +113,7 @@ export function OnboardingPage() {
         <div className="mb-12 w-full max-w-4xl px-8 text-center">
           <h1 className="mb-2 text-3xl font-semibold">Welcome</h1>
 
-          <div className="relative flex min-h-[300px] w-full items-center justify-center overflow-hidden">
+          <div className="relative flex min-h-[300px] w-full items-center justify-center">
             <AnimatePresence mode="wait" initial={false} custom={direction}>
               <motion.div
                 key={currentStep}

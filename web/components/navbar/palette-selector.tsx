@@ -50,6 +50,7 @@ export function PaletteGrid() {
       {filteredPalettes.map((palette) => (
         <Button
           key={palette.name}
+          type="button"
           className={cn("py-5", paletteName === palette.name && "ring-2")}
           style={{
             backgroundColor: palette.colors.bg,
@@ -98,7 +99,7 @@ export function PaletteSelector({ children }: { children?: ReactNode }) {
       {children ? (
         children
       ) : (
-        <div className="flex min-h-0 flex-1 flex-col">
+        <div className="flex min-h-0 w-full flex-1 flex-col">
           <PaletteSelector>
             <PaletteInput />
             <ScrollArea className="min-h-0 flex-1">
