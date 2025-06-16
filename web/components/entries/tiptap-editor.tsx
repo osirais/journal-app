@@ -108,9 +108,10 @@ export const TiptapEditor: FC<TiptapEditorProps> = ({
 
   useEffect(() => {
     if (!editor) return;
-
-    editor.commands.setContent(content || "");
-  }, [content, editor]);
+    if (!editor.getText().trim()) {
+      editor.commands.setContent(content || "");
+    }
+  }, [editor]);
 
   if (!editor) {
     return null;
