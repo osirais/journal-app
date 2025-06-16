@@ -1,33 +1,57 @@
+import { useDialogStore } from "@/hooks/use-dialog-store";
 import { ClipboardList, LayoutDashboard, NotebookPen, Trophy, UserCog } from "lucide-react";
 import { useRouter } from "next/navigation";
 
 export function useSearchActions() {
   const router = useRouter();
 
+  const dialog = useDialogStore();
+
   return [
     {
       name: "Dashboard",
-      action: () => router.push("/dashboard"),
+      action: () => {
+        dialog.close();
+        router.push("/dashboard");
+      },
       icon: LayoutDashboard
     },
     {
       name: "Journals",
-      action: () => router.push("/journals"),
+      action: () => {
+        dialog.close();
+        router.push("/journals");
+      },
       icon: NotebookPen
     },
     {
       name: "Tasks",
-      action: () => router.push("/tasks"),
+      action: () => {
+        dialog.close();
+        router.push("/tasks");
+      },
       icon: ClipboardList
     },
     {
       name: "Achievements",
-      action: () => router.push("/achievements"),
+      action: () => {
+        dialog.close();
+        router.push("/achievements");
+      },
       icon: Trophy
     },
     {
       name: "Manage Account",
-      action: () => router.push("/manage-account"),
+      action: () => {
+        dialog.close();
+        router.push("/manage-account");
+      },
+      icon: UserCog
+    },
+    {
+      name: "Create New Entry",
+      action: () =>
+        dialog.open("create-entry", { ...dialog.data, createEntryData: { journalId: "" } }),
       icon: UserCog
     }
   ];

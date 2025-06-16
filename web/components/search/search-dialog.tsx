@@ -28,7 +28,6 @@ export function SearchDialog() {
 
   const executeAction = (action: (typeof searchActions)[0]) => {
     action.action();
-    dialog.close();
     setQuery("");
   };
 
@@ -44,6 +43,7 @@ export function SearchDialog() {
 
       if (e.key === "Escape") {
         dialog.close();
+        setQuery("");
         return;
       }
 
