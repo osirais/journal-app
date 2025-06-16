@@ -4,7 +4,7 @@ import { getUserOrThrow } from "@/utils/get-user-throw";
 import { createClient } from "@/utils/supabase/server";
 import { revalidatePath } from "next/cache";
 
-export async function updateJournal(journalId: string, formData: FormData) {
+export async function updateJournal(journalId: string, formData: FormData, color: string) {
   const supabase = await createClient();
 
   const title = formData.get("title") as string;
@@ -22,6 +22,7 @@ export async function updateJournal(journalId: string, formData: FormData) {
       .update({
         title: title.trim(),
         description: description?.trim() || null,
+        color_hex: color,
         updated_at: new Date().toISOString()
       })
       .eq("id", journalId)

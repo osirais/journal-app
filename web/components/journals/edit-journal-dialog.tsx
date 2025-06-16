@@ -1,23 +1,40 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
+import { ColorPicker } from "@/components/journals/color-picker";
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle
-} from "@/components/ui/dialog";
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle
+} from "@/components/ui/alert-dialog";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage
+} from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { updateJournal } from "@/lib/actions/journal-actions";
 import type { JournalWithEntryCount } from "@/types";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2 } from "lucide-react";
-import type React from "react";
 import { useEffect, useState, useTransition } from "react";
+import { useForm } from "react-hook-form";
 import { toast } from "sonner";
+import * as z from "zod";
+
+const formSchema = z.object({
+  title: z.string().nonempty({ message: "Title is required" }),
+  description: z.string().optional()
+});
 
 type EditJournalDialogProps = {
   journal: JournalWithEntryCount;
@@ -33,105 +50,113 @@ export function EditJournalDialog({
   onJournalUpdated
 }: EditJournalDialogProps) {
   const [isPending, startTransition] = useTransition();
-  const [title, setTitle] = useState(journal.title);
-  const [description, setDescription] = useState(journal.description || "");
+  const [color, setColor] = useState(journal.color_hex);
 
-  // reset form when dialog opens
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      title: journal.title,
+      description: journal.description || ""
+    }
+  });
+
   useEffect(() => {
     if (open) {
-      setTitle(journal.title);
-      setDescription(journal.description || "");
+      form.reset({
+        title: journal.title,
+        description: journal.description || ""
+      });
     }
-  }, [open, journal]);
+  }, [open, journal, form]);
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-
-    if (!title.trim()) {
-      toast.error("Title is required");
-      return;
-    }
-
-    const formData = new FormData();
-    formData.append("title", title.trim());
-    formData.append("description", description.trim());
-
+  function onSubmit(values: z.infer<typeof formSchema>) {
     startTransition(async () => {
-      const result = await updateJournal(journal.id, formData);
+      const formData = new FormData();
+      formData.append("title", values.title.trim());
+      formData.append("description", values.description?.trim() || "");
+
+      const result = await updateJournal(journal.id, formData, color);
 
       if (result.error) {
         toast.error(result.error);
-      } else {
-        toast.success("Journal updated successfully");
-
-        const updatedJournal: JournalWithEntryCount = {
-          ...journal,
-          title: title.trim(),
-          description: description.trim(),
-          updated_at: new Date().toISOString()
-        };
-
-        // notify parent component about the update
-        if (onJournalUpdated) {
-          onJournalUpdated(updatedJournal);
-        }
-
-        onOpenChange(false);
+        return;
       }
+
+      toast.success("Journal updated");
+
+      const updatedJournal: JournalWithEntryCount = {
+        ...journal,
+        title: values.title.trim(),
+        description: values.description?.trim() || "",
+        color_hex: color
+      };
+
+      if (onJournalUpdated) {
+        onJournalUpdated(updatedJournal);
+      }
+
+      onOpenChange(false);
     });
-  };
+  }
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[425px]">
-        <form onSubmit={handleSubmit}>
-          <DialogHeader>
-            <DialogTitle>Edit Journal</DialogTitle>
-            <DialogDescription>
-              Make changes to your journal here. Click save when you're done.
-            </DialogDescription>
-          </DialogHeader>
-          <div className="grid gap-4 py-4">
-            <div className="grid gap-2">
-              <Label htmlFor="title">Title</Label>
-              <Input
-                id="title"
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
-                placeholder="Enter journal title"
-                disabled={isPending}
-                required
-              />
+    <AlertDialog open={open} onOpenChange={onOpenChange}>
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle>Edit Journal</AlertDialogTitle>
+          <AlertDialogDescription>
+            Make changes to your journal. Click save when you're done.
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+            <FormField
+              control={form.control}
+              name="title"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Title</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Journal title" {...field} disabled={isPending} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="description"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Description</FormLabel>
+                  <FormControl>
+                    <Textarea
+                      placeholder="Journal description (optional)"
+                      rows={3}
+                      {...field}
+                      disabled={isPending}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <div>
+              <Label htmlFor="color">Color</Label>
+              <ColorPicker selectedColor={color} onColorChange={setColor} />
             </div>
-            <div className="grid gap-2">
-              <Label htmlFor="description">Description</Label>
-              <Textarea
-                id="description"
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-                placeholder="Enter journal description (optional)"
-                disabled={isPending}
-                rows={3}
-              />
-            </div>
-          </div>
-          <DialogFooter>
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => onOpenChange(false)}
-              disabled={isPending}
-              className="cursor-pointer"
-            >
-              Cancel
-            </Button>
-            <Button type="submit" disabled={isPending} className="cursor-pointer">
-              {isPending && <Loader2 className="mr-2 size-4 animate-spin" />}
-              Save Changes
-            </Button>
-          </DialogFooter>
-        </form>
-      </DialogContent>
-    </Dialog>
+            <AlertDialogFooter>
+              <AlertDialogCancel type="button" className="cursor-pointer">
+                Cancel
+              </AlertDialogCancel>
+              <AlertDialogAction type="submit" className="cursor-pointer" disabled={isPending}>
+                {isPending && <Loader2 className="mr-2 size-4 animate-spin" />}
+                Save Changes
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </form>
+        </Form>
+      </AlertDialogContent>
+    </AlertDialog>
   );
 }
