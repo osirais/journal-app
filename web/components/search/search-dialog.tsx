@@ -3,14 +3,14 @@
 import { useSearchActions } from "@/components/search/search-actions";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
-import { useDialog } from "@/hooks/useDialogStore";
+import { useDialog } from "@/hooks/use-dialog-store";
 import { Search, X } from "lucide-react";
 import { useEffect, useState } from "react";
 
 export function SearchDialog() {
   const dialog = useDialog();
 
-  const isModalOpen = dialog.isOpen && dialog.type === "search";
+  const isDialogOpen = dialog.isOpen && dialog.type === "search";
 
   const [query, setQuery] = useState("");
   const [selectedIndex, setSelectedIndex] = useState(0);
@@ -72,7 +72,7 @@ export function SearchDialog() {
   };
 
   return (
-    <Dialog open={isModalOpen} onOpenChange={dialog.onClose}>
+    <Dialog open={isDialogOpen} onOpenChange={dialog.onClose}>
       <DialogTitle className="sr-only">Search</DialogTitle>
       <DialogContent className="max-w-lg p-0">
         <div className="flex flex-col">

@@ -1,11 +1,14 @@
 "use client";
 
-import { CreateJournalDialog } from "@/components/journals/create-journal-dialog";
 import { JournalCard } from "@/components/journals/journal-card";
 import { JournalCardSkeleton } from "@/components/journals/journal-card-skeleton";
 import { JournalsSortDropdown } from "@/components/journals/journals-sort-dropdown";
+import { Button } from "@/components/ui/button";
+import { useDialog } from "@/hooks/use-dialog-store";
+import { useJournalCallbackStore } from "@/hooks/use-journal-callback-store";
 import type { JournalWithEntryCount } from "@/types";
 import axios from "axios";
+import { Plus } from "lucide-react";
 import { useEffect, useState } from "react";
 
 type SortOption =
@@ -21,6 +24,8 @@ export function JournalsPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [sort, setSort] = useState<SortOption>("newest");
+
+  const dialog = useDialog();
 
   const fetchJournals = async (sortBy: SortOption) => {
     setLoading(true);
@@ -43,9 +48,15 @@ export function JournalsPage() {
     setSort(sortBy);
   };
 
+  const setOnJournalCreated = useJournalCallbackStore((s) => s.setOnJournalCreated);
+
   const handleJournalCreated = (journal: JournalWithEntryCount) => {
     setJournals((prev) => [journal, ...prev]);
   };
+
+  useEffect(() => {
+    setOnJournalCreated(handleJournalCreated);
+  }, [handleJournalCreated]);
 
   const handleJournalDeleted = (journal: JournalWithEntryCount) => {
     setJournals((prev) => prev.filter((j) => j.id !== journal.id));
@@ -60,7 +71,21 @@ export function JournalsPage() {
           {error}
         </div>
       )}
-      <CreateJournalDialog onJournalCreated={handleJournalCreated} />
+
+      <div className="mb-6 flex items-center justify-between">
+        <h2 className="text-lg font-semibold">Create New Journal</h2>
+        <Button
+          onClick={() => {
+            dialog.onOpen("create-journal");
+          }}
+          size="sm"
+          className="size-9 cursor-pointer rounded-full p-0"
+        >
+          <Plus className="size-4" />
+          <span className="sr-only">Create entry</span>
+        </Button>
+      </div>
+
       <div className="mb-6">
         <JournalsSortDropdown onSortChange={handleSortChange} defaultSort={sort} />
       </div>

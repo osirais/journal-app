@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useArrowKeyNavigation } from "@/hooks/useArrowKeyNavigation";
+import { useArrowKeyNavigation } from "@/hooks/use-arrow-key-navigation";
 import { getUserOrThrow } from "@/utils/get-user-throw";
 import { createClient } from "@/utils/supabase/client";
 import type { Editor } from "@tiptap/react";

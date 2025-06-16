@@ -9,7 +9,7 @@ import {
   CarouselPrevious
 } from "@/components/ui/carousel";
 import { steps } from "@/constants/steps";
-import { useArrowKeyNavigation } from "@/hooks/useArrowKeyNavigation";
+import { useArrowKeyNavigation } from "@/hooks/use-arrow-key-navigation";
 import { NavigationAdapter, NextStep, useNextStep } from "nextstepjs";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import ShadcnCustomCard from "../tour/tour-card";

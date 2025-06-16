@@ -9,8 +9,7 @@ import {
   AlertDialogDescription,
   AlertDialogFooter,
   AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger
+  AlertDialogTitle
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import {
@@ -24,6 +23,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { useDialog } from "@/hooks/use-dialog-store";
 import { zodResolver } from "@hookform/resolvers/zod";
 import axios from "axios";
 import { Plus } from "lucide-react";
@@ -42,7 +42,10 @@ interface CreateJournalDialogProps {
 }
 
 export function CreateJournalDialog({ onJournalCreated }: CreateJournalDialogProps) {
-  const [open, setOpen] = useState(false);
+  const dialog = useDialog();
+
+  const isDialogOpen = dialog.isOpen && dialog.type === "create-journal";
+
   const [color, setColor] = useState("#99aab5");
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -69,7 +72,7 @@ export function CreateJournalDialog({ onJournalCreated }: CreateJournalDialogPro
 
       form.reset();
       setColor("#99aab5");
-      setOpen(false);
+      dialog.onClose();
     } catch (err: any) {
       toast.error("Failed to create journal");
       console.error(err);
@@ -77,70 +80,58 @@ export function CreateJournalDialog({ onJournalCreated }: CreateJournalDialogPro
   }
 
   return (
-    <div className="mb-6 flex items-center justify-between">
-      <h2 className="text-lg font-semibold">Create New Journal</h2>
-      <AlertDialog open={open} onOpenChange={setOpen}>
-        <AlertDialogTrigger asChild>
-          <Button size="sm" className="size-9 cursor-pointer rounded-full p-0">
-            <Plus className="size-4" />
-            <span className="sr-only">Create entry</span>
-          </Button>
-        </AlertDialogTrigger>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Create a new journal</AlertDialogTitle>
-            <AlertDialogDescription>Add a new journal to your collection.</AlertDialogDescription>
-          </AlertDialogHeader>
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(handleCreate)} className="space-y-6">
-              <FormField
-                control={form.control}
-                name="title"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Title</FormLabel>
-                    <FormControl>
-                      <Input placeholder="My awesome journal" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="description"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Description</FormLabel>
-                    <FormControl>
-                      <Textarea
-                        placeholder="A brief description of what this journal is about"
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <div>
-                <Label htmlFor="color">Color</Label>
-                <ColorPicker selectedColor={color} onColorChange={setColor} />
-              </div>
-
-              <AlertDialogFooter>
-                <AlertDialogCancel type="button" className="cursor-pointer">
-                  Cancel
-                </AlertDialogCancel>
-                <AlertDialogAction type="submit" className="cursor-pointer">
-                  Create
-                </AlertDialogAction>
-              </AlertDialogFooter>
-            </form>
-          </Form>
-        </AlertDialogContent>
-      </AlertDialog>
-    </div>
+    <AlertDialog open={isDialogOpen} onOpenChange={dialog.onClose}>
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle>Create a new journal</AlertDialogTitle>
+          <AlertDialogDescription>Add a new journal to your collection.</AlertDialogDescription>
+        </AlertDialogHeader>
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(handleCreate)} className="space-y-6">
+            <FormField
+              control={form.control}
+              name="title"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Title</FormLabel>
+                  <FormControl>
+                    <Input placeholder="My awesome journal" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="description"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Description</FormLabel>
+                  <FormControl>
+                    <Textarea
+                      placeholder="A brief description of what this journal is about"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <div>
+              <Label htmlFor="color">Color</Label>
+              <ColorPicker selectedColor={color} onColorChange={setColor} />
+            </div>
+            <AlertDialogFooter>
+              <AlertDialogCancel type="button" className="cursor-pointer">
+                Cancel
+              </AlertDialogCancel>
+              <AlertDialogAction type="submit" className="cursor-pointer">
+                Create
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </form>
+        </Form>
+      </AlertDialogContent>
+    </AlertDialog>
   );
 }

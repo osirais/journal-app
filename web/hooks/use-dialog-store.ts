@@ -1,6 +1,6 @@
 import { create } from "zustand";
 
-export type DialogType = "search";
+export type DialogType = "search" | "create-journal";
 
 interface DialogData {}
 
