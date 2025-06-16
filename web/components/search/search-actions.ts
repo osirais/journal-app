@@ -52,7 +52,7 @@ export function useSearchActions() {
       name: "Create New Entry",
       action: () =>
         dialog.open("create-entry", { ...dialog.data, createEntryData: { journalId: "" } }),
-      icon: UserCog
+      icon: NotebookPen
     }
   ];
 }
