@@ -6,6 +6,7 @@ CREATE OR REPLACE FUNCTION get_entries_by_journal(
 RETURNS TABLE (
   id UUID,
   journal_id UUID,
+  title TEXT,
   content TEXT,
   created_at TIMESTAMPTZ,
   updated_at TIMESTAMPTZ,
@@ -29,6 +30,7 @@ BEGIN
     SELECT
       e.id,
       e.journal_id,
+      e.title,
       e.content,
       e.created_at,
       e.updated_at,

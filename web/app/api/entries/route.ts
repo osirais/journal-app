@@ -56,6 +56,10 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "journalId is required" }, { status: 400 });
   }
 
+  if (!title || typeof title !== "string") {
+    return NextResponse.json({ error: "title is required" }, { status: 400 });
+  }
+
   if (!content || typeof content !== "string") {
     return NextResponse.json(
       { error: "content is required and must be a string" },
@@ -83,7 +87,7 @@ export async function POST(req: Request) {
     .insert([
       {
         journal_id: journalId,
-        title: title ?? null,
+        title,
         content
       }
     ])
