@@ -6,6 +6,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { useTheme } from "@/contexts/theme-context";
 import { Palette, palettes } from "@/lib/theme-palettes";
 import { cn } from "@/lib/utils";
+import { Separator } from "@radix-ui/react-dropdown-menu";
 import { Search } from "lucide-react";
 import { createContext, ReactNode, useContext, useEffect, useState } from "react";
 
@@ -35,6 +36,22 @@ function formatPaletteName(name: string) {
 
 export function PaletteGrid() {
   const { paletteName, setPaletteName } = useTheme();
+  const favoritePalettes = [
+    {
+      name: "light",
+      colors: {
+        bg: "oklch(1 0 0)",
+        main: "oklch(0.205 0 0)"
+      }
+    },
+    {
+      name: "dark",
+      colors: {
+        bg: "oklch(0.145 0 0)",
+        main: "oklch(0.922 0 0)"
+      }
+    }
+  ];
   const { filteredPalettes, query } = usePaletteSelectorContext();
 
   if (!filteredPalettes) {
@@ -46,24 +63,49 @@ export function PaletteGrid() {
   }
 
   return (
-    <div className="grid grid-cols-2 gap-2 p-4 pt-1">
-      {filteredPalettes.map((palette) => (
-        <Button
-          key={palette.name}
-          type="button"
-          className={cn("py-5", paletteName === palette.name && "ring-2")}
-          style={{
-            backgroundColor: palette.colors.bg,
-            color: palette.colors.main,
-            borderColor: palette.colors.subAlt
-          }}
-          onClick={() => setPaletteName(palette.name)}
-        >
-          <span className="block truncate text-sm font-medium">
-            {formatPaletteName(palette.name)}
-          </span>
-        </Button>
-      ))}
+    <div className="flex flex-col justify-center gap-3">
+      {favoritePalettes && (
+        <>
+          <div className="grid grid-cols-2 gap-2 px-4 py-1">
+            {favoritePalettes.map((palette) => (
+              <Button
+                key={palette.name}
+                type="button"
+                className={cn("py-5", paletteName === palette.name && "ring-2")}
+                style={{
+                  backgroundColor: palette.colors.bg,
+                  color: palette.colors.main
+                }}
+                onClick={() => setPaletteName(palette.name)}
+              >
+                <span className="block truncate text-sm font-medium">
+                  {formatPaletteName(palette.name)}
+                </span>
+              </Button>
+            ))}
+          </div>
+          <Separator className="border-1 mx-4" />
+        </>
+      )}
+      <div className="grid grid-cols-2 gap-2 p-4 pt-1">
+        {filteredPalettes.map((palette) => (
+          <Button
+            key={palette.name}
+            type="button"
+            className={cn("py-5", paletteName === palette.name && "ring-2")}
+            style={{
+              backgroundColor: palette.colors.bg,
+              color: palette.colors.main,
+              borderColor: palette.colors.subAlt
+            }}
+            onClick={() => setPaletteName(palette.name)}
+          >
+            <span className="block truncate text-sm font-medium">
+              {formatPaletteName(palette.name)}
+            </span>
+          </Button>
+        ))}
+      </div>
     </div>
   );
 }
