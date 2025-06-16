@@ -11,7 +11,6 @@ import {
   AlertDialogHeader,
   AlertDialogTitle
 } from "@/components/ui/alert-dialog";
-import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
@@ -23,10 +22,9 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { useDialog } from "@/hooks/use-dialog-store";
+import { useDialogStore } from "@/hooks/use-dialog-store";
 import { zodResolver } from "@hookform/resolvers/zod";
 import axios from "axios";
-import { Plus } from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -42,7 +40,7 @@ interface CreateJournalDialogProps {
 }
 
 export function CreateJournalDialog({ onJournalCreated }: CreateJournalDialogProps) {
-  const dialog = useDialog();
+  const dialog = useDialogStore();
 
   const isDialogOpen = dialog.isOpen && dialog.type === "create-journal";
 
@@ -72,7 +70,7 @@ export function CreateJournalDialog({ onJournalCreated }: CreateJournalDialogPro
 
       form.reset();
       setColor("#99aab5");
-      dialog.onClose();
+      dialog.close();
     } catch (err: any) {
       toast.error("Failed to create journal");
       console.error(err);
@@ -80,7 +78,7 @@ export function CreateJournalDialog({ onJournalCreated }: CreateJournalDialogPro
   }
 
   return (
-    <AlertDialog open={isDialogOpen} onOpenChange={dialog.onClose}>
+    <AlertDialog open={isDialogOpen} onOpenChange={dialog.close}>
       <AlertDialogContent>
         <AlertDialogHeader>
           <AlertDialogTitle>Create a new journal</AlertDialogTitle>

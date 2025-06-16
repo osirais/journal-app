@@ -3,12 +3,12 @@
 import { useSearchActions } from "@/components/search/search-actions";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
-import { useDialog } from "@/hooks/use-dialog-store";
+import { useDialogStore } from "@/hooks/use-dialog-store";
 import { Search, X } from "lucide-react";
 import { useEffect, useState } from "react";
 
 export function SearchDialog() {
-  const dialog = useDialog();
+  const dialog = useDialogStore();
 
   const isDialogOpen = dialog.isOpen && dialog.type === "search";
 
@@ -30,14 +30,14 @@ export function SearchDialog() {
     function onKeyDown(e: KeyboardEvent) {
       if (e.ctrlKey && e.key.toLowerCase() === "k") {
         e.preventDefault();
-        dialog.onOpen("search");
+        dialog.open("search");
         return;
       }
 
       if (!open) return;
 
       if (e.key === "Escape") {
-        dialog.onClose();
+        dialog.close();
         return;
       }
 
@@ -67,12 +67,12 @@ export function SearchDialog() {
 
   const executeAction = (action: (typeof searchActions)[0]) => {
     action.action();
-    dialog.onClose();
+    dialog.close();
     setQuery("");
   };
 
   return (
-    <Dialog open={isDialogOpen} onOpenChange={dialog.onClose}>
+    <Dialog open={isDialogOpen} onOpenChange={dialog.close}>
       <DialogTitle className="sr-only">Search</DialogTitle>
       <DialogContent className="max-w-lg p-0">
         <div className="flex flex-col">
@@ -89,7 +89,7 @@ export function SearchDialog() {
             <Button
               variant="ghost"
               size="sm"
-              onClick={() => dialog.onClose()}
+              onClick={() => dialog.close()}
               className="h-6 w-6 p-0"
             >
               <X className="h-3 w-3" />

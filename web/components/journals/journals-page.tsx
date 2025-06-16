@@ -4,7 +4,7 @@ import { JournalCard } from "@/components/journals/journal-card";
 import { JournalCardSkeleton } from "@/components/journals/journal-card-skeleton";
 import { JournalsSortDropdown } from "@/components/journals/journals-sort-dropdown";
 import { Button } from "@/components/ui/button";
-import { useDialog } from "@/hooks/use-dialog-store";
+import { useDialogStore } from "@/hooks/use-dialog-store";
 import { useJournalCallbackStore } from "@/hooks/use-journal-callback-store";
 import type { JournalWithEntryCount } from "@/types";
 import axios from "axios";
@@ -25,7 +25,7 @@ export function JournalsPage() {
   const [error, setError] = useState<string | null>(null);
   const [sort, setSort] = useState<SortOption>("newest");
 
-  const dialog = useDialog();
+  const dialog = useDialogStore();
 
   const fetchJournals = async (sortBy: SortOption) => {
     setLoading(true);
@@ -76,7 +76,7 @@ export function JournalsPage() {
         <h2 className="text-lg font-semibold">Create New Journal</h2>
         <Button
           onClick={() => {
-            dialog.onOpen("create-journal");
+            dialog.open("create-journal");
           }}
           size="sm"
           className="size-9 cursor-pointer rounded-full p-0"

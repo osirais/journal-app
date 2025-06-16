@@ -8,14 +8,14 @@ interface DialogStore {
   type: DialogType | null;
   data: DialogData;
   isOpen: boolean;
-  onOpen: (type: DialogType, data?: DialogData) => void;
-  onClose: () => void;
+  open: (type: DialogType, data?: DialogData) => void;
+  close: () => void;
 }
 
-export const useDialog = create<DialogStore>((set) => ({
+export const useDialogStore = create<DialogStore>((set) => ({
   type: null,
   data: {},
   isOpen: false,
-  onOpen: (type, data = {}) => set({ isOpen: true, type, data }),
-  onClose: () => set({ type: null, isOpen: false })
+  open: (type, data = {}) => set({ isOpen: true, type, data }),
+  close: () => set({ type: null, isOpen: false })
 }));
