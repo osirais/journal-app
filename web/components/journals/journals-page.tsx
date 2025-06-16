@@ -56,7 +56,7 @@ export function JournalsPage() {
 
   useEffect(() => {
     setOnJournalCreated(handleJournalCreated);
-  }, [handleJournalCreated]);
+  }, [setOnJournalCreated]);
 
   const handleJournalDeleted = (journal: JournalWithEntryCount) => {
     setJournals((prev) => prev.filter((j) => j.id !== journal.id));

@@ -27,7 +27,7 @@ export const DialogProvider = () => {
       <SearchDialog />
       <CreateJournalDialog onJournalCreated={onJournalCreated} />
       <CreateEntryDialog
-        journalId={dialogStore.data.createEntryData?.journalId!}
+        journalId={dialogStore.data.createEntryData?.journalId ?? ""}
         onEntryCreated={onEntryCreated}
       />
     </>

@@ -26,6 +26,12 @@ export function SearchDialog() {
     setSelectedIndex(0);
   }, [query]);
 
+  const executeAction = (action: (typeof searchActions)[0]) => {
+    action.action();
+    dialog.close();
+    setQuery("");
+  };
+
   useEffect(() => {
     function onKeyDown(e: KeyboardEvent) {
       if (e.ctrlKey && e.key.toLowerCase() === "k") {
@@ -63,13 +69,7 @@ export function SearchDialog() {
 
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
-  }, [open, filteredActions, selectedIndex]);
-
-  const executeAction = (action: (typeof searchActions)[0]) => {
-    action.action();
-    dialog.close();
-    setQuery("");
-  };
+  }, [open, filteredActions, selectedIndex, dialog, executeAction]);
 
   return (
     <Dialog open={isDialogOpen} onOpenChange={dialog.close}>

@@ -115,7 +115,7 @@ export const TiptapEditor: FC<TiptapEditorProps> = ({
     }
 
     if (onCreate) onCreate(editor);
-  }, [editor]);
+  }, [editor, content, onCreate]);
 
   if (!editor) {
     return null;
