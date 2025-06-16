@@ -146,7 +146,9 @@ export function CreateEntryDialog({ journalId, onEntryCreated }: CreateEntryDial
               />
 
               <div>
-                <Label htmlFor="tags">Tags</Label>
+                <Label htmlFor="tags" className="mb-2">
+                  Tags
+                </Label>
                 <Card className="p-2">
                   <ReactTags
                     tags={tags}

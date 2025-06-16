@@ -38,7 +38,7 @@ export async function GET(req: Request) {
 
   const filteredEntries = tagId
     ? entries.filter((entry: any) => {
-        return entry.entry_tags?.some((tag: any) => tag.id === tagId);
+        return entry.entry_tags?.some((tag: TagType) => tag.id === tagId);
       })
     : entries;
 
