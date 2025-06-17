@@ -1,16 +1,15 @@
 "use client";
 
 import { ColorPicker } from "@/components/journals/color-picker";
+import { Button } from "@/components/ui/button";
 import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle
-} from "@/components/ui/alert-dialog";
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle
+} from "@/components/ui/dialog";
 import {
   Form,
   FormControl,
@@ -100,14 +99,14 @@ export function EditJournalDialog({
   }
 
   return (
-    <AlertDialog open={open} onOpenChange={onOpenChange}>
-      <AlertDialogContent>
-        <AlertDialogHeader>
-          <AlertDialogTitle>Edit Journal</AlertDialogTitle>
-          <AlertDialogDescription>
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Edit Journal</DialogTitle>
+          <DialogDescription>
             Make changes to your journal. Click save when you're done.
-          </AlertDialogDescription>
-        </AlertDialogHeader>
+          </DialogDescription>
+        </DialogHeader>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
             <FormField
@@ -145,18 +144,15 @@ export function EditJournalDialog({
               <Label htmlFor="color">Color</Label>
               <ColorPicker selectedColor={color} onColorChange={setColor} />
             </div>
-            <AlertDialogFooter>
-              <AlertDialogCancel type="button" className="cursor-pointer">
-                Cancel
-              </AlertDialogCancel>
-              <AlertDialogAction type="submit" className="cursor-pointer" disabled={isPending}>
+            <DialogFooter>
+              <Button type="submit" className="cursor-pointer" disabled={isPending}>
                 {isPending && <Loader2 className="mr-2 size-4 animate-spin" />}
                 Save Changes
-              </AlertDialogAction>
-            </AlertDialogFooter>
+              </Button>
+            </DialogFooter>
           </form>
         </Form>
-      </AlertDialogContent>
-    </AlertDialog>
+      </DialogContent>
+    </Dialog>
   );
 }

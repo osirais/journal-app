@@ -1,17 +1,16 @@
 "use client";
 
 import { TiptapEditor } from "@/components/entries/tiptap-editor";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle
-} from "@/components/ui/alert-dialog";
+import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle
+} from "@/components/ui/dialog";
 import {
   Form,
   FormControl,
@@ -103,12 +102,12 @@ export function CreateEntryDialog({ journalId, onEntryCreated }: CreateEntryDial
   };
 
   return (
-    <AlertDialog open={isDialogOpen} onOpenChange={dialog.close}>
-      <AlertDialogContent>
-        <AlertDialogHeader>
-          <AlertDialogTitle>Create a new entry</AlertDialogTitle>
-          <AlertDialogDescription>Add a new entry to your journal.</AlertDialogDescription>
-        </AlertDialogHeader>
+    <Dialog open={isDialogOpen} onOpenChange={dialog.close}>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Create a new entry</DialogTitle>
+          <DialogDescription>Add a new entry to your journal.</DialogDescription>
+        </DialogHeader>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(handleCreate)} className="space-y-6">
             <FormField
@@ -124,7 +123,6 @@ export function CreateEntryDialog({ journalId, onEntryCreated }: CreateEntryDial
                 </FormItem>
               )}
             />
-
             <FormField
               control={form.control}
               name="content"
@@ -142,7 +140,6 @@ export function CreateEntryDialog({ journalId, onEntryCreated }: CreateEntryDial
                 </FormItem>
               )}
             />
-
             <div>
               <Label htmlFor="tags" className="mb-2">
                 Tags
@@ -169,18 +166,14 @@ export function CreateEntryDialog({ journalId, onEntryCreated }: CreateEntryDial
                 />
               </Card>
             </div>
-
-            <AlertDialogFooter>
-              <AlertDialogCancel type="button" className="cursor-pointer">
-                Cancel
-              </AlertDialogCancel>
-              <AlertDialogAction type="submit" className="cursor-pointer" disabled={creating}>
+            <DialogFooter>
+              <Button type="submit" className="cursor-pointer" disabled={creating}>
                 {creating ? "Creating..." : "Create"}
-              </AlertDialogAction>
-            </AlertDialogFooter>
+              </Button>
+            </DialogFooter>
           </form>
         </Form>
-      </AlertDialogContent>
-    </AlertDialog>
+      </DialogContent>
+    </Dialog>
   );
 }
