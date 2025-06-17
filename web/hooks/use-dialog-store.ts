@@ -1,6 +1,6 @@
 import { create } from "zustand";
 
-export type DialogType = "search" | "create-journal" | "create-entry" | "pick-journal";
+export type DialogType = "search" | "create-journal" | "create-entry" | "pick-journal" | "sign-out";
 
 interface DialogData {
   createEntryData?: {

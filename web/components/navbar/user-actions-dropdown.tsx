@@ -9,6 +9,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu";
+import { useDialogStore } from "@/hooks/use-dialog-store";
 import {
   ChevronDown,
   ClipboardList,
@@ -20,14 +21,14 @@ import {
   UserCog
 } from "lucide-react";
 import Link from "next/link";
-import { useTransition, type FC } from "react";
+import { type FC } from "react";
 
 interface UserActionsDropdownProps {
   username: string;
 }
 
 export const UserActionsDropdown: FC<UserActionsDropdownProps> = ({ username }) => {
-  const [_, startTransition] = useTransition();
+  const dialog = useDialogStore();
 
   return (
     <DropdownMenu>
@@ -77,11 +78,7 @@ export const UserActionsDropdown: FC<UserActionsDropdownProps> = ({ username }) 
         <DropdownMenuSeparator />
         <DropdownMenuItem
           className="flex cursor-pointer items-center gap-2 text-red-500"
-          onClick={() => {
-            startTransition(() => {
-              signOutAction();
-            });
-          }}
+          onClick={() => dialog.open("sign-out")}
         >
           <LogOut size={16} />
           <span>Sign out</span>

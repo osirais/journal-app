@@ -1,5 +1,6 @@
 "use client";
 
+import { SignOutDialog } from "@/components/auth/sign-out-dialog";
 import { CreateEntryDialog } from "@/components/entries/create-entry-dialog";
 import { PickJournalDialog } from "@/components/entries/pick-journal-dialog";
 import { CreateJournalDialog } from "@/components/journals/create-journal-dialog";
@@ -25,6 +26,7 @@ export const DialogProvider = () => {
 
   return (
     <>
+      <SignOutDialog />
       <SearchDialog />
       <CreateJournalDialog onJournalCreated={onJournalCreated} />
       <PickJournalDialog />
