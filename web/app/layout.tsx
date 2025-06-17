@@ -71,8 +71,10 @@ export default async function RootLayout({
           Skip to content
         </a>
         <ThemeProvider disableTransitionOnChange nonce={nonce}>
-          <DialogProvider />
-          <NextStepProvider>{children}</NextStepProvider>
+          <NextStepProvider>
+            <DialogProvider />
+            {children}
+          </NextStepProvider>
           <Toaster />
         </ThemeProvider>
       </body>

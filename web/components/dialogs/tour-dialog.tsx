@@ -3,21 +3,11 @@
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from "@/components/ui/dialog";
 import { useNextStep } from "nextstepjs";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
-type TourDialogProps = {
-  completedTour: boolean;
-};
-
-export default function TourDialog({ completedTour }: TourDialogProps) {
+export default function TourDialog() {
   const [open, setOpen] = useState(false);
   const { startNextStep } = useNextStep();
-
-  useEffect(() => {
-    if (!completedTour) {
-      setOpen(true);
-    }
-  }, [completedTour]);
 
   const handleStartTour = () => {
     startNextStep("mainTour");

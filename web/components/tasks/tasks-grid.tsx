@@ -14,6 +14,7 @@ import {
   DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
+import { useDialogStore } from "@/hooks/use-dialog-store";
 import { getTasks, toggleTaskActive } from "@/lib/actions/task-actions";
 import { cn } from "@/lib/utils";
 import { Task } from "@/types";
@@ -57,18 +58,20 @@ export function TasksGrid() {
     setTasks((prev) => prev.map((task) => (task.id === updatedTask.id ? updatedTask : task)));
   }
 
-  function handleToggleActive(taskId: string) {
-    startTransition(async () => {
-      try {
-        const updatedTask = await toggleTaskActive(taskId);
-        setTasks((prev) => prev.map((task) => (task.id === taskId ? updatedTask : task)));
-      } catch {
-        toast.error("Failed to update task status");
-      }
-    });
-  }
+  // function handleToggleActive(taskId: string) {
+  //   startTransition(async () => {
+  //     try {
+  //       const updatedTask = await toggleTaskActive(taskId);
+  //       setTasks((prev) => prev.map((task) => (task.id === taskId ? updatedTask : task)));
+  //     } catch {
+  //       toast.error("Failed to update task status");
+  //     }
+  //   });
+  // }
 
   const filtered = tasks.filter((t) => t.name.toLowerCase().includes(searchQuery.toLowerCase()));
+
+  const dialog = useDialogStore();
 
   return (
     <div className="container mx-auto max-w-4xl p-6">
@@ -94,7 +97,10 @@ export function TasksGrid() {
             <h1 className="text-3xl font-bold tracking-tight">Tasks</h1>
             <p className="text-muted-foreground">Manage your recurring tasks</p>
           </div>
-          <CreateTaskDialog onTaskCreated={handleTaskCreated} />
+          <Button onClick={() => dialog.open("create-task")} className="cursor-pointer gap-2">
+            <Plus className="size-4" />
+            Create Task
+          </Button>
         </header>
         <div className="relative">
           <Search className="text-muted-foreground absolute left-3 top-1/2 size-4 -translate-y-1/2 transform" />

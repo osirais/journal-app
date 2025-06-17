@@ -6,7 +6,8 @@ import { MoodChartSSR } from "@/components/dashboard/mood-chart-ssr";
 import { MoodCardSSR } from "@/components/dashboard/mood-ssr";
 import { ReasonsCard } from "@/components/dashboard/reasons-card";
 import { TasksCardSSR } from "@/components/dashboard/tasks-ssr";
-import TourDialog from "@/components/dialogs/tour-dialog";
+import { TourTrigger } from "@/components/tour/tour-trigger";
+import { useDialogStore } from "@/hooks/use-dialog-store";
 import { getUserAchievementsData } from "@/lib/actions/achievement-actions";
 import { getUserOrThrow } from "@/utils/get-user-throw";
 import { createClient } from "@/utils/supabase/server";
@@ -27,9 +28,11 @@ export default async function Page() {
     .eq("id", user.id)
     .single();
 
+  const shouldTriggerTour = !profile?.completed_tour;
+
   return (
     <>
-      <TourDialog completedTour={profile?.completed_tour} />
+      <TourTrigger shouldTrigger={shouldTriggerTour} />
       <DashboardCarousel>
         <div className="space-y-6">
           <h1 className="text-2xl font-bold">Garden</h1>

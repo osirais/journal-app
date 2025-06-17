@@ -17,6 +17,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
+import { useDialogStore } from "@/hooks/use-dialog-store";
 import { createTask } from "@/lib/actions/task-actions";
 import { LoaderCircle, Plus } from "lucide-react";
 import { useState, useTransition } from "react";
@@ -38,6 +39,10 @@ interface CreateTaskDialogProps {
 }
 
 export function CreateTaskDialog({ onTaskCreated, triggerButton }: CreateTaskDialogProps) {
+  const dialog = useDialogStore();
+
+  const isDialogOpen = dialog.isOpen && dialog.type === "create-task";
+
   const [isOpen, setIsOpen] = useState(false);
   const [taskName, setTaskName] = useState("");
   const [taskDescription, setTaskDescription] = useState("");
@@ -75,21 +80,7 @@ export function CreateTaskDialog({ onTaskCreated, triggerButton }: CreateTaskDia
   }
 
   return (
-    <Dialog
-      open={isOpen}
-      onOpenChange={(open) => {
-        setIsOpen(open);
-        if (!open) resetForm();
-      }}
-    >
-      <DialogTrigger asChild>
-        {triggerButton || (
-          <Button className="cursor-pointer gap-2">
-            <Plus className="size-4" />
-            Create Task
-          </Button>
-        )}
-      </DialogTrigger>
+    <Dialog open={isDialogOpen} onOpenChange={dialog.close}>
       <DialogContent className="sm:max-w-[425px]">
         <form onSubmit={handleCreateTask}>
           <DialogHeader>
