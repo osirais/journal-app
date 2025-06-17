@@ -15,6 +15,7 @@ import TourDialog from "@/components/dialogs/tour-dialog";
 import { useDialogStore } from "@/hooks/use-dialog-store";
 import { useEntryCallbackStore } from "@/hooks/use-entry-callback-store";
 import { useJournalCallbackStore } from "@/hooks/use-journal-callback-store";
+import { useTaskCallbackStore } from "@/hooks/use-task-callback-store";
 import { useEffect, useState } from "react";
 
 export const DialogProvider = () => {
@@ -23,6 +24,7 @@ export const DialogProvider = () => {
   const dialogStore = useDialogStore();
   const onJournalCreated = useJournalCallbackStore((s) => s.onJournalCreated);
   const onEntryCreated = useEntryCallbackStore((s) => s.onEntryCreated);
+  const onTaskCreated = useTaskCallbackStore((s) => s.onTaskCreated);
 
   useEffect(() => {
     setIsMounted(true);
@@ -37,7 +39,7 @@ export const DialogProvider = () => {
         onEntryCreated={onEntryCreated}
       />
       <CreateJournalDialog onJournalCreated={onJournalCreated} />
-      {/* <CreateTaskDialog /> */}
+      <CreateTaskDialog onTaskCreated={onTaskCreated} />
       {/* <DeleteJournalDialog /> */}
       {/* <DeleteReasonDialog /> */}
       {/* <DeleteTaskDialog /> */}

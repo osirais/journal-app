@@ -1,6 +1,5 @@
 "use client";
 
-import { CreateTaskDialog } from "@/components/dialogs/create-task-dialog";
 import { DeleteTaskDialog } from "@/components/dialogs/delete-task-dialog";
 import { EditTaskDialog } from "@/components/dialogs/edit-task-dialog";
 import { TaskSkeleton } from "@/components/tasks/task-skeleton";
@@ -15,7 +14,8 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
 import { useDialogStore } from "@/hooks/use-dialog-store";
-import { getTasks, toggleTaskActive } from "@/lib/actions/task-actions";
+import { useTaskCallbackStore } from "@/hooks/use-task-callback-store";
+import { getTasks } from "@/lib/actions/task-actions";
 import { cn } from "@/lib/utils";
 import { Task } from "@/types";
 import { Edit, MoreHorizontal, Plus, Search, Trash2 } from "lucide-react";
@@ -26,7 +26,6 @@ export function TasksGrid() {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [isLoading, setIsLoading] = useState(true);
-  const [isPending, startTransition] = useTransition();
 
   const [taskToDelete, setTaskToDelete] = useState<Task | null>(null);
   const [taskToEdit, setTaskToEdit] = useState<Task | null>(null);
@@ -46,9 +45,16 @@ export function TasksGrid() {
     }
   }
 
+  const setOnTaskCreated = useTaskCallbackStore((s) => s.setOnTaskCreated);
+
   function handleTaskCreated(task: Task) {
     setTasks((prev) => [task, ...prev]);
+    dialog.close();
   }
+
+  useEffect(() => {
+    setOnTaskCreated(handleTaskCreated);
+  }, [setOnTaskCreated]);
 
   function handleTaskDeleted(id: string) {
     setTasks((prev) => prev.filter((task) => task.id !== id));
@@ -132,15 +138,13 @@ export function TasksGrid() {
                   : "Create your first task to start managing your work"}
               </CardDescription>
               {!searchQuery && (
-                <CreateTaskDialog
-                  onTaskCreated={handleTaskCreated}
-                  triggerButton={
-                    <Button className="mt-4 cursor-pointer gap-2">
-                      <Plus className="size-4" />
-                      Create Your First Task
-                    </Button>
-                  }
-                />
+                <Button
+                  onClick={() => dialog.open("create-task")}
+                  className="mt-4 cursor-pointer gap-2"
+                >
+                  <Plus className="size-4" />
+                  Create Your First Task
+                </Button>
               )}
             </CardContent>
           </Card>
