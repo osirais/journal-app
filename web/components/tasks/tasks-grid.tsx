@@ -19,7 +19,7 @@ import { getTasks } from "@/lib/actions/task-actions";
 import { cn } from "@/lib/utils";
 import { Task } from "@/types";
 import { Edit, MoreHorizontal, Plus, Search, Trash2 } from "lucide-react";
-import { useEffect, useState, useTransition } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
 export function TasksGrid() {
@@ -63,17 +63,6 @@ export function TasksGrid() {
   function handleTaskUpdated(updatedTask: Task) {
     setTasks((prev) => prev.map((task) => (task.id === updatedTask.id ? updatedTask : task)));
   }
-
-  // function handleToggleActive(taskId: string) {
-  //   startTransition(async () => {
-  //     try {
-  //       const updatedTask = await toggleTaskActive(taskId);
-  //       setTasks((prev) => prev.map((task) => (task.id === taskId ? updatedTask : task)));
-  //     } catch {
-  //       toast.error("Failed to update task status");
-  //     }
-  //   });
-  // }
 
   const filtered = tasks.filter((t) => t.name.toLowerCase().includes(searchQuery.toLowerCase()));
 

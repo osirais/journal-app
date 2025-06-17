@@ -5,7 +5,7 @@ import { Dialog, DialogContent, DialogDescription, DialogTitle } from "@/compone
 import { useNextStep } from "nextstepjs";
 import { useState } from "react";
 
-export default function TourDialog() {
+export function TourDialog() {
   const [open, setOpen] = useState(false);
   const { startNextStep } = useNextStep();
 

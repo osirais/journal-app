@@ -11,11 +11,13 @@ import { EditTaskDialog } from "@/components/dialogs/edit-task-dialog";
 import { PickJournalDialog } from "@/components/dialogs/pick-journal-dialog";
 import { SearchDialog } from "@/components/dialogs/search-dialog";
 import { SignOutDialog } from "@/components/dialogs/sign-out-dialog";
-import TourDialog from "@/components/dialogs/tour-dialog";
+import { TourDialog } from "@/components/dialogs/tour-dialog";
+//
 import { useDialogStore } from "@/hooks/use-dialog-store";
 import { useEntryCallbackStore } from "@/hooks/use-entry-callback-store";
 import { useJournalCallbackStore } from "@/hooks/use-journal-callback-store";
 import { useTaskCallbackStore } from "@/hooks/use-task-callback-store";
+//
 import { useEffect, useState } from "react";
 
 export const DialogProvider = () => {
