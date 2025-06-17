@@ -34,78 +34,25 @@ function formatPaletteName(name: string) {
     .join(" ");
 }
 
-export function PaletteGrid() {
+export function PaletteGrid({ palettes }: { palettes: Palette[] }) {
   const { paletteName, setPaletteName } = useTheme();
-  const favoritePalettes = [
-    {
-      name: "light",
-      colors: {
-        bg: "oklch(1 0 0)",
-        main: "oklch(0.205 0 0)"
-      }
-    },
-    {
-      name: "dark",
-      colors: {
-        bg: "oklch(0.145 0 0)",
-        main: "oklch(0.922 0 0)"
-      }
-    }
-  ];
-  const { filteredPalettes, query } = usePaletteSelectorContext();
-
-  if (!filteredPalettes) {
-    return (
-      <div className="text-muted-foreground py-8 text-center">
-        No palettes found matching "{query}"
-      </div>
-    );
-  }
 
   return (
-    <div className="flex flex-col justify-center gap-3">
-      {favoritePalettes && (
-        <>
-          <div className="grid grid-cols-2 gap-2 px-4 py-1">
-            {favoritePalettes.map((palette) => (
-              <Button
-                key={palette.name}
-                type="button"
-                className={cn("py-5", paletteName === palette.name && "ring-2")}
-                style={{
-                  backgroundColor: palette.colors.bg,
-                  color: palette.colors.main
-                }}
-                onClick={() => setPaletteName(palette.name)}
-              >
-                <span className="block truncate text-sm font-medium">
-                  {formatPaletteName(palette.name)}
-                </span>
-              </Button>
-            ))}
-          </div>
-          <Separator className="border-1 mx-4" />
-        </>
-      )}
-      <div className="grid grid-cols-2 gap-2 p-4 pt-1">
-        {filteredPalettes.map((palette) => (
-          <Button
-            key={palette.name}
-            type="button"
-            className={cn("py-5", paletteName === palette.name && "ring-2")}
-            style={{
-              backgroundColor: palette.colors.bg,
-              color: palette.colors.main,
-              borderColor: palette.colors.subAlt
-            }}
-            onClick={() => setPaletteName(palette.name)}
-          >
-            <span className="block truncate text-sm font-medium">
-              {formatPaletteName(palette.name)}
-            </span>
-          </Button>
-        ))}
-      </div>
+    <div className="grid grid-cols-2 gap-2 px-4">
+      {palettes.map(({ name, colors }) => (
+        <Button
+          key={name}
+          type="button"
+          className={cn("py-5", paletteName === name && "ring-2")}
+          style={{
+            backgroundColor: colors["--color-background"],
+            color: colors["--color-primary"]
+          }}
+          onClick={() => setPaletteName(name)}
+        >
+          <span className="block truncate text-sm font-medium">{formatPaletteName(name)}</span>
+        </Button>
+      ))}
     </div>
   );
 }
@@ -127,6 +74,7 @@ export function usePaletteSelectorContext() {
 
 export function PaletteSelector({ children }: { children?: ReactNode }) {
   const [query, setQuery] = useState("");
+  const { favoritePalettes } = useTheme();
   const [filteredPalettes, setFilteredPalettes] = useState<Palette[]>(palettes);
 
   useEffect(() => {
@@ -136,18 +84,37 @@ export function PaletteSelector({ children }: { children?: ReactNode }) {
     );
   }, [query]);
 
+  const favoriteFiltered = favoritePalettes
+    ? filteredPalettes.filter((p) => favoritePalettes.has(p.name))
+    : [];
+  const nonFavoriteFiltered = favoritePalettes
+    ? filteredPalettes.filter((p) => !favoritePalettes.has(p.name))
+    : filteredPalettes;
+
   return (
     <PaletteSelectorContext.Provider value={{ query, setQuery, filteredPalettes }}>
       {children ? (
         children
       ) : (
         <div className="flex min-h-0 w-full flex-1 flex-col">
-          <PaletteSelector>
-            <PaletteInput />
-            <ScrollArea className="min-h-0 flex-1">
-              <PaletteGrid />
-            </ScrollArea>
-          </PaletteSelector>
+          <PaletteInput />
+          <ScrollArea className="min-h-0 flex-1">
+            <div className="flex flex-col gap-4 pb-4 pt-1">
+              {filteredPalettes.length ? (
+                <>
+                  {favoriteFiltered.length > 0 && <PaletteGrid palettes={favoriteFiltered} />}
+                  {favoriteFiltered.length > 0 && nonFavoriteFiltered.length > 0 && (
+                    <Separator className="border-1 mx-4" />
+                  )}
+                  {nonFavoriteFiltered.length > 0 && <PaletteGrid palettes={nonFavoriteFiltered} />}
+                </>
+              ) : (
+                <div className="text-muted-foreground py-8 text-center">
+                  No palettes found matching "{query}"
+                </div>
+              )}
+            </div>
+          </ScrollArea>
         </div>
       )}
     </PaletteSelectorContext.Provider>

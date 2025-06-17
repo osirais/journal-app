@@ -8,6 +8,7 @@ import useSWR from "swr";
 
 export interface Theme {
   palette: { name: string; colors?: Record<string, string> };
+  favoritePalettes: Set<string>;
 }
 
 declare global {
@@ -31,6 +32,8 @@ export interface UseThemeProps {
   paletteName: string;
 
   setPaletteName: (name: string) => Promise<void>;
+
+  favoritePalettes?: Set<string>;
 }
 
 export interface ThemeProviderProps extends React.PropsWithChildren {
@@ -55,7 +58,8 @@ const MEDIA = "(prefers-color-scheme: dark)";
 const ThemeContext = createContext<UseThemeProps | undefined>(undefined);
 
 const DEFAULT_THEME: Theme = {
-  palette: { name: "system" }
+  palette: { name: "system" },
+  favoritePalettes: new Set(["light", "dark"])
 };
 
 function saveToLS(storageKey: string, value: string) {
@@ -158,53 +162,6 @@ function Theme({
     [mutate, storageKey, theme]
   );
 
-  function defineCssVarMap(c: any) {
-    const {
-      bg,
-      main,
-      caret,
-      sub,
-      subAlt,
-      text,
-      error,
-      errorExtra,
-      colorfulError,
-      colorfulErrorExtra
-    } = c;
-    return {
-      "--color-bg": bg,
-      "--color-main": main,
-      "--color-caret": caret,
-      "--color-sub": sub,
-      "--color-sub-alt": subAlt,
-      "--color-text": text,
-      "--color-error": error,
-      "--color-error-extra": errorExtra,
-      "--color-colorful-error": colorfulError,
-      "--color-colorful-error-extra": colorfulErrorExtra,
-      "--color-background": bg,
-      "--color-foreground": text,
-      "--color-card": bg,
-      "--color-card-foreground": text,
-      "--color-popover": bg,
-      "--color-popover-foreground": text,
-      "--color-primary": main,
-      "--color-primary-foreground": bg,
-      "--color-secondary": subAlt,
-      "--color-secondary-foreground": sub,
-      "--color-muted": subAlt,
-      "--color-muted-foreground": sub,
-      "--color-accent": subAlt,
-      "--color-accent-foreground": sub,
-      "--color-destructive": error,
-      "--color-destructive-foreground": text,
-      "--color-border": subAlt,
-      "--color-input": subAlt,
-      "--color-ring": main,
-      "--color-hover": text
-    };
-  }
-
   const applyTheme = useCallback(() => {
     if (!paletteName) return;
 
@@ -226,17 +183,10 @@ function Theme({
 
     (el.style as any).colorScheme = colorScheme;
 
-    if (systemThemes.includes(resolved)) {
-      Object.keys(defineCssVarMap({})).forEach((key) => {
-        el.style.removeProperty(key);
-      });
-      return;
-    }
-
     const palette = getPalette(resolved);
     if (!palette) return;
 
-    Object.entries(defineCssVarMap(palette.colors)).forEach(([k, v]) => {
+    Object.entries(palette.colors).forEach(([k, v]) => {
       el.style.setProperty(k, v);
     });
   }, [defaultTheme.palette.name, disableTransitionOnChange, nonce, paletteName, themes]);
@@ -274,7 +224,8 @@ function Theme({
       paletteName,
       setPaletteName,
       forcedTheme,
-      themes: themes
+      themes: themes,
+      favoritePalettes: theme.favoritePalettes
     }),
     [theme, paletteName, setPaletteName, forcedTheme, themes]
   );
@@ -306,58 +257,14 @@ function script(storageKey: string, defaultTheme: string, forcedTheme: string, t
     if (theme === "light" || theme === "dark") {
       el.style.colorScheme = theme;
     } else {
-      const palette = JSON.parse(localStorage.getItem(storageKey) || "{}");
+      const { colors }: { colors: Record<string, string> } = JSON.parse(
+        localStorage.getItem(storageKey) || "{}"
+      );
 
-      if (palette?.colors) {
-        const {
-          bg,
-          main,
-          caret,
-          sub,
-          subAlt,
-          text,
-          error,
-          errorExtra,
-          colorfulError,
-          colorfulErrorExtra
-        } = palette.colors;
-
-        const cssVars = {
-          "--color-bg": bg,
-          "--color-main": main,
-          "--color-caret": caret,
-          "--color-sub": sub,
-          "--color-sub-alt": subAlt,
-          "--color-text": text,
-          "--color-error": error,
-          "--color-error-extra": errorExtra,
-          "--color-colorful-error": colorfulError,
-          "--color-colorful-error-extra": colorfulErrorExtra,
-          "--color-background": bg,
-          "--color-foreground": text,
-          "--color-card": bg,
-          "--color-card-foreground": text,
-          "--color-popover": bg,
-          "--color-popover-foreground": text,
-          "--color-primary": main,
-          "--color-primary-foreground": bg,
-          "--color-secondary": subAlt,
-          "--color-secondary-foreground": sub,
-          "--color-muted": subAlt,
-          "--color-muted-foreground": sub,
-          "--color-accent": subAlt,
-          "--color-accent-foreground": sub,
-          "--color-destructive": error,
-          "--color-destructive-foreground": text,
-          "--color-border": subAlt,
-          "--color-input": subAlt,
-          "--color-ring": main,
-          "--color-hover": text
-        };
-
-        for (const [key, value] of Object.entries(cssVars)) {
-          el.style.setProperty(key, value);
-        }
+      if (colors) {
+        Object.entries(colors).forEach(([k, v]) => {
+          el.style.setProperty(k, v);
+        });
       }
     }
   }

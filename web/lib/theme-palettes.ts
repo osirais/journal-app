@@ -1,26 +1,144 @@
 // Colors from https://github.com/monkeytypegame/monkeytype
 
-export type PaletteColors = {
-  bg: string;
-  main: string;
-  caret: string;
-  sub: string;
-  subAlt: string;
-  text: string;
-  error: string;
-  errorExtra: string;
-  colorfulError: string;
-  colorfulErrorExtra: string;
-};
-
 export type Palette = {
   name: string;
-  colors: PaletteColors;
+  colors: Record<string, string>;
 };
 
-export const palettes: Palette[] = [
+type UnresolvedPalette = Palette &
+  ({ type?: "shadcn"; colors: ShadcnColors } | { type: "monkeytype"; colors: MonkeytypeColors });
+
+type ShadcnColors = Record<
+  | "background"
+  | "foreground"
+  | "card"
+  | "card-foreground"
+  | "popover"
+  | "popover-foreground"
+  | "primary"
+  | "primary-foreground"
+  | "secondary"
+  | "secondary-foreground"
+  | "muted"
+  | "muted-foreground"
+  | "accent"
+  | "accent-foreground"
+  | "destructive"
+  | "border"
+  | "input"
+  | "ring",
+  string
+>;
+
+type MonkeytypeColors = Record<
+  | "bg"
+  | "main"
+  | "caret"
+  | "sub"
+  | "subAlt"
+  | "text"
+  | "error"
+  | "errorExtra"
+  | "colorfulError"
+  | "colorfulErrorExtra",
+  string
+>;
+
+const shadcnToMonkeytypeMap = {
+  background: "bg",
+  foreground: "text",
+  card: "bg",
+  "card-foreground": "text",
+  popover: "bg",
+  "popover-foreground": "text",
+  primary: "main",
+  "primary-foreground": "bg",
+  secondary: "subAlt",
+  "secondary-foreground": "sub",
+  muted: "subAlt",
+  "muted-foreground": "sub",
+  accent: "subAlt",
+  "accent-foreground": "sub",
+  destructive: "error",
+  border: "subAlt",
+  input: "subAlt",
+  ring: "main"
+} as const satisfies Record<keyof ShadcnColors, keyof MonkeytypeColors>;
+
+function resolvePalette(palette: UnresolvedPalette): Palette {
+  let colors: Record<string, string> = palette.colors;
+  switch (palette.type) {
+    case "monkeytype":
+      colors = Object.fromEntries(
+        Object.entries(shadcnToMonkeytypeMap).map(([shadcnKey, monkeytypeKey]) => [
+          shadcnKey,
+          colors[monkeytypeKey]
+        ])
+      );
+  }
+
+  return {
+    ...palette,
+    colors: Object.fromEntries(
+      Object.entries(colors).map(([key, value]) => [`--color-${key}`, value])
+    )
+  };
+}
+
+export function getPalette(name: string): Palette | undefined {
+  return paletteMap[name];
+}
+
+const unresolvedPalettes: UnresolvedPalette[] = [
+  {
+    name: "light",
+    colors: {
+      background: "oklch(1 0 0)",
+      foreground: "oklch(0.145 0 0)",
+      card: "oklch(1 0 0)",
+      "card-foreground": "oklch(0.145 0 0)",
+      popover: "oklch(1 0 0)",
+      "popover-foreground": "oklch(0.145 0 0)",
+      primary: "oklch(0.205 0 0)",
+      "primary-foreground": "oklch(0.985 0 0)",
+      secondary: "oklch(0.97 0 0)",
+      "secondary-foreground": "oklch(0.205 0 0)",
+      muted: "oklch(0.97 0 0)",
+      "muted-foreground": "oklch(0.556 0 0)",
+      accent: "oklch(0.97 0 0)",
+      "accent-foreground": "oklch(0.205 0 0)",
+      destructive: "oklch(0.577 0.245 27.325)",
+      border: "oklch(0.922 0 0)",
+      input: "oklch(0.922 0 0)",
+      ring: "oklch(0.708 0 0)"
+    }
+  },
+  {
+    name: "dark",
+    colors: {
+      background: "oklch(0.145 0 0)",
+      foreground: "oklch(0.985 0 0)",
+      card: "oklch(0.145 0 0)",
+      "card-foreground": "oklch(0.985 0 0)",
+      popover: "oklch(0.205 0 0)",
+      "popover-foreground": "oklch(0.985 0 0)",
+      primary: "oklch(0.922 0 0)",
+      "primary-foreground": "oklch(0.205 0 0)",
+      secondary: "oklch(0.269 0 0)",
+      "secondary-foreground": "oklch(0.985 0 0)",
+      muted: "oklch(0.269 0 0)",
+      "muted-foreground": "oklch(0.708 0 0)",
+      accent: "oklch(0.269 0 0)",
+      "accent-foreground": "oklch(0.985 0 0)",
+      destructive: "oklch(0.704 0.191 22.216)",
+      border: "oklch(1 0 0 / 10%)",
+      input: "oklch(1 0 0 / 15%)",
+      ring: "oklch(0.556 0 0)"
+    }
+  },
   {
     name: "8008",
+    type: "monkeytype",
     colors: {
       bg: "oklch(34.6% 0.021 259.4)",
       main: "oklch(66.4% 0.206 6.4)",
@@ -36,6 +154,7 @@ export const palettes: Palette[] = [
   },
   {
     name: "80s_after_dark",
+    type: "monkeytype",
     colors: {
       bg: "oklch(24.2% 0.048 278.7)",
       main: "oklch(82.2% 0.114 348.5)",
@@ -51,6 +170,7 @@ export const palettes: Palette[] = [
   },
   {
     name: "9009",
+    type: "monkeytype",
     colors: {
       bg: "oklch(94% 0.012 91.5)",
       main: "oklch(13.8% 0.002 196.9)",
@@ -66,6 +186,7 @@ export const palettes: Palette[] = [
   },
   {
     name: "aether",
+    type: "monkeytype",
     colors: {
       bg: "oklch(20.5% 0.02 248.8)",
       main: "oklch(90.9% 0.03 332.5)",
@@ -81,6 +202,7 @@ export const palettes: Palette[] = [
   },
   {
     name: "alduin",
+    type: "monkeytype",
     colors: {
       bg: "oklch(22.6% 0 0)",
       main: "oklch(87.5% 0.054 98)",
@@ -96,6 +218,7 @@ export const palettes: Palette[] = [
   },
   {
     name: "alpine",
+    type: "monkeytype",
     colors: {
       bg: "oklch(52.9% 0.036 293.1)",
       main: "oklch(100% 0 0)",
@@ -111,6 +234,7 @@ export const palettes: Palette[] = [
   },
   {
     name: "anti_hero",
+    type: "monkeytype",
     colors: {
       bg: "oklch(13.6% 0.094 264.1)",
       main: "oklch(82.7% 0.097 19.3)",
@@ -126,6 +250,7 @@ export const palettes: Palette[] = [
   },
   {
     name: "arch",
+    type: "monkeytype",
     colors: {
       bg: "oklch(16% 0.009 274.3)",
       main: "oklch(74.7% 0.062 189.3)",
@@ -141,6 +266,7 @@ export const palettes: Palette[] = [
   },
   {
     name: "aurora",
+    type: "monkeytype",
     colors: {
       bg: "oklch(20.2% 0.041 234.5)",
       main: "oklch(81.9% 0.209 153.4)",
@@ -156,6 +282,7 @@ export const palettes: Palette[] = [
   },
   {
     name: "beach",
+    type: "monkeytype",
     colors: {
       bg: "oklch(94.8% 0.084 95.2)",
       main: "oklch(80.5% 0.069 164.4)",
@@ -171,6 +298,7 @@ export const palettes: Palette[] = [
   },
   {
     name: "bento",
+    type: "monkeytype",
     colors: {
       bg: "oklch(34.3% 0.039 260.5)",
       main: "oklch(74% 0.163 11.6)",
@@ -186,6 +314,7 @@ export const palettes: Palette[] = [
   },
   {
     name: "bingsu",
+    type: "monkeytype",
     colors: {
       bg: "oklch(74.4% 0.02 5.5)",
       main: "oklch(53.2% 0.048 354.1)",
@@ -201,6 +330,7 @@ export const palettes: Palette[] = [
   },
   {
     name: "bliss",
+    type: "monkeytype",
     colors: {
       bg: "oklch(27.2% 0.001 197.1)",
       main: "oklch(88.8% 0.035 40)",
@@ -216,6 +346,7 @@ export const palettes: Palette[] = [
   },
   {
     name: "blue_dolphin",
+    type: "monkeytype",
     colors: {
       bg: "oklch(32.4% 0.067 232.6)",
       main: "oklch(90.7% 0.08 328.9)",
@@ -231,6 +362,7 @@ export const palettes: Palette[] = [
   },
   {
     name: "blueberry_dark",
+    type: "monkeytype",
     colors: {
       bg: "oklch(29.1% 0.045 265.7)",
       main: "oklch(86.3% 0.071 247.4)",
@@ -246,6 +378,7 @@ export const palettes: Palette[] = [
   },
   {
     name: "blueberry_light",
+    type: "monkeytype",
     colors: {
       bg: "oklch(90.8% 0.029 273.1)",
       main: "oklch(49.4% 0.039 247.3)",
@@ -261,6 +394,7 @@ export const palettes: Palette[] = [
   },
   {
     name: "botanical",
+    type: "monkeytype",
     colors: {
       bg: "oklch(66.7% 0.037 187.2)",
       main: "oklch(95.3% 0.008 216.6)",
@@ -276,6 +410,7 @@ export const palettes: Palette[] = [
   },
   {
     name: "bouquet",
+    type: "monkeytype",
     colors: {
       bg: "oklch(33.6% 0.049 174.3)",
       main: "oklch(77.7% 0.089 22.7)",
@@ -291,6 +426,7 @@ export const palettes: Palette[] = [
   },
   {
     name: "breeze",
+    type: "monkeytype",
     colors: {
       bg: "oklch(88.4% 0.031 64.3)",
       main: "oklch(56.2% 0.102 298.4)",
@@ -306,6 +442,7 @@ export const palettes: Palette[] = [
   },
   {
     name: "bushido",
+    type: "monkeytype",
     colors: {
       bg: "oklch(28% 0.02 264.2)",
       main: "oklch(64.3% 0.196 21.2)",
@@ -321,6 +458,7 @@ export const palettes: Palette[] = [
   },
   {
     name: "cafe",
+    type: "monkeytype",
     colors: {
       bg: "oklch(77.7% 0.059 72.8)",
       main: "oklch(18.3% 0.007 78.1)",
@@ -336,6 +474,7 @@ export const palettes: Palette[] = [
   },
   {
     name: "camping",
+    type: "monkeytype",
     colors: {
       bg: "oklch(96.2% 0.02 77.3)",
       main: "oklch(59.4% 0.092 139.4)",
@@ -351,6 +490,7 @@ export const palettes: Palette[] = [
   },
   {
     name: "carbon",
+    type: "monkeytype",
     colors: {
       bg: "oklch(31.3% 0 0)",
       main: "oklch(69.3% 0.189 46.9)",
@@ -366,6 +506,7 @@ export const palettes: Palette[] = [
   },
   {
     name: "catppuccin",
+    type: "monkeytype",
     colors: {
       bg: "oklch(24.3% 0.03 283.9)",
       main: "oklch(78.7% 0.119 304.8)",
@@ -381,6 +522,7 @@ export const palettes: Palette[] = [
   },
   {
     name: "chaos_theory",
+    type: "monkeytype",
     colors: {
       bg: "oklch(19.3% 0.03 289.4)",
       main: "oklch(75.6% 0.195 339.6)",
@@ -396,6 +538,7 @@ export const palettes: Palette[] = [
   },
   {
     name: "cheesecake",
+    type: "monkeytype",
     colors: {
       bg: "oklch(95.8% 0.038 85.3)",
       main: "oklch(44.5% 0.137 5.5)",
@@ -411,6 +554,7 @@ export const palettes: Palette[] = [
   },
   {
     name: "cherry_blossom",
+    type: "monkeytype",
     colors: {
       bg: "oklch(32.4% 0.006 258.4)",
       main: "oklch(66.7% 0.201 330.8)",
@@ -426,6 +570,7 @@ export const palettes: Palette[] = [
   },
   {
     name: "comfy",
+    type: "monkeytype",
     colors: {
       bg: "oklch(46.4% 0.037 251.5)",
       main: "oklch(88.3% 0.05 28.9)",
@@ -441,6 +586,7 @@ export const palettes: Palette[] = [
   },
   {
     name: "copper",
+    type: "monkeytype",
     colors: {
       bg: "oklch(32.8% 0.033 36.6)",
       main: "oklch(60.2% 0.1 36.7)",
@@ -456,6 +602,7 @@ export const palettes: Palette[] = [
   },
   {
     name: "creamsicle",
+    type: "monkeytype",
     colors: {
       bg: "oklch(77.8% 0.139 44.7)",
       main: "oklch(99% 0.005 106.5)",
@@ -471,6 +618,7 @@ export const palettes: Palette[] = [
   },
   {
     name: "cy_red",
+    type: "monkeytype",
     colors: {
       bg: "oklch(37.7% 0.103 23.4)",
       main: "oklch(63.5% 0.185 24.1)",
@@ -486,6 +634,7 @@ export const palettes: Palette[] = [
   },
   {
     name: "cyberspace",
+    type: "monkeytype",
     colors: {
       bg: "oklch(22.1% 0.01 145.2)",
       main: "oklch(74.9% 0.18 156.3)",
@@ -516,6 +665,7 @@ export const palettes: Palette[] = [
   // },
   {
     name: "dark_magic_girl",
+    type: "monkeytype",
     colors: {
       bg: "oklch(22.9% 0.038 237.5)",
       main: "oklch(83.1% 0.086 353.6)",
@@ -531,6 +681,7 @@ export const palettes: Palette[] = [
   },
   {
     name: "dark_note",
+    type: "monkeytype",
     colors: {
       bg: "oklch(23.9% 0 0)",
       main: "oklch(84% 0.104 75.4)",
@@ -546,6 +697,7 @@ export const palettes: Palette[] = [
   },
   {
     name: "darling",
+    type: "monkeytype",
     colors: {
       bg: "oklch(88.2% 0.062 12.2)",
       main: "oklch(100% 0 0)",
@@ -561,6 +713,7 @@ export const palettes: Palette[] = [
   },
   {
     name: "deku",
+    type: "monkeytype",
     colors: {
       bg: "oklch(57.7% 0.098 195.7)",
       main: "oklch(52.3% 0.167 26.9)",
@@ -576,6 +729,7 @@ export const palettes: Palette[] = [
   },
   {
     name: "desert_oasis",
+    type: "monkeytype",
     colors: {
       bg: "oklch(96.4% 0.04 86.7)",
       main: "oklch(72.5% 0.149 84.7)",
@@ -591,6 +745,7 @@ export const palettes: Palette[] = [
   },
   {
     name: "dev",
+    type: "monkeytype",
     colors: {
       bg: "oklch(24.2% 0.017 259.8)",
       main: "oklch(68.7% 0.124 226.4)",
@@ -606,6 +761,7 @@ export const palettes: Palette[] = [
   },
   {
     name: "diner",
+    type: "monkeytype",
     colors: {
       bg: "oklch(56% 0.063 243)",
       main: "oklch(75.4% 0.107 96.2)",
@@ -621,6 +777,7 @@ export const palettes: Palette[] = [
   },
   {
     name: "dino",
+    type: "monkeytype",
     colors: {
       bg: "oklch(100% 0 0)",
       main: "oklch(77.5% 0.188 150.2)",
@@ -636,6 +793,7 @@ export const palettes: Palette[] = [
   },
   {
     name: "discord",
+    type: "monkeytype",
     colors: {
       bg: "oklch(32.1% 0.009 268.4)",
       main: "oklch(57.3% 0.198 274.7)",
@@ -651,6 +809,7 @@ export const palettes: Palette[] = [
   },
   {
     name: "dmg",
+    type: "monkeytype",
     colors: {
       bg: "oklch(89.1% 0.002 247.8)",
       main: "oklch(49.6% 0.187 359.8)",
@@ -666,6 +825,7 @@ export const palettes: Palette[] = [
   },
   {
     name: "dollar",
+    type: "monkeytype",
     colors: {
       bg: "oklch(91.5% 0.021 106.8)",
       main: "oklch(59.6% 0.055 144.9)",
@@ -681,6 +841,7 @@ export const palettes: Palette[] = [
   },
   {
     name: "dots",
+    type: "monkeytype",
     colors: {
       bg: "oklch(19.8% 0.023 272.4)",
       main: "oklch(100% 0 0)",
@@ -696,6 +857,7 @@ export const palettes: Palette[] = [
   },
   {
     name: "dracula",
+    type: "monkeytype",
     colors: {
       bg: "oklch(28.8% 0.022 277.5)",
       main: "oklch(74.2% 0.149 301.9)",
@@ -711,6 +873,7 @@ export const palettes: Palette[] = [
   },
   {
     name: "drowning",
+    type: "monkeytype",
     colors: {
       bg: "oklch(21.7% 0.027 287.2)",
       main: "oklch(54.7% 0.118 262.1)",
@@ -726,6 +889,7 @@ export const palettes: Palette[] = [
   },
   {
     name: "dualshot",
+    type: "monkeytype",
     colors: {
       bg: "oklch(55.6% 0 0)",
       main: "oklch(25.1% 0.001 197.1)",
@@ -741,6 +905,7 @@ export const palettes: Palette[] = [
   },
   {
     name: "earthsong",
+    type: "monkeytype",
     colors: {
       bg: "oklch(26.7% 0.009 67.4)",
       main: "oklch(60.5% 0.12 144.5)",
@@ -756,6 +921,7 @@ export const palettes: Palette[] = [
   },
   {
     name: "everblush",
+    type: "monkeytype",
     colors: {
       bg: "oklch(21.6% 0.012 225.8)",
       main: "oklch(79% 0.13 140.2)",
@@ -771,6 +937,7 @@ export const palettes: Palette[] = [
   },
   {
     name: "evil_eye",
+    type: "monkeytype",
     colors: {
       bg: "oklch(58.5% 0.134 239.8)",
       main: "oklch(96.3% 0.012 79.8)",
@@ -786,6 +953,7 @@ export const palettes: Palette[] = [
   },
   {
     name: "ez_mode",
+    type: "monkeytype",
     colors: {
       bg: "oklch(52.2% 0.167 254.2)",
       main: "oklch(72.6% 0.222 338.4)",
@@ -801,6 +969,7 @@ export const palettes: Palette[] = [
   },
   {
     name: "fire",
+    type: "monkeytype",
     colors: {
       bg: "oklch(10.6% 0.043 29.2)",
       main: "oklch(48.9% 0.19 28.1)",
@@ -816,6 +985,7 @@ export const palettes: Palette[] = [
   },
   {
     name: "fledgling",
+    type: "monkeytype",
     colors: {
       bg: "oklch(34.2% 0.017 310.2)",
       main: "oklch(71.6% 0.174 13.5)",
@@ -831,6 +1001,7 @@ export const palettes: Palette[] = [
   },
   {
     name: "fleuriste",
+    type: "monkeytype",
     colors: {
       bg: "oklch(77.3% 0.047 77.9)",
       main: "oklch(44.4% 0.034 173.7)",
@@ -846,6 +1017,7 @@ export const palettes: Palette[] = [
   },
   {
     name: "floret",
+    type: "monkeytype",
     colors: {
       bg: "oklch(24.9% 0.043 207.6)",
       main: "oklch(90.5% 0.136 92.6)",
@@ -861,6 +1033,7 @@ export const palettes: Palette[] = [
   },
   {
     name: "froyo",
+    type: "monkeytype",
     colors: {
       bg: "oklch(89% 0.022 85.9)",
       main: "oklch(58.8% 0.002 197.1)",
@@ -876,6 +1049,7 @@ export const palettes: Palette[] = [
   },
   {
     name: "frozen_llama",
+    type: "monkeytype",
     colors: {
       bg: "oklch(90.4% 0.085 188.4)",
       main: "oklch(48.3% 0.152 300)",
@@ -891,6 +1065,7 @@ export const palettes: Palette[] = [
   },
   {
     name: "fruit_chew",
+    type: "monkeytype",
     colors: {
       bg: "oklch(87% 0.005 325.6)",
       main: "oklch(35.9% 0.125 325.9)",
@@ -906,6 +1081,7 @@ export const palettes: Palette[] = [
   },
   {
     name: "fundamentals",
+    type: "monkeytype",
     colors: {
       bg: "oklch(55.7% 0.002 197.1)",
       main: "oklch(68.2% 0.064 147)",
@@ -921,6 +1097,7 @@ export const palettes: Palette[] = [
   },
   {
     name: "future_funk",
+    type: "monkeytype",
     colors: {
       bg: "oklch(27% 0.082 301.7)",
       main: "oklch(96.3% 0.012 79.8)",
@@ -936,6 +1113,7 @@ export const palettes: Palette[] = [
   },
   {
     name: "github",
+    type: "monkeytype",
     colors: {
       bg: "oklch(27.4% 0.018 251.9)",
       main: "oklch(75.2% 0.196 146.5)",
@@ -951,6 +1129,7 @@ export const palettes: Palette[] = [
   },
   {
     name: "godspeed",
+    type: "monkeytype",
     colors: {
       bg: "oklch(91.8% 0.029 93.8)",
       main: "oklch(77.4% 0.044 231.9)",
@@ -966,6 +1145,7 @@ export const palettes: Palette[] = [
   },
   {
     name: "graen",
+    type: "monkeytype",
     colors: {
       bg: "oklch(34.3% 0.019 163.6)",
       main: "oklch(68.1% 0.034 75.1)",
@@ -981,6 +1161,7 @@ export const palettes: Palette[] = [
   },
   {
     name: "grand_prix",
+    type: "monkeytype",
     colors: {
       bg: "oklch(39.2% 0.042 254)",
       main: "oklch(81.9% 0.169 115.5)",
@@ -996,6 +1177,7 @@ export const palettes: Palette[] = [
   },
   {
     name: "grape",
+    type: "monkeytype",
     colors: {
       bg: "oklch(22.2% 0.11 313)",
       main: "oklch(75.5% 0.178 59.7)",
@@ -1011,6 +1193,7 @@ export const palettes: Palette[] = [
   },
   {
     name: "gruvbox_dark",
+    type: "monkeytype",
     colors: {
       bg: "oklch(27.7% 0 0)",
       main: "oklch(72.5% 0.143 77.7)",
@@ -1026,6 +1209,7 @@ export const palettes: Palette[] = [
   },
   {
     name: "gruvbox_light",
+    type: "monkeytype",
     colors: {
       bg: "oklch(95.6% 0.055 96.2)",
       main: "oklch(64.5% 0.094 145.3)",
@@ -1041,6 +1225,7 @@ export const palettes: Palette[] = [
   },
   {
     name: "hammerhead",
+    type: "monkeytype",
     colors: {
       bg: "oklch(12.7% 0.032 267)",
       main: "oklch(77.3% 0.115 180.8)",
@@ -1056,6 +1241,7 @@ export const palettes: Palette[] = [
   },
   {
     name: "hanok",
+    type: "monkeytype",
     colors: {
       bg: "oklch(86.4% 0.021 88.7)",
       main: "oklch(37% 0.042 55.9)",
@@ -1071,6 +1257,7 @@ export const palettes: Palette[] = [
   },
   {
     name: "hedge",
+    type: "monkeytype",
     colors: {
       bg: "oklch(44.7% 0.077 135.3)",
       main: "oklch(63.1% 0.117 134.9)",
@@ -1086,6 +1273,7 @@ export const palettes: Palette[] = [
   },
   {
     name: "honey",
+    type: "monkeytype",
     colors: {
       bg: "oklch(78.7% 0.164 78.1)",
       main: "oklch(94.9% 0.183 106.1)",
@@ -1101,6 +1289,7 @@ export const palettes: Palette[] = [
   },
   {
     name: "horizon",
+    type: "monkeytype",
     colors: {
       bg: "oklch(23.7% 0.016 274.1)",
       main: "oklch(74.9% 0.053 68.8)",
@@ -1116,6 +1305,7 @@ export const palettes: Palette[] = [
   },
   {
     name: "husqy",
+    type: "monkeytype",
     colors: {
       bg: "oklch(0% 0 0)",
       main: "oklch(73.8% 0.172 305.9)",
@@ -1131,6 +1321,7 @@ export const palettes: Palette[] = [
   },
   {
     name: "iceberg_dark",
+    type: "monkeytype",
     colors: {
       bg: "oklch(21.1% 0.018 275)",
       main: "oklch(69.8% 0.064 256.1)",
@@ -1146,6 +1337,7 @@ export const palettes: Palette[] = [
   },
   {
     name: "iceberg_light",
+    type: "monkeytype",
     colors: {
       bg: "oklch(93.4% 0.004 271.4)",
       main: "oklch(45.6% 0.13 262.3)",
@@ -1161,6 +1353,7 @@ export const palettes: Palette[] = [
   },
   {
     name: "incognito",
+    type: "monkeytype",
     colors: {
       bg: "oklch(16.4% 0 0)",
       main: "oklch(77.2% 0.174 64.6)",
@@ -1176,6 +1369,7 @@ export const palettes: Palette[] = [
   },
   {
     name: "ishtar",
+    type: "monkeytype",
     colors: {
       bg: "oklch(24.4% 0 0)",
       main: "oklch(42.4% 0.158 30)",
@@ -1191,6 +1385,7 @@ export const palettes: Palette[] = [
   },
   {
     name: "iv_clover",
+    type: "monkeytype",
     colors: {
       bg: "oklch(70.6% 0 0)",
       main: "oklch(39.2% 0.035 13.5)",
@@ -1206,6 +1401,7 @@ export const palettes: Palette[] = [
   },
   {
     name: "iv_spade",
+    type: "monkeytype",
     colors: {
       bg: "oklch(15.4% 0 0)",
       main: "oklch(69.5% 0.072 75.6)",
@@ -1221,6 +1417,7 @@ export const palettes: Palette[] = [
   },
   {
     name: "joker",
+    type: "monkeytype",
     colors: {
       bg: "oklch(19.3% 0.047 306.6)",
       main: "oklch(82.4% 0.212 129.1)",
@@ -1236,6 +1433,7 @@ export const palettes: Palette[] = [
   },
   {
     name: "laser",
+    type: "monkeytype",
     colors: {
       bg: "oklch(25.5% 0.074 287.8)",
       main: "oklch(64% 0.11 208.2)",
@@ -1251,6 +1449,7 @@ export const palettes: Palette[] = [
   },
   {
     name: "lavender",
+    type: "monkeytype",
     colors: {
       bg: "oklch(74% 0.041 296.8)",
       main: "oklch(91.8% 0.008 293.9)",
@@ -1266,6 +1465,7 @@ export const palettes: Palette[] = [
   },
   {
     name: "leather",
+    type: "monkeytype",
     colors: {
       bg: "oklch(58.2% 0.094 47.9)",
       main: "oklch(93.1% 0.06 77.6)",
@@ -1281,6 +1481,7 @@ export const palettes: Palette[] = [
   },
   {
     name: "lil_dragon",
+    type: "monkeytype",
     colors: {
       bg: "oklch(92.2% 0.022 316.5)",
       main: "oklch(58.1% 0.182 298.1)",
@@ -1296,6 +1497,7 @@ export const palettes: Palette[] = [
   },
   {
     name: "lilac_mist",
+    type: "monkeytype",
     colors: {
       bg: "oklch(99.2% 0.006 334)",
       main: "oklch(56.4% 0.172 347)",
@@ -1311,6 +1513,7 @@ export const palettes: Palette[] = [
   },
   {
     name: "lime",
+    type: "monkeytype",
     colors: {
       bg: "oklch(61.7% 0.017 235.6)",
       main: "oklch(75.6% 0.16 127.6)",
@@ -1326,6 +1529,7 @@ export const palettes: Palette[] = [
   },
   {
     name: "luna",
+    type: "monkeytype",
     colors: {
       bg: "oklch(24.7% 0.047 293.7)",
       main: "oklch(72.3% 0.161 4.4)",
@@ -1341,6 +1545,7 @@ export const palettes: Palette[] = [
   },
   {
     name: "macroblank",
+    type: "monkeytype",
     colors: {
       bg: "oklch(83.7% 0.037 174.5)",
       main: "oklch(53.6% 0.185 32.4)",
@@ -1356,6 +1561,7 @@ export const palettes: Palette[] = [
   },
   {
     name: "magic_girl",
+    type: "monkeytype",
     colors: {
       bg: "oklch(100% 0 0)",
       main: "oklch(83.1% 0.086 353.6)",
@@ -1371,6 +1577,7 @@ export const palettes: Palette[] = [
   },
   {
     name: "mashu",
+    type: "monkeytype",
     colors: {
       bg: "oklch(28.9% 0.002 286.3)",
       main: "oklch(55% 0.078 296.6)",
@@ -1386,6 +1593,7 @@ export const palettes: Palette[] = [
   },
   {
     name: "matcha_moccha",
+    type: "monkeytype",
     colors: {
       bg: "oklch(35.9% 0.049 49.5)",
       main: "oklch(74.4% 0.147 136.8)",
@@ -1401,6 +1609,7 @@ export const palettes: Palette[] = [
   },
   {
     name: "material",
+    type: "monkeytype",
     colors: {
       bg: "oklch(30.9% 0.019 229.8)",
       main: "oklch(79.1% 0.075 188.2)",
@@ -1416,6 +1625,7 @@ export const palettes: Palette[] = [
   },
   {
     name: "matrix",
+    type: "monkeytype",
     colors: {
       bg: "oklch(0% 0 0)",
       main: "oklch(86.7% 0.294 142.3)",
@@ -1431,6 +1641,7 @@ export const palettes: Palette[] = [
   },
   {
     name: "menthol",
+    type: "monkeytype",
     colors: {
       bg: "oklch(71.8% 0.151 164.9)",
       main: "oklch(100% 0 0)",
@@ -1446,6 +1657,7 @@ export const palettes: Palette[] = [
   },
   {
     name: "metaverse",
+    type: "monkeytype",
     colors: {
       bg: "oklch(25.6% 0 0)",
       main: "oklch(57.3% 0.208 24.3)",
@@ -1461,6 +1673,7 @@ export const palettes: Palette[] = [
   },
   {
     name: "metropolis",
+    type: "monkeytype",
     colors: {
       bg: "oklch(23.2% 0.033 244.5)",
       main: "oklch(75% 0.101 185.5)",
@@ -1476,6 +1689,7 @@ export const palettes: Palette[] = [
   },
   {
     name: "mexican",
+    type: "monkeytype",
     colors: {
       bg: "oklch(80.1% 0.154 74.1)",
       main: "oklch(52.4% 0.203 342.4)",
@@ -1491,6 +1705,7 @@ export const palettes: Palette[] = [
   },
   {
     name: "miami",
+    type: "monkeytype",
     colors: {
       bg: "oklch(67.4% 0.197 4.2)",
       main: "oklch(81.6% 0.14 190.2)",
@@ -1506,6 +1721,7 @@ export const palettes: Palette[] = [
   },
   {
     name: "miami_nights",
+    type: "monkeytype",
     colors: {
       bg: "oklch(21% 0.004 286.1)",
       main: "oklch(67.1% 0.174 354.9)",
@@ -1521,6 +1737,7 @@ export const palettes: Palette[] = [
   },
   {
     name: "midnight",
+    type: "monkeytype",
     colors: {
       bg: "oklch(16.3% 0.012 260.6)",
       main: "oklch(56.3% 0.07 263.8)",
@@ -1536,6 +1753,7 @@ export const palettes: Palette[] = [
   },
   {
     name: "milkshake",
+    type: "monkeytype",
     colors: {
       bg: "oklch(100% 0 0)",
       main: "oklch(29.2% 0.046 266.3)",
@@ -1551,6 +1769,7 @@ export const palettes: Palette[] = [
   },
   {
     name: "mint",
+    type: "monkeytype",
     colors: {
       bg: "oklch(32.9% 0.079 245.4)",
       main: "oklch(80.2% 0.152 156.3)",
@@ -1566,6 +1785,7 @@ export const palettes: Palette[] = [
   },
   {
     name: "mizu",
+    type: "monkeytype",
     colors: {
       bg: "oklch(82.7% 0.039 236.2)",
       main: "oklch(98.7% 0.007 97.3)",
@@ -1581,6 +1801,7 @@ export const palettes: Palette[] = [
   },
   {
     name: "modern_dolch",
+    type: "monkeytype",
     colors: {
       bg: "oklch(30.1% 0.004 264.5)",
       main: "oklch(83.6% 0.092 186.9)",
@@ -1596,6 +1817,7 @@ export const palettes: Palette[] = [
   },
   {
     name: "modern_dolch_light",
+    type: "monkeytype",
     colors: {
       bg: "oklch(89.1% 0 0)",
       main: "oklch(81.2% 0.07 179.7)",
@@ -1611,6 +1833,7 @@ export const palettes: Palette[] = [
   },
   {
     name: "modern_ink",
+    type: "monkeytype",
     colors: {
       bg: "oklch(100% 0 0)",
       main: "oklch(64.9% 0.239 32.3)",
@@ -1626,6 +1849,7 @@ export const palettes: Palette[] = [
   },
   {
     name: "monokai",
+    type: "monkeytype",
     colors: {
       bg: "oklch(27.4% 0.011 114.8)",
       main: "oklch(84.1% 0.204 127.3)",
@@ -1641,6 +1865,7 @@ export const palettes: Palette[] = [
   },
   {
     name: "moonlight",
+    type: "monkeytype",
     colors: {
       bg: "oklch(23.7% 0.02 258.4)",
       main: "oklch(72.6% 0.086 75.3)",
@@ -1656,6 +1881,7 @@ export const palettes: Palette[] = [
   },
   {
     name: "mountain",
+    type: "monkeytype",
     colors: {
       bg: "oklch(16.8% 0 0)",
       main: "oklch(92.8% 0 0)",
@@ -1671,6 +1897,7 @@ export const palettes: Palette[] = [
   },
   {
     name: "mr_sleeves",
+    type: "monkeytype",
     colors: {
       bg: "oklch(87.5% 0.008 228.9)",
       main: "oklch(77.6% 0.061 36.5)",
@@ -1686,6 +1913,7 @@ export const palettes: Palette[] = [
   },
   {
     name: "ms_cupcakes",
+    type: "monkeytype",
     colors: {
       bg: "oklch(100% 0 0)",
       main: "oklch(81.7% 0.114 217.1)",
@@ -1701,6 +1929,7 @@ export const palettes: Palette[] = [
   },
   {
     name: "muted",
+    type: "monkeytype",
     colors: {
       bg: "oklch(43.9% 0 0)",
       main: "oklch(80% 0.068 301.4)",
@@ -1716,6 +1945,7 @@ export const palettes: Palette[] = [
   },
   {
     name: "nautilus",
+    type: "monkeytype",
     colors: {
       bg: "oklch(25% 0.045 257)",
       main: "oklch(80.5% 0.157 86.8)",
@@ -1731,6 +1961,7 @@ export const palettes: Palette[] = [
   },
   {
     name: "nebula",
+    type: "monkeytype",
     colors: {
       bg: "oklch(25.8% 0.037 283.5)",
       main: "oklch(56.6% 0.182 348.5)",
@@ -1746,6 +1977,7 @@ export const palettes: Palette[] = [
   },
   {
     name: "night_runner",
+    type: "monkeytype",
     colors: {
       bg: "oklch(24.8% 0 0)",
       main: "oklch(96.7% 0.211 110.1)",
@@ -1761,6 +1993,7 @@ export const palettes: Palette[] = [
   },
   {
     name: "nord",
+    type: "monkeytype",
     colors: {
       bg: "oklch(28% 0.02 264.2)",
       main: "oklch(77.5% 0.062 217.5)",
@@ -1776,6 +2009,7 @@ export const palettes: Palette[] = [
   },
   {
     name: "nord_light",
+    type: "monkeytype",
     colors: {
       bg: "oklch(95.1% 0.007 260.7)",
       main: "oklch(76.3% 0.048 194.5)",
@@ -1791,6 +2025,7 @@ export const palettes: Palette[] = [
   },
   {
     name: "norse",
+    type: "monkeytype",
     colors: {
       bg: "oklch(26.1% 0.002 286.3)",
       main: "oklch(45.6% 0.06 217.9)",
@@ -1806,6 +2041,7 @@ export const palettes: Palette[] = [
   },
   {
     name: "oblivion",
+    type: "monkeytype",
     colors: {
       bg: "oklch(31.6% 0.002 145.5)",
       main: "oklch(70.7% 0.015 84.6)",
@@ -1821,6 +2057,7 @@ export const palettes: Palette[] = [
   },
   {
     name: "olive",
+    type: "monkeytype",
     colors: {
       bg: "oklch(91.8% 0.033 99.6)",
       main: "oklch(65.5% 0.052 110.3)",
@@ -1836,6 +2073,7 @@ export const palettes: Palette[] = [
   },
   {
     name: "olivia",
+    type: "monkeytype",
     colors: {
       bg: "oklch(22.4% 0.004 308.3)",
       main: "oklch(79.2% 0.061 42)",
@@ -1851,6 +2089,7 @@ export const palettes: Palette[] = [
   },
   {
     name: "onedark",
+    type: "monkeytype",
     colors: {
       bg: "oklch(32.5% 0.021 265.9)",
       main: "oklch(73% 0.121 245.3)",
@@ -1866,6 +2105,7 @@ export const palettes: Palette[] = [
   },
   {
     name: "our_theme",
+    type: "monkeytype",
     colors: {
       bg: "oklch(54.2% 0.212 24.9)",
       main: "oklch(87.2% 0.176 93.5)",
@@ -1881,6 +2121,7 @@ export const palettes: Palette[] = [
   },
   {
     name: "paper",
+    type: "monkeytype",
     colors: {
       bg: "oklch(94.9% 0 0)",
       main: "oklch(38.7% 0 0)",
@@ -1896,6 +2137,7 @@ export const palettes: Palette[] = [
   },
   {
     name: "passion_fruit",
+    type: "monkeytype",
     colors: {
       bg: "oklch(40.3% 0.127 2.8)",
       main: "oklch(79.9% 0.098 5.8)",
@@ -1911,6 +2153,7 @@ export const palettes: Palette[] = [
   },
   {
     name: "pastel",
+    type: "monkeytype",
     colors: {
       bg: "oklch(80.8% 0.055 2.4)",
       main: "oklch(95.8% 0.079 102.4)",
@@ -1926,6 +2169,7 @@ export const palettes: Palette[] = [
   },
   {
     name: "peach_blossom",
+    type: "monkeytype",
     colors: {
       bg: "oklch(28.1% 0 0)",
       main: "oklch(75.1% 0.056 144.2)",
@@ -1941,6 +2185,7 @@ export const palettes: Palette[] = [
   },
   {
     name: "peaches",
+    type: "monkeytype",
     colors: {
       bg: "oklch(88% 0.031 88.4)",
       main: "oklch(68.4% 0.13 36.2)",
@@ -1956,6 +2201,7 @@ export const palettes: Palette[] = [
   },
   {
     name: "phantom",
+    type: "monkeytype",
     colors: {
       bg: "oklch(8% 0.056 264.1)",
       main: "oklch(71.9% 0.132 264.2)",
@@ -1971,6 +2217,7 @@ export const palettes: Palette[] = [
   },
   {
     name: "pink_lemonade",
+    type: "monkeytype",
     colors: {
       bg: "oklch(89.4% 0.095 88.2)",
       main: "oklch(79% 0.104 30.5)",
@@ -1986,6 +2233,7 @@ export const palettes: Palette[] = [
   },
   {
     name: "pulse",
+    type: "monkeytype",
     colors: {
       bg: "oklch(20.9% 0 0)",
       main: "oklch(71.2% 0.118 198.4)",
@@ -2001,6 +2249,7 @@ export const palettes: Palette[] = [
   },
   {
     name: "purpleish",
+    type: "monkeytype",
     colors: {
       bg: "oklch(24.5% 0.038 283.3)",
       main: "oklch(54.4% 0.181 294.8)",
@@ -2016,6 +2265,7 @@ export const palettes: Palette[] = [
   },
   {
     name: "rainbow_trail",
+    type: "monkeytype",
     colors: {
       bg: "oklch(97% 0 0)",
       main: "oklch(33.3% 0 0)",
@@ -2031,6 +2281,7 @@ export const palettes: Palette[] = [
   },
   {
     name: "red_dragon",
+    type: "monkeytype",
     colors: {
       bg: "oklch(17.3% 0.026 15.9)",
       main: "oklch(65.4% 0.233 28.1)",
@@ -2046,6 +2297,7 @@ export const palettes: Palette[] = [
   },
   {
     name: "red_samurai",
+    type: "monkeytype",
     colors: {
       bg: "oklch(41.1% 0.134 19)",
       main: "oklch(72.6% 0.08 70.4)",
@@ -2061,6 +2313,7 @@ export const palettes: Palette[] = [
   },
   {
     name: "repose_dark",
+    type: "monkeytype",
     colors: {
       bg: "oklch(31.9% 0.011 254)",
       main: "oklch(86.1% 0.03 98.5)",
@@ -2076,6 +2329,7 @@ export const palettes: Palette[] = [
   },
   {
     name: "repose_light",
+    type: "monkeytype",
     colors: {
       bg: "oklch(93.4% 0.035 98.1)",
       main: "oklch(48.7% 0.003 128.5)",
@@ -2091,6 +2345,7 @@ export const palettes: Palette[] = [
   },
   {
     name: "retro",
+    type: "monkeytype",
     colors: {
       bg: "oklch(86.8% 0.025 89.2)",
       main: "oklch(22.3% 0.008 84.6)",
@@ -2106,6 +2361,7 @@ export const palettes: Palette[] = [
   },
   {
     name: "retrocast",
+    type: "monkeytype",
     colors: {
       bg: "oklch(50.7% 0.085 202.4)",
       main: "oklch(84% 0.081 199.7)",
@@ -2121,6 +2377,7 @@ export const palettes: Palette[] = [
   },
   {
     name: "rgb",
+    type: "monkeytype",
     colors: {
       bg: "oklch(17.8% 0 0)",
       main: "oklch(94.9% 0 0)",
@@ -2136,6 +2393,7 @@ export const palettes: Palette[] = [
   },
   {
     name: "rose_pine",
+    type: "monkeytype",
     colors: {
       bg: "oklch(23.7% 0.019 294.1)",
       main: "oklch(82.2% 0.054 209.6)",
@@ -2151,6 +2409,7 @@ export const palettes: Palette[] = [
   },
   {
     name: "rose_pine_dawn",
+    type: "monkeytype",
     colors: {
       bg: "oklch(98.7% 0.011 76.6)",
       main: "oklch(62.9% 0.066 210.1)",
@@ -2166,6 +2425,7 @@ export const palettes: Palette[] = [
   },
   {
     name: "rose_pine_moon",
+    type: "monkeytype",
     colors: {
       bg: "oklch(28.8% 0.043 289.1)",
       main: "oklch(82.2% 0.054 209.6)",
@@ -2181,6 +2441,7 @@ export const palettes: Palette[] = [
   },
   {
     name: "rudy",
+    type: "monkeytype",
     colors: {
       bg: "oklch(28.4% 0.042 252)",
       main: "oklch(66.8% 0.078 78.5)",
@@ -2196,6 +2457,7 @@ export const palettes: Palette[] = [
   },
   {
     name: "ryujinscales",
+    type: "monkeytype",
     colors: {
       bg: "oklch(19.1% 0.041 258.1)",
       main: "oklch(70.5% 0.159 36.9)",
@@ -2211,6 +2473,7 @@ export const palettes: Palette[] = [
   },
   {
     name: "serika",
+    type: "monkeytype",
     colors: {
       bg: "oklch(91% 0.003 286.3)",
       main: "oklch(79.5% 0.159 91.3)",
@@ -2226,6 +2489,7 @@ export const palettes: Palette[] = [
   },
   {
     name: "serika_dark",
+    type: "monkeytype",
     colors: {
       bg: "oklch(32.4% 0.006 258.4)",
       main: "oklch(79.5% 0.159 91.3)",
@@ -2241,6 +2505,7 @@ export const palettes: Palette[] = [
   },
   {
     name: "sewing_tin",
+    type: "monkeytype",
     colors: {
       bg: "oklch(28.2% 0.123 281.8)",
       main: "oklch(86.6% 0.102 84.7)",
@@ -2256,6 +2521,7 @@ export const palettes: Palette[] = [
   },
   {
     name: "sewing_tin_light",
+    type: "monkeytype",
     colors: {
       bg: "oklch(100% 0 0)",
       main: "oklch(32.1% 0.139 282.1)",
@@ -2271,6 +2537,7 @@ export const palettes: Palette[] = [
   },
   {
     name: "shadow",
+    type: "monkeytype",
     colors: {
       bg: "oklch(0% 0 0)",
       main: "oklch(94.9% 0 0)",
@@ -2286,6 +2553,7 @@ export const palettes: Palette[] = [
   },
   {
     name: "shoko",
+    type: "monkeytype",
     colors: {
       bg: "oklch(87.5% 0.016 248)",
       main: "oklch(78.4% 0.076 223.5)",
@@ -2301,6 +2569,7 @@ export const palettes: Palette[] = [
   },
   {
     name: "slambook",
+    type: "monkeytype",
     colors: {
       bg: "oklch(98.8% 0.04 104.1)",
       main: "oklch(11% 0.067 278.1)",
@@ -2316,6 +2585,7 @@ export const palettes: Palette[] = [
   },
   {
     name: "snes",
+    type: "monkeytype",
     colors: {
       bg: "oklch(80.4% 0.006 297.7)",
       main: "oklch(43.3% 0.137 292.5)",
@@ -2331,6 +2601,7 @@ export const palettes: Palette[] = [
   },
   {
     name: "soaring_skies",
+    type: "monkeytype",
     colors: {
       bg: "oklch(98.5% 0.011 71.9)",
       main: "oklch(77.8% 0.118 225.9)",
@@ -2346,6 +2617,7 @@ export const palettes: Palette[] = [
   },
   {
     name: "solarized_dark",
+    type: "monkeytype",
     colors: {
       bg: "oklch(26.7% 0.049 219.8)",
       main: "oklch(64.4% 0.151 118.6)",
@@ -2361,6 +2633,7 @@ export const palettes: Palette[] = [
   },
   {
     name: "solarized_light",
+    type: "monkeytype",
     colors: {
       bg: "oklch(97.4% 0.026 90.1)",
       main: "oklch(64.4% 0.151 118.6)",
@@ -2376,6 +2649,7 @@ export const palettes: Palette[] = [
   },
   {
     name: "solarized_osaka",
+    type: "monkeytype",
     colors: {
       bg: "oklch(17.7% 0.032 217.9)",
       main: "oklch(64.4% 0.151 118.6)",
@@ -2391,6 +2665,7 @@ export const palettes: Palette[] = [
   },
   {
     name: "sonokai",
+    type: "monkeytype",
     colors: {
       bg: "oklch(30.2% 0.011 271)",
       main: "oklch(80.1% 0.134 131.7)",
@@ -2406,6 +2681,7 @@ export const palettes: Palette[] = [
   },
   {
     name: "stealth",
+    type: "monkeytype",
     colors: {
       bg: "oklch(8.2% 0.008 240.8)",
       main: "oklch(36% 0.011 236.9)",
@@ -2421,6 +2697,7 @@ export const palettes: Palette[] = [
   },
   {
     name: "strawberry",
+    type: "monkeytype",
     colors: {
       bg: "oklch(72.8% 0.142 19.1)",
       main: "oklch(99% 0.005 106.5)",
@@ -2436,6 +2713,7 @@ export const palettes: Palette[] = [
   },
   {
     name: "striker",
+    type: "monkeytype",
     colors: {
       bg: "oklch(40.1% 0.113 254.2)",
       main: "oklch(89% 0.006 170.4)",
@@ -2451,6 +2729,7 @@ export const palettes: Palette[] = [
   },
   {
     name: "suisei",
+    type: "monkeytype",
     colors: {
       bg: "oklch(40.6% 0.045 259.7)",
       main: "oklch(92.5% 0.055 218)",
@@ -2466,6 +2745,7 @@ export const palettes: Palette[] = [
   },
   {
     name: "sunset",
+    type: "monkeytype",
     colors: {
       bg: "oklch(24.1% 0.012 307.9)",
       main: "oklch(76.9% 0.124 39.2)",
@@ -2481,6 +2761,7 @@ export const palettes: Palette[] = [
   },
   {
     name: "superuser",
+    type: "monkeytype",
     colors: {
       bg: "oklch(28.5% 0.018 266.3)",
       main: "oklch(89% 0.185 159.8)",
@@ -2496,6 +2777,7 @@ export const palettes: Palette[] = [
   },
   {
     name: "sweden",
+    type: "monkeytype",
     colors: {
       bg: "oklch(46% 0.14 252.7)",
       main: "oklch(86.5% 0.177 90.4)",
@@ -2511,6 +2793,7 @@ export const palettes: Palette[] = [
   },
   {
     name: "tangerine",
+    type: "monkeytype",
     colors: {
       bg: "oklch(95.7% 0.026 58.3)",
       main: "oklch(67.4% 0.216 38.7)",
@@ -2526,6 +2809,7 @@ export const palettes: Palette[] = [
   },
   {
     name: "taro",
+    type: "monkeytype",
     colors: {
       bg: "oklch(80.8% 0.098 279.5)",
       main: "oklch(17.9% 0.023 300.8)",
@@ -2541,6 +2825,7 @@ export const palettes: Palette[] = [
   },
   {
     name: "terminal",
+    type: "monkeytype",
     colors: {
       bg: "oklch(21.7% 0.002 247.9)",
       main: "oklch(66.8% 0.166 127)",
@@ -2556,6 +2841,7 @@ export const palettes: Palette[] = [
   },
   {
     name: "terra",
+    type: "monkeytype",
     colors: {
       bg: "oklch(16.8% 0.008 163.9)",
       main: "oklch(75.9% 0.153 133.1)",
@@ -2571,6 +2857,7 @@ export const palettes: Palette[] = [
   },
   {
     name: "terrazzo",
+    type: "monkeytype",
     colors: {
       bg: "oklch(92.8% 0.02 65.1)",
       main: "oklch(68.4% 0.141 42.7)",
@@ -2586,6 +2873,7 @@ export const palettes: Palette[] = [
   },
   {
     name: "terror_below",
+    type: "monkeytype",
     colors: {
       bg: "oklch(21.7% 0.026 178.4)",
       main: "oklch(69.1% 0.081 168.2)",
@@ -2601,6 +2889,7 @@ export const palettes: Palette[] = [
   },
   {
     name: "tiramisu",
+    type: "monkeytype",
     colors: {
       bg: "oklch(83% 0.02 77.3)",
       main: "oklch(70.5% 0.073 65.5)",
@@ -2616,6 +2905,7 @@ export const palettes: Palette[] = [
   },
   {
     name: "trackday",
+    type: "monkeytype",
     colors: {
       bg: "oklch(42.4% 0.043 272.3)",
       main: "oklch(62.5% 0.182 30.4)",
@@ -2631,6 +2921,7 @@ export const palettes: Palette[] = [
   },
   {
     name: "trance",
+    type: "monkeytype",
     colors: {
       bg: "oklch(11.2% 0.062 263.7)",
       main: "oklch(60% 0.236 1.7)",
@@ -2646,6 +2937,7 @@ export const palettes: Palette[] = [
   },
   {
     name: "tron_orange",
+    type: "monkeytype",
     colors: {
       bg: "oklch(21.3% 0.021 195.7)",
       main: "oklch(90.8% 0.195 107.2)",
@@ -2661,6 +2953,7 @@ export const palettes: Palette[] = [
   },
   {
     name: "vaporwave",
+    type: "monkeytype",
     colors: {
       bg: "oklch(75.1% 0.096 281.8)",
       main: "oklch(70.5% 0.203 330.3)",
@@ -2676,6 +2969,7 @@ export const palettes: Palette[] = [
   },
   {
     name: "vesper",
+    type: "monkeytype",
     colors: {
       bg: "oklch(17.3% 0 0)",
       main: "oklch(86.9% 0.088 60.7)",
@@ -2691,6 +2985,7 @@ export const palettes: Palette[] = [
   },
   {
     name: "viridescent",
+    type: "monkeytype",
     colors: {
       bg: "oklch(31.4% 0.01 196.7)",
       main: "oklch(82% 0.082 160)",
@@ -2706,6 +3001,7 @@ export const palettes: Palette[] = [
   },
   {
     name: "voc",
+    type: "monkeytype",
     colors: {
       bg: "oklch(16.5% 0.047 329.4)",
       main: "oklch(85% 0.047 75.6)",
@@ -2721,6 +3017,7 @@ export const palettes: Palette[] = [
   },
   {
     name: "vscode",
+    type: "monkeytype",
     colors: {
       bg: "oklch(23.5% 0 0)",
       main: "oklch(56.7% 0.155 248.5)",
@@ -2736,6 +3033,7 @@ export const palettes: Palette[] = [
   },
   {
     name: "watermelon",
+    type: "monkeytype",
     colors: {
       bg: "oklch(35.5% 0.049 168.4)",
       main: "oklch(65% 0.138 17.8)",
@@ -2751,6 +3049,7 @@ export const palettes: Palette[] = [
   },
   {
     name: "wavez",
+    type: "monkeytype",
     colors: {
       bg: "oklch(27.2% 0.021 228.1)",
       main: "oklch(80.3% 0.222 138.3)",
@@ -2766,6 +3065,7 @@ export const palettes: Palette[] = [
   },
   {
     name: "witch_girl",
+    type: "monkeytype",
     colors: {
       bg: "oklch(91.1% 0.027 20.5)",
       main: "oklch(54.2% 0.045 167.3)",
@@ -2781,6 +3081,8 @@ export const palettes: Palette[] = [
   }
 ];
 
-export function getPalette(name: string): Palette | undefined {
-  return palettes.find((p) => p.name === name);
-}
+const paletteMap: Record<string, Palette> = Object.fromEntries(
+  unresolvedPalettes.map((p) => [p.name, resolvePalette(p)])
+);
+
+export const palettes: Palette[] = Object.values(paletteMap);

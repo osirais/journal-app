@@ -1,7 +1,6 @@
 "use client";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { useTheme } from "@/contexts/theme-context";
 import { LoaderCircle } from "lucide-react";
 import { useEffect, useState } from "react";
 import { ActivityCalendar } from "react-activity-calendar";
@@ -18,8 +17,6 @@ interface ActivityCalendarCSRProps {
 
 export function ActivityCalendarCSR({ data }: ActivityCalendarCSRProps) {
   const [mounted, setMounted] = useState(false);
-  const { theme } = useTheme();
-  const colors = theme.palette?.colors;
 
   useEffect(() => {
     setMounted(true);
@@ -77,17 +74,10 @@ export function ActivityCalendarCSR({ data }: ActivityCalendarCSRProps) {
                   borderRadius: "0.5rem",
                   margin: "0 auto"
                 }}
-                theme={
-                  colors
-                    ? {
-                        light: [colors.subAlt, colors.main],
-                        dark: [colors.subAlt, colors.main]
-                      }
-                    : {
-                        light: ["var(--muted)", "var(--primary)"],
-                        dark: ["var(--muted)", "var(--primary)"]
-                      }
-                }
+                theme={{
+                  light: ["var(--color-muted)", "var(--color-primary)"],
+                  dark: ["var(--color-muted)", "var(--color-primary)"]
+                }}
               />
             </div>
           )}
