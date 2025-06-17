@@ -1,10 +1,10 @@
 "use client";
 
-import { SignOutDialog } from "@/components/auth/sign-out-dialog";
-import { CreateEntryDialog } from "@/components/entries/create-entry-dialog";
-import { PickJournalDialog } from "@/components/entries/pick-journal-dialog";
-import { CreateJournalDialog } from "@/components/journals/create-journal-dialog";
-import { SearchDialog } from "@/components/search/search-dialog";
+import { CreateEntryDialog } from "@/components/dialogs/create-entry-dialog";
+import { CreateJournalDialog } from "@/components/dialogs/create-journal-dialog";
+import { PickJournalDialog } from "@/components/dialogs/pick-journal-dialog";
+import { SearchDialog } from "@/components/dialogs/search-dialog";
+import { SignOutDialog } from "@/components/dialogs/sign-out-dialog";
 import { useDialogStore } from "@/hooks/use-dialog-store";
 import { useEntryCallbackStore } from "@/hooks/use-entry-callback-store";
 import { useJournalCallbackStore } from "@/hooks/use-journal-callback-store";

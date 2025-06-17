@@ -6,7 +6,7 @@ import { MoodChartSSR } from "@/components/dashboard/mood-chart-ssr";
 import { MoodCardSSR } from "@/components/dashboard/mood-ssr";
 import { ReasonsCard } from "@/components/dashboard/reasons-card";
 import { TasksCardSSR } from "@/components/dashboard/tasks-ssr";
-import TourDialog from "@/components/tour/tour-dialog";
+import TourDialog from "@/components/dialogs/tour-dialog";
 import { getUserAchievementsData } from "@/lib/actions/achievement-actions";
 import { getUserOrThrow } from "@/utils/get-user-throw";
 import { createClient } from "@/utils/supabase/server";

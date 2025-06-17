@@ -1,6 +1,6 @@
 "use client";
 
-import { DeleteReasonDialog } from "@/components/reasons/delete-reason-dialog";
+import { DeleteReasonDialog } from "@/components/dialogs/delete-reason-dialog";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import {

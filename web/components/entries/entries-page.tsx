@@ -1,6 +1,6 @@
 "use client";
 
-import { CreateEntryDialog } from "@/components/entries/create-entry-dialog";
+import { CreateEntryDialog } from "@/components/dialogs/create-entry-dialog";
 import { EntriesSortDropdown } from "@/components/entries/entries-sort-dropdown";
 import { EntryCard } from "@/components/entries/entry-card";
 import { TagComponent } from "@/components/tag-component";

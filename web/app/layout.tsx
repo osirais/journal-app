@@ -1,8 +1,7 @@
 import { ThemeProvider } from "@/contexts/theme-context";
 import { Geist } from "next/font/google";
 import "./globals.css";
-import { DialogProvider } from "@/components/dialog/dialog-provider";
-import { SearchDialog } from "@/components/search/search-dialog";
+import { DialogProvider } from "@/components/dialogs/dialog-provider";
 import { Toaster } from "@/components/ui/sonner";
 import { defaultUrl } from "@/constants/url";
 import { headers } from "next/headers";

@@ -1,9 +1,9 @@
 "use client";
 
-import { useSearchActions } from "@/components/search/search-actions";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { useDialogStore } from "@/hooks/use-dialog-store";
+import { useSearchActions } from "@/hooks/use-search-actions";
 import { fuzzyFind } from "@/utils/fuzzy-find";
 import { Search, X } from "lucide-react";
 import { useEffect, useState } from "react";
