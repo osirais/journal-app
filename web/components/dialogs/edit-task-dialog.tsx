@@ -16,6 +16,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
+import { useDialogStore } from "@/hooks/use-dialog-store";
 import { updateTask } from "@/lib/actions/task-actions";
 import { LoaderCircle } from "lucide-react";
 import { useEffect, useState, useTransition } from "react";
@@ -33,19 +34,20 @@ interface Task {
 
 interface EditTaskDialogProps {
   task: Task | null;
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-  onTaskUpdated: (task: Task) => void;
+  onTaskEdited: (task: Task) => void;
 }
 
-export function EditTaskDialog({ task, open, onOpenChange, onTaskUpdated }: EditTaskDialogProps) {
+export function EditTaskDialog({ task, onTaskEdited }: EditTaskDialogProps) {
+  const dialog = useDialogStore();
+
+  const isDialogOpen = dialog.isOpen && dialog.type === "edit-task";
+
   const [taskName, setTaskName] = useState("");
   const [taskDescription, setTaskDescription] = useState("");
   const [taskInterval, setTaskInterval] = useState<Task["interval"]>("daily");
   const [taskActive, setTaskActive] = useState(true);
   const [isUpdating, startTransition] = useTransition();
 
-  // Update form values when task changes
   useEffect(() => {
     if (task) {
       setTaskName(task.name);
@@ -67,8 +69,8 @@ export function EditTaskDialog({ task, open, onOpenChange, onTaskUpdated }: Edit
           interval: taskInterval,
           active: taskActive
         });
-        onTaskUpdated(updated);
-        onOpenChange(false);
+        onTaskEdited(updated);
+        dialog.close();
         toast.success("Task updated successfully");
       } catch {
         toast.error("Failed to update task");
@@ -77,7 +79,7 @@ export function EditTaskDialog({ task, open, onOpenChange, onTaskUpdated }: Edit
   }
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog open={isDialogOpen} onOpenChange={dialog.close}>
       <DialogContent className="sm:max-w-[425px]">
         <form onSubmit={handleUpdateTask}>
           <DialogHeader>
@@ -149,7 +151,7 @@ export function EditTaskDialog({ task, open, onOpenChange, onTaskUpdated }: Edit
             <Button
               type="button"
               variant="outline"
-              onClick={() => onOpenChange(false)}
+              onClick={() => dialog.close()}
               className="cursor-pointer"
             >
               Cancel

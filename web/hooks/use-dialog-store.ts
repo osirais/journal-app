@@ -31,6 +31,9 @@ interface DialogData {
   deleteTaskData?: {
     task: Task;
   };
+  editTaskData?: {
+    task: Task;
+  };
 }
 
 interface DialogStore {

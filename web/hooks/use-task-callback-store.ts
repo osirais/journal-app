@@ -7,6 +7,9 @@ type TaskCallbackStore = {
 
   onTaskDeleted: (taskId: string) => void;
   setOnTaskDeleted: (cb: (taskId: string) => void) => void;
+
+  onTaskEdited: (task: Task) => void;
+  setOnTaskEdited: (cb: (task: Task) => void) => void;
 };
 
 export const useTaskCallbackStore = create<TaskCallbackStore>((set) => ({
@@ -14,5 +17,8 @@ export const useTaskCallbackStore = create<TaskCallbackStore>((set) => ({
   setOnTaskCreated: (cb) => set({ onTaskCreated: cb }),
 
   onTaskDeleted: () => {},
-  setOnTaskDeleted: (cb) => set({ onTaskDeleted: cb })
+  setOnTaskDeleted: (cb) => set({ onTaskDeleted: cb }),
+
+  onTaskEdited: () => {},
+  setOnTaskEdited: (cb) => set({ onTaskEdited: cb })
 }));

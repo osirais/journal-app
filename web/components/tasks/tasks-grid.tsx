@@ -1,6 +1,5 @@
 "use client";
 
-import { EditTaskDialog } from "@/components/dialogs/edit-task-dialog";
 import { TaskSkeleton } from "@/components/tasks/task-skeleton";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -26,8 +25,6 @@ export function TasksGrid() {
   const [searchQuery, setSearchQuery] = useState("");
   const [isLoading, setIsLoading] = useState(true);
 
-  const [taskToEdit, setTaskToEdit] = useState<Task | null>(null);
-
   useEffect(() => {
     loadTasks();
   }, []);
@@ -45,6 +42,7 @@ export function TasksGrid() {
 
   const setOnTaskCreated = useTaskCallbackStore((s) => s.setOnTaskCreated);
   const setOnTaskDeleted = useTaskCallbackStore((s) => s.setOnTaskDeleted);
+  const setOnTaskEdited = useTaskCallbackStore((s) => s.setOnTaskEdited);
 
   function handleTaskCreated(task: Task) {
     setTasks((prev) => [task, ...prev]);
@@ -55,14 +53,15 @@ export function TasksGrid() {
     setTasks((prev) => prev.filter((t) => t.id !== taskId));
   }
 
+  function handleTaskEdited(updatedTask: Task) {
+    setTasks((prev) => prev.map((task) => (task.id === updatedTask.id ? updatedTask : task)));
+  }
+
   useEffect(() => {
     setOnTaskCreated(handleTaskCreated);
     setOnTaskDeleted(handleTaskDeleted);
-  }, [setOnTaskCreated, setOnTaskDeleted]);
-
-  function handleTaskUpdated(updatedTask: Task) {
-    setTasks((prev) => prev.map((task) => (task.id === updatedTask.id ? updatedTask : task)));
-  }
+    setOnTaskEdited(handleTaskEdited);
+  }, [setOnTaskCreated, setOnTaskDeleted, setOnTaskEdited]);
 
   const filtered = tasks.filter((t) => t.name.toLowerCase().includes(searchQuery.toLowerCase()));
 
@@ -70,15 +69,6 @@ export function TasksGrid() {
 
   return (
     <div className="container mx-auto max-w-4xl p-6">
-      <EditTaskDialog
-        task={taskToEdit}
-        open={!!taskToEdit}
-        onOpenChange={(open) => {
-          if (!open) setTaskToEdit(null);
-        }}
-        onTaskUpdated={handleTaskUpdated}
-      />
-
       <div className="flex flex-col space-y-6">
         <header className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
@@ -168,7 +158,7 @@ export function TasksGrid() {
                         <DropdownMenuContent align="end" className="w-32">
                           <DropdownMenuItem
                             className="cursor-pointer"
-                            onSelect={() => setTaskToEdit(task)}
+                            onSelect={() => dialog.open("edit-task", { editTaskData: { task } })}
                           >
                             <Edit className="mr-2 size-4" />
                             Edit

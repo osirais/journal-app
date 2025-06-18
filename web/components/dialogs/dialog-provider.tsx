@@ -36,6 +36,7 @@ export const DialogProvider = () => {
 
   const onTaskCreated = useTaskCallbackStore((s) => s.onTaskCreated);
   const onTaskDeleted = useTaskCallbackStore((s) => s.onTaskDeleted);
+  const onTaskEdited = useTaskCallbackStore((s) => s.onTaskEdited);
 
   const onReasonDeleted = useReasonCallbackStore((s) => s.onReasonDeleted);
 
@@ -69,7 +70,10 @@ export const DialogProvider = () => {
         journal={dialogStore.data.deleteJournalData?.journal as JournalWithEntryCount}
         onJournalEdited={onJournalEdited}
       />
-      {/* <EditTaskDialog /> */}
+      <EditTaskDialog
+        task={dialogStore.data.editTaskData?.task as Task}
+        onTaskEdited={onTaskEdited}
+      />
       <PickJournalDialog />
       <SearchDialog />
       <SignOutDialog />
