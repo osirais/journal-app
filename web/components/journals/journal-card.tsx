@@ -1,6 +1,5 @@
 "use client";
 
-import { EditJournalDialog } from "@/components/dialogs/edit-journal-dialog";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import {
@@ -11,30 +10,30 @@ import {
   DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu";
 import { useDialogStore } from "@/hooks/use-dialog-store";
+import { useJournalCallbackStore } from "@/hooks/use-journal-callback-store";
 import type { JournalWithEntryCount } from "@/types";
 import { formatDateAgo } from "@/utils/format-date-ago";
 import { CalendarIcon, Clock, Edit, MoreVertical, NotebookPen, Trash2 } from "lucide-react";
 import Link from "next/link";
 import type React from "react";
 import type { FC } from "react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 type JournalCardProps = {
   journal: JournalWithEntryCount;
-  onEdit?: (journal: JournalWithEntryCount) => void;
+  onEdit: (journal: JournalWithEntryCount) => void;
 };
 
 export const JournalCard: FC<JournalCardProps> = ({ journal: initialJournal, onEdit }) => {
   const dialog = useDialogStore();
 
-  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   // keep a local state of the journal to update it in real-time
   const [journal, setJournal] = useState<JournalWithEntryCount>(initialJournal);
 
   const handleEdit = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    setIsEditDialogOpen(true);
+    dialog.open("edit-journal");
     onEdit?.(journal);
   };
 
@@ -44,10 +43,16 @@ export const JournalCard: FC<JournalCardProps> = ({ journal: initialJournal, onE
     dialog.open("delete-journal", { deleteJournalData: { journal } });
   };
 
-  const handleJournalUpdated = (updatedJournal: JournalWithEntryCount) => {
+  const handleJournalEdited = (updatedJournal: JournalWithEntryCount) => {
     setJournal(updatedJournal);
-    onEdit?.(updatedJournal);
+    onEdit(updatedJournal);
   };
+
+  const setOnJournalEdited = useJournalCallbackStore((s) => s.setOnJournalEdited);
+
+  useEffect(() => {
+    setOnJournalEdited(handleJournalEdited);
+  }, [setOnJournalEdited]);
 
   return (
     <>
@@ -122,12 +127,6 @@ export const JournalCard: FC<JournalCardProps> = ({ journal: initialJournal, onE
           </div>
         </CardContent>
       </Card>
-      <EditJournalDialog
-        journal={journal}
-        open={isEditDialogOpen}
-        onOpenChange={setIsEditDialogOpen}
-        onJournalUpdated={handleJournalUpdated}
-      />
     </>
   );
 };

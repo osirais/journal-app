@@ -7,6 +7,9 @@ type JournalCallbackStore = {
 
   onJournalDeleted: (journalId: string) => void;
   setOnJournalDeleted: (cb: (journalId: string) => void) => void;
+
+  onJournalEdited: (journal: JournalWithEntryCount) => void;
+  setOnJournalEdited: (cb: (journal: JournalWithEntryCount) => void) => void;
 };
 
 export const useJournalCallbackStore = create<JournalCallbackStore>((set) => ({
@@ -14,5 +17,8 @@ export const useJournalCallbackStore = create<JournalCallbackStore>((set) => ({
   setOnJournalCreated: (cb) => set({ onJournalCreated: cb }),
 
   onJournalDeleted: () => {},
-  setOnJournalDeleted: (cb) => set({ onJournalDeleted: cb })
+  setOnJournalDeleted: (cb) => set({ onJournalDeleted: cb }),
+
+  onJournalEdited: () => {},
+  setOnJournalEdited: (cb) => set({ onJournalEdited: cb })
 }));

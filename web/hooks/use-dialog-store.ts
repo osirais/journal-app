@@ -22,6 +22,9 @@ interface DialogData {
   deleteJournalData?: {
     journal: JournalWithEntryCount;
   };
+  editJournalData?: {
+    journal: JournalWithEntryCount;
+  };
   deleteReasonData?: {
     reason: Reason;
   };

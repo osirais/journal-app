@@ -21,6 +21,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { useDialogStore } from "@/hooks/use-dialog-store";
 import { updateJournal } from "@/lib/actions/journal-actions";
 import type { JournalWithEntryCount } from "@/types";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -37,17 +38,40 @@ const formSchema = z.object({
 
 type EditJournalDialogProps = {
   journal: JournalWithEntryCount;
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-  onJournalUpdated?: (updatedJournal: JournalWithEntryCount) => void;
+  onJournalEdited: (updatedJournal: JournalWithEntryCount) => void;
 };
 
-export function EditJournalDialog({
-  journal,
-  open,
-  onOpenChange,
-  onJournalUpdated
-}: EditJournalDialogProps) {
+export function EditJournalDialog({ journal, onJournalEdited }: EditJournalDialogProps) {
+  const dialog = useDialogStore();
+
+  const isDialogOpen = dialog.isOpen && dialog.type === "edit-journal";
+
+  if (!journal) {
+    return (
+      <Dialog open={isDialogOpen} onOpenChange={dialog.close}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Journal Not Found</DialogTitle>
+            <DialogDescription>
+              The selected journal could not be found. It may have already been deleted or is
+              unavailable.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => dialog.close()}
+              className="cursor-pointer"
+            >
+              Close
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    );
+  }
+
   const [isPending, startTransition] = useTransition();
   const [color, setColor] = useState(journal.color_hex);
 
@@ -60,13 +84,13 @@ export function EditJournalDialog({
   });
 
   useEffect(() => {
-    if (open) {
+    if (isDialogOpen) {
       form.reset({
         title: journal.title,
         description: journal.description || ""
       });
     }
-  }, [open, journal, form]);
+  }, [journal, form]);
 
   function onSubmit(values: z.infer<typeof formSchema>) {
     startTransition(async () => {
@@ -90,16 +114,14 @@ export function EditJournalDialog({
         color_hex: color
       };
 
-      if (onJournalUpdated) {
-        onJournalUpdated(updatedJournal);
-      }
+      onJournalEdited(updatedJournal);
 
-      onOpenChange(false);
+      dialog.close();
     });
   }
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog open={isDialogOpen} onOpenChange={dialog.close}>
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Edit Journal</DialogTitle>
