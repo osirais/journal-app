@@ -43,7 +43,6 @@ export function CreateTaskDialog({ onTaskCreated, triggerButton }: CreateTaskDia
 
   const isDialogOpen = dialog.isOpen && dialog.type === "create-task";
 
-  const [isOpen, setIsOpen] = useState(false);
   const [taskName, setTaskName] = useState("");
   const [taskDescription, setTaskDescription] = useState("");
   const [taskInterval, setTaskInterval] = useState<Task["interval"]>("daily");
@@ -71,7 +70,6 @@ export function CreateTaskDialog({ onTaskCreated, triggerButton }: CreateTaskDia
         );
         onTaskCreated(created);
         resetForm();
-        setIsOpen(false);
         toast.success("Task created successfully");
       } catch {
         toast.error("Failed to create task");
@@ -149,7 +147,7 @@ export function CreateTaskDialog({ onTaskCreated, triggerButton }: CreateTaskDia
             <Button
               type="button"
               variant="outline"
-              onClick={() => setIsOpen(false)}
+              onClick={() => dialog.close()}
               className="cursor-pointer"
             >
               Cancel

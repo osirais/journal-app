@@ -1,6 +1,5 @@
 "use client";
 
-import { DeleteJournalDialog } from "@/components/dialogs/delete-journal-dialog";
 import { EditJournalDialog } from "@/components/dialogs/edit-journal-dialog";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -11,6 +10,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu";
+import { useDialogStore } from "@/hooks/use-dialog-store";
 import type { JournalWithEntryCount } from "@/types";
 import { formatDateAgo } from "@/utils/format-date-ago";
 import { CalendarIcon, Clock, Edit, MoreVertical, NotebookPen, Trash2 } from "lucide-react";
@@ -22,16 +22,12 @@ import { useState } from "react";
 type JournalCardProps = {
   journal: JournalWithEntryCount;
   onEdit?: (journal: JournalWithEntryCount) => void;
-  onDelete?: (journal: JournalWithEntryCount) => void;
 };
 
-export const JournalCard: FC<JournalCardProps> = ({
-  journal: initialJournal,
-  onEdit,
-  onDelete
-}) => {
+export const JournalCard: FC<JournalCardProps> = ({ journal: initialJournal, onEdit }) => {
+  const dialog = useDialogStore();
+
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
-  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   // keep a local state of the journal to update it in real-time
   const [journal, setJournal] = useState<JournalWithEntryCount>(initialJournal);
 
@@ -45,7 +41,7 @@ export const JournalCard: FC<JournalCardProps> = ({
   const handleDelete = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    setIsDeleteDialogOpen(true);
+    dialog.open("delete-journal", { ...dialog.data, deleteJournalData: { journal } });
   };
 
   const handleJournalUpdated = (updatedJournal: JournalWithEntryCount) => {
@@ -131,12 +127,6 @@ export const JournalCard: FC<JournalCardProps> = ({
         open={isEditDialogOpen}
         onOpenChange={setIsEditDialogOpen}
         onJournalUpdated={handleJournalUpdated}
-      />
-      <DeleteJournalDialog
-        journal={journal}
-        open={isDeleteDialogOpen}
-        onOpenChange={setIsDeleteDialogOpen}
-        onDeleted={() => onDelete?.(journal)}
       />
     </>
   );

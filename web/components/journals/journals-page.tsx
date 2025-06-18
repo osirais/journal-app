@@ -49,18 +49,22 @@ export function JournalsPage() {
   };
 
   const setOnJournalCreated = useJournalCallbackStore((s) => s.setOnJournalCreated);
+  const setOnJournalDeleted = useJournalCallbackStore((s) => s.setOnJournalDeleted);
 
   const handleJournalCreated = (journal: JournalWithEntryCount) => {
     setJournals((prev) => [journal, ...prev]);
   };
 
-  useEffect(() => {
-    setOnJournalCreated(handleJournalCreated);
-  }, [setOnJournalCreated]);
-
   const handleJournalDeleted = (journal: JournalWithEntryCount) => {
     setJournals((prev) => prev.filter((j) => j.id !== journal.id));
   };
+
+  useEffect(() => {
+    setOnJournalCreated(handleJournalCreated);
+    setOnJournalDeleted((journalId) => {
+      handleJournalDeleted({ id: journalId } as JournalWithEntryCount);
+    });
+  }, [setOnJournalCreated, setOnJournalDeleted]);
 
   return (
     <div className="container mx-auto max-w-3xl py-8">
@@ -102,7 +106,7 @@ export function JournalsPage() {
       ) : (
         <div className="grid gap-3 md:grid-cols-2">
           {journals.map((journal) => (
-            <JournalCard key={journal.id} journal={journal} onDelete={handleJournalDeleted} />
+            <JournalCard key={journal.id} journal={journal} />
           ))}
         </div>
       )}

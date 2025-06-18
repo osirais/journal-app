@@ -9,6 +9,7 @@ import {
   DialogHeader,
   DialogTitle
 } from "@/components/ui/dialog";
+import { useDialogStore } from "@/hooks/use-dialog-store";
 import { deleteJournal } from "@/lib/actions/journal-actions";
 import type { JournalWithEntryCount } from "@/types";
 import { Loader2 } from "lucide-react";
@@ -17,18 +18,41 @@ import { toast } from "sonner";
 
 type DeleteJournalDialogProps = {
   journal: JournalWithEntryCount;
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-  onDeleted: (id: string) => void;
+  onJournalDeleted: (id: string) => void;
 };
 
-export function DeleteJournalDialog({
-  journal,
-  open,
-  onOpenChange,
-  onDeleted
-}: DeleteJournalDialogProps) {
+export function DeleteJournalDialog({ journal, onJournalDeleted }: DeleteJournalDialogProps) {
+  const dialog = useDialogStore();
+
+  const isDialogOpen = dialog.isOpen && dialog.type === "delete-journal";
+
   const [isPending, startTransition] = useTransition();
+
+  if (!journal) {
+    return (
+      <Dialog open={isDialogOpen} onOpenChange={dialog.close}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Journal Not Found</DialogTitle>
+            <DialogDescription>
+              The selected journal could not be found. It may have already been deleted or is
+              unavailable.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => dialog.close()}
+              className="cursor-pointer"
+            >
+              Close
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    );
+  }
 
   const handleDelete = () => {
     startTransition(async () => {
@@ -38,14 +62,15 @@ export function DeleteJournalDialog({
         toast.error(result.error);
       } else {
         toast.success("Journal deleted successfully");
-        onOpenChange(false);
-        onDeleted(journal.id);
+        dialog.close();
+
+        onJournalDeleted(journal.id);
       }
     });
   };
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog open={isDialogOpen} onOpenChange={dialog.close}>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle>Delete Journal</DialogTitle>
@@ -63,7 +88,7 @@ export function DeleteJournalDialog({
           <Button
             type="button"
             variant="outline"
-            onClick={() => onOpenChange(false)}
+            onClick={() => dialog.close()}
             disabled={isPending}
             className="cursor-pointer"
           >

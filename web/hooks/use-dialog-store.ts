@@ -1,3 +1,4 @@
+import { JournalWithEntryCount } from "@/types";
 import { create } from "zustand";
 
 export type DialogType =
@@ -17,6 +18,9 @@ export type DialogType =
 interface DialogData {
   createEntryData?: {
     journalId: string;
+  };
+  deleteJournalData?: {
+    journal: JournalWithEntryCount;
   };
 }
 

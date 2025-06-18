@@ -18,13 +18,17 @@ import { useEntryCallbackStore } from "@/hooks/use-entry-callback-store";
 import { useJournalCallbackStore } from "@/hooks/use-journal-callback-store";
 import { useTaskCallbackStore } from "@/hooks/use-task-callback-store";
 //
+import { JournalWithEntryCount } from "@/types";
+//
 import { useEffect, useState } from "react";
 
 export const DialogProvider = () => {
   const [isMounted, setIsMounted] = useState(false);
 
   const dialogStore = useDialogStore();
+
   const onJournalCreated = useJournalCallbackStore((s) => s.onJournalCreated);
+  const onJournalDeleted = useJournalCallbackStore((s) => s.onJournalDeleted);
   const onEntryCreated = useEntryCallbackStore((s) => s.onEntryCreated);
   const onTaskCreated = useTaskCallbackStore((s) => s.onTaskCreated);
 
@@ -42,7 +46,10 @@ export const DialogProvider = () => {
       />
       <CreateJournalDialog onJournalCreated={onJournalCreated} />
       <CreateTaskDialog onTaskCreated={onTaskCreated} />
-      {/* <DeleteJournalDialog /> */}
+      <DeleteJournalDialog
+        journal={dialogStore.data.deleteJournalData?.journal as JournalWithEntryCount}
+        onJournalDeleted={onJournalDeleted}
+      />
       {/* <DeleteReasonDialog /> */}
       {/* <DeleteTaskDialog /> */}
       {/* <EditJournalDialog /> */}
