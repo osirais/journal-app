@@ -94,7 +94,7 @@ export function SearchDialog() {
               <X className="h-3 w-3" />
             </Button>
           </div>
-          <div className="h-[16rem] overflow-hidden">
+          <div className="h-64 overflow-hidden">
             {filteredActions.length > 0 ? (
               <div className="p-1">
                 {filteredActions.map((action, index) => (

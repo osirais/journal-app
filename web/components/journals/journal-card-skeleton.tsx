@@ -9,7 +9,7 @@ export const JournalCardSkeleton: FC = () => {
     <Card className="relative w-full max-w-sm overflow-hidden">
       <CardContent className="flex h-full flex-col p-4">
         <div className="flex items-start gap-4">
-          <Skeleton className="size-20 flex-shrink-0 rounded-lg" />
+          <Skeleton className="size-20 shrink-0 rounded-lg" />
           <div className="flex flex-1 flex-col overflow-hidden">
             <Skeleton className="mt-1 h-4 w-3/4" />
             <div className="mt-2 grid gap-2">

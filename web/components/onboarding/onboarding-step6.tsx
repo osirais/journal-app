@@ -48,7 +48,7 @@ export function OnboardingStep6({ onSuccess }: OnboardingStep6Props) {
 
   return (
     <div className="flex h-full w-full flex-col">
-      <div className="flex flex-grow flex-col items-center justify-center space-y-4 px-8 text-center">
+      <div className="flex grow flex-col items-center justify-center space-y-4 px-8 text-center">
         <h2 className="text-xl font-medium">Mood</h2>
         <p className="text-muted-foreground max-w-md">How are you feeling today?</p>
         <ToggleGroup

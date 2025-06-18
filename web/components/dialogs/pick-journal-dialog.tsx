@@ -97,7 +97,7 @@ export function PickJournalDialog() {
               <X className="h-3 w-3" />
             </Button>
           </div>
-          <div className="h-[16rem] overflow-hidden">
+          <div className="h-64 overflow-hidden">
             {filteredJournals.length > 0 ? (
               <div className="p-1">
                 {filteredJournals.map((journal, index) => (

@@ -439,7 +439,7 @@ function EntryContent() {
             </div>
           </div>
         ) : (
-          <div className="flex min-h-[2rem] flex-wrap items-center gap-2">
+          <div className="flex min-h-8 flex-wrap items-center gap-2">
             {data.tags.length > 0 ? (
               data.tags.map((tag) => (
                 <TagComponent

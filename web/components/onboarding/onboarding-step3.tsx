@@ -36,7 +36,7 @@ export function OnboardingStep3({ journalName, onSuccess }: OnboardingStep3Props
 
   return (
     <form onSubmit={handleSubmit} className="mx-auto flex h-full w-full flex-col">
-      <div className="flex-grow overflow-auto px-8 py-6">
+      <div className="grow overflow-auto px-8 py-6">
         <h2 className="text-center text-xl font-medium">Add Entry to {journalName}</h2>
         <p className="text-muted-foreground mx-auto max-w-md text-center">
           Start writing anything that's on your mind. You can edit or delete it later.

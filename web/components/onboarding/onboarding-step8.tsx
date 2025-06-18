@@ -30,7 +30,7 @@ export function OnboardingStep8({ onSuccess }: OnboardingStep8Props) {
 
   return (
     <div className="flex h-full w-full flex-col">
-      <div className="flex-grow space-y-4 px-8 text-center">
+      <div className="grow space-y-4 px-8 text-center">
         <h2 className="text-xl font-medium">Set Your Intention</h2>
         <p className="text-muted-foreground mx-auto max-w-md">
           Take a moment to write a personal reminder for why you started this journey. This message

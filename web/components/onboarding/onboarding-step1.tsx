@@ -7,7 +7,7 @@ interface OnboardingStep1Props {
 export function OnboardingStep1({ onSuccess }: OnboardingStep1Props) {
   return (
     <div className="flex h-full w-full flex-col justify-center text-center">
-      <div className="flex flex-grow flex-col items-center justify-center space-y-2">
+      <div className="flex grow flex-col items-center justify-center space-y-2">
         <h2 className="text-xl font-medium">Getting Started</h2>
         <p className="text-muted-foreground max-w-md">Let's begin your journey with us.</p>
       </div>

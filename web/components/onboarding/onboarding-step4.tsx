@@ -10,7 +10,7 @@ interface OnboardingStep4Props {
 export function OnboardingStep4({ onSuccess }: OnboardingStep4Props) {
   return (
     <div className="flex h-full w-full flex-col justify-center px-8 text-center">
-      <div className="flex flex-grow flex-col items-center justify-center space-y-4">
+      <div className="flex grow flex-col items-center justify-center space-y-4">
         <Droplet size={48} className="text-white" />
         <p className="text-muted-foreground max-w-md">
           You got +5 droplets for creating a daily journal entry. Droplets are the currency that

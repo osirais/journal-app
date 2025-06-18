@@ -38,7 +38,7 @@ export function OnboardingStep5({ onSuccess }: OnboardingStep5Props) {
           <CardTitle>This is your garden</CardTitle>
           <p className="text-muted-foreground mx-auto max-w-md">Get droplets to make it grow</p>
         </CardHeader>
-        <CardContent className="flex flex-grow flex-col items-center justify-center p-0">
+        <CardContent className="flex grow flex-col items-center justify-center p-0">
           <div className="relative h-96 w-full max-w-md">
             <Canvas camera={{ position: [10, 1, 0] }} className="absolute inset-0">
               <ambientLight intensity={0.5} />

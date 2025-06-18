@@ -33,7 +33,7 @@ export function OnboardingStep2({ onSuccess }: OnboardingStep2Props) {
       onSubmit={handleSubmit}
       className="flex h-full w-full flex-col justify-center text-center"
     >
-      <div className="flex flex-grow flex-col items-center justify-center space-y-4 px-8">
+      <div className="flex grow flex-col items-center justify-center space-y-4 px-8">
         <div className="max-w-md space-y-2">
           <h2 className="text-xl font-medium">Name Your Journal</h2>
           <p className="text-muted-foreground">

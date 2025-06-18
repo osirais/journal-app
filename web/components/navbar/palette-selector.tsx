@@ -104,7 +104,7 @@ export function PaletteSelector({ children }: { children?: ReactNode }) {
                 <>
                   {favoriteFiltered.length > 0 && <PaletteGrid palettes={favoriteFiltered} />}
                   {favoriteFiltered.length > 0 && nonFavoriteFiltered.length > 0 && (
-                    <Separator className="border-1 mx-4" />
+                    <Separator className="border mx-4" />
                   )}
                   {nonFavoriteFiltered.length > 0 && <PaletteGrid palettes={nonFavoriteFiltered} />}
                 </>

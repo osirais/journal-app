@@ -120,7 +120,7 @@ export function OnboardProfile({ onSuccess }: { onSuccess: () => void }) {
           <p className="text-muted-foreground">You're all set to continue.</p>
         </div>
       ) : (
-        <div className="flex flex-grow flex-col items-center justify-center space-y-4 px-8">
+        <div className="flex grow flex-col items-center justify-center space-y-4 px-8">
           <div className="max-w-md space-y-2">
             <h2 className="text-xl font-medium">Set up your profile</h2>
             <p className="text-muted-foreground">Choose a username. You can change this later.</p>
