@@ -146,7 +146,6 @@ export default function EntriesPage() {
         <Button
           onClick={() => {
             dialog.open("create-entry", {
-              ...dialog.data,
               createEntryData: { journalId: journalId as string }
             });
           }}

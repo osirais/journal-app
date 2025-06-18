@@ -41,7 +41,7 @@ export const JournalCard: FC<JournalCardProps> = ({ journal: initialJournal, onE
   const handleDelete = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    dialog.open("delete-journal", { ...dialog.data, deleteJournalData: { journal } });
+    dialog.open("delete-journal", { deleteJournalData: { journal } });
   };
 
   const handleJournalUpdated = (updatedJournal: JournalWithEntryCount) => {

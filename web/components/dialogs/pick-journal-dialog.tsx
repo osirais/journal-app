@@ -31,7 +31,7 @@ export function PickJournalDialog() {
   }, [query, filteredJournals.length]);
 
   const handleSelect = (journal: { id: string; title: string }) => {
-    dialog.open("create-entry", { ...dialog.data, createEntryData: { journalId: journal.id } });
+    dialog.open("create-entry", { createEntryData: { journalId: journal.id } });
 
     setQuery("");
   };

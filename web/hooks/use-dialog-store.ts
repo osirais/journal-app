@@ -36,6 +36,11 @@ export const useDialogStore = create<DialogStore>((set) => ({
   type: null,
   data: {},
   isOpen: false,
-  open: (type, data = {}) => set({ isOpen: true, type, data }),
+  open: (type, newData = {}) =>
+    set((state) => ({
+      isOpen: true,
+      type,
+      data: { ...state.data, ...newData }
+    })),
   close: () => set({ type: null, isOpen: false })
 }));
