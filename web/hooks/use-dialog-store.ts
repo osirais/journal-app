@@ -1,4 +1,4 @@
-import { JournalWithEntryCount, Reason } from "@/types";
+import { JournalWithEntryCount, Reason, Task } from "@/types";
 import { create } from "zustand";
 
 export type DialogType =
@@ -24,6 +24,9 @@ interface DialogData {
   };
   deleteReasonData?: {
     reason: Reason;
+  };
+  deleteTaskData?: {
+    task: Task;
   };
 }
 

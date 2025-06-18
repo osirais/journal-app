@@ -1,6 +1,5 @@
 "use client";
 
-import { DeleteTaskDialog } from "@/components/dialogs/delete-task-dialog";
 import { EditTaskDialog } from "@/components/dialogs/edit-task-dialog";
 import { TaskSkeleton } from "@/components/tasks/task-skeleton";
 import { Button } from "@/components/ui/button";
@@ -27,7 +26,6 @@ export function TasksGrid() {
   const [searchQuery, setSearchQuery] = useState("");
   const [isLoading, setIsLoading] = useState(true);
 
-  const [taskToDelete, setTaskToDelete] = useState<Task | null>(null);
   const [taskToEdit, setTaskToEdit] = useState<Task | null>(null);
 
   useEffect(() => {
@@ -46,19 +44,21 @@ export function TasksGrid() {
   }
 
   const setOnTaskCreated = useTaskCallbackStore((s) => s.setOnTaskCreated);
+  const setOnTaskDeleted = useTaskCallbackStore((s) => s.setOnTaskDeleted);
 
   function handleTaskCreated(task: Task) {
     setTasks((prev) => [task, ...prev]);
     dialog.close();
   }
 
+  function handleTaskDeleted(taskId: string) {
+    setTasks((prev) => prev.filter((t) => t.id !== taskId));
+  }
+
   useEffect(() => {
     setOnTaskCreated(handleTaskCreated);
-  }, [setOnTaskCreated]);
-
-  function handleTaskDeleted(id: string) {
-    setTasks((prev) => prev.filter((task) => task.id !== id));
-  }
+    setOnTaskDeleted(handleTaskDeleted);
+  }, [setOnTaskCreated, setOnTaskDeleted]);
 
   function handleTaskUpdated(updatedTask: Task) {
     setTasks((prev) => prev.map((task) => (task.id === updatedTask.id ? updatedTask : task)));
@@ -78,14 +78,7 @@ export function TasksGrid() {
         }}
         onTaskUpdated={handleTaskUpdated}
       />
-      <DeleteTaskDialog
-        task={taskToDelete}
-        open={!!taskToDelete}
-        onOpenChange={(open) => {
-          if (!open) setTaskToDelete(null);
-        }}
-        onTaskDeleted={handleTaskDeleted}
-      />
+
       <div className="flex flex-col space-y-6">
         <header className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
@@ -183,7 +176,9 @@ export function TasksGrid() {
                           <DropdownMenuSeparator />
                           <DropdownMenuItem
                             className="cursor-pointer text-red-500"
-                            onSelect={() => setTaskToDelete(task)}
+                            onSelect={() =>
+                              dialog.open("delete-task", { deleteTaskData: { task } })
+                            }
                           >
                             <Trash2 className="mr-2 size-4" />
                             Delete

@@ -7,6 +7,7 @@ import {
   DialogHeader,
   DialogTitle
 } from "@/components/ui/dialog";
+import { useDialogStore } from "@/hooks/use-dialog-store";
 import { deleteTask } from "@/lib/actions/task-actions";
 import { LoaderCircle } from "lucide-react";
 import { useTransition } from "react";
@@ -24,17 +25,14 @@ interface Task {
 
 interface DeleteTaskDialogProps {
   task: Task | null;
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-  onTaskDeleted: (id: string) => void;
+  onTaskDeleted: (taskId: string) => void;
 }
 
-export function DeleteTaskDialog({
-  task,
-  open,
-  onOpenChange,
-  onTaskDeleted
-}: DeleteTaskDialogProps) {
+export function DeleteTaskDialog({ task, onTaskDeleted }: DeleteTaskDialogProps) {
+  const dialog = useDialogStore();
+
+  const isDialogOpen = dialog.isOpen && dialog.type === "delete-task";
+
   const [isPending, startTransition] = useTransition();
 
   function handleDeleteTask() {
@@ -48,13 +46,13 @@ export function DeleteTaskDialog({
       } catch {
         toast.error("Failed to delete task");
       } finally {
-        onOpenChange(false);
+        dialog.close();
       }
     });
   }
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog open={isDialogOpen} onOpenChange={dialog.close}>
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Delete Task</DialogTitle>
@@ -63,7 +61,7 @@ export function DeleteTaskDialog({
           </DialogDescription>
         </DialogHeader>
         <DialogFooter>
-          <Button variant="outline" onClick={() => onOpenChange(false)}>
+          <Button variant="outline" onClick={() => dialog.close()}>
             Cancel
           </Button>
           <Button
