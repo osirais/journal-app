@@ -10,14 +10,20 @@ export async function createReason(text: string) {
   const supabase = await createClient();
   const user = await getUserOrThrow(supabase);
 
-  const { error } = await supabase.from("reason").insert({
-    user_id: user.id,
-    text
-  });
+  const { data, error } = await supabase
+    .from("reason")
+    .insert({
+      user_id: user.id,
+      text
+    })
+    .select()
+    .single();
 
   if (error) throw new Error(error.message);
 
   revalidatePath("/reasons");
+
+  return data;
 }
 
 export async function deleteReason(id: string) {

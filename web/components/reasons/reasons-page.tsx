@@ -29,8 +29,11 @@ export function ReasonsPage({ initialReasons }: ReasonsPageProps) {
 
     startTransition(async () => {
       try {
-        await createReason(inputText);
-        setInputText("");
+        const newReason = await createReason(inputText);
+        if (newReason) {
+          setReasons((prev) => [newReason, ...prev]);
+          setInputText("");
+        }
       } catch (error) {
         console.error(error);
       }
@@ -58,6 +61,7 @@ export function ReasonsPage({ initialReasons }: ReasonsPageProps) {
           disabled={isPending}
           value={inputText}
           onChange={(e) => setInputText(e.target.value)}
+          autoComplete="off"
         />
         <Button type="submit" disabled={isPending} className="cursor-pointer">
           {isPending ? "Adding..." : "Add"}
