@@ -1,6 +1,5 @@
 "use client";
 
-import { DeleteReasonDialog } from "@/components/dialogs/delete-reason-dialog";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import {
@@ -9,23 +8,13 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu";
+import { useDialogStore } from "@/hooks/use-dialog-store";
 import { Reason } from "@/types";
 import { formatDateAgo } from "@/utils/format-date-ago";
 import { MoreVertical, Trash2 } from "lucide-react";
-import { useState } from "react";
 
-export function ReasonCard({
-  reason,
-  onDelete
-}: {
-  reason: Reason;
-  onDelete: (id: string) => void;
-}) {
-  const [deleteOpen, setDeleteOpen] = useState(false);
-
-  const handleDeleted = () => {
-    onDelete(reason.id);
-  };
+export function ReasonCard({ reason }: { reason: Reason }) {
+  const dialog = useDialogStore();
 
   return (
     <>
@@ -47,7 +36,7 @@ export function ReasonCard({
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-32">
                 <DropdownMenuItem
-                  onClick={() => setDeleteOpen(true)}
+                  onClick={() => dialog.open("delete-reason", { deleteReasonData: { reason } })}
                   className="cursor-pointer text-red-500"
                 >
                   <Trash2 className="mr-2 size-4" />
@@ -58,12 +47,6 @@ export function ReasonCard({
           </div>
         </CardContent>
       </Card>
-      <DeleteReasonDialog
-        reason={reason}
-        open={deleteOpen}
-        onOpenChange={setDeleteOpen}
-        onDeleted={handleDeleted}
-      />
     </>
   );
 }

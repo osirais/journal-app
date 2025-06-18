@@ -9,6 +9,7 @@ import {
   DialogHeader,
   DialogTitle
 } from "@/components/ui/dialog";
+import { useDialogStore } from "@/hooks/use-dialog-store";
 import { deleteReason } from "@/lib/actions/reason-actions";
 import { Reason } from "@/types";
 import { Loader2 } from "lucide-react";
@@ -17,18 +18,41 @@ import { toast } from "sonner";
 
 type DeleteReasonDialogProps = {
   reason: Reason;
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-  onDeleted: () => void;
+  onReasonDeleted: (reasonId: string) => void;
 };
 
-export function DeleteReasonDialog({
-  reason,
-  open,
-  onOpenChange,
-  onDeleted
-}: DeleteReasonDialogProps) {
+export function DeleteReasonDialog({ reason, onReasonDeleted }: DeleteReasonDialogProps) {
+  const dialog = useDialogStore();
+
+  const isDialogOpen = dialog.isOpen && dialog.type === "delete-reason";
+
   const [isPending, startTransition] = useTransition();
+
+  if (!reason) {
+    return (
+      <Dialog open={isDialogOpen} onOpenChange={dialog.close}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Reason Not Found</DialogTitle>
+            <DialogDescription>
+              The selected reason could not be found. It may have already been deleted or is
+              unavailable.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => dialog.close()}
+              className="cursor-pointer"
+            >
+              Close
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    );
+  }
 
   const handleDelete = () => {
     startTransition(async () => {
@@ -37,9 +61,9 @@ export function DeleteReasonDialog({
 
         toast.success("Reason deleted");
 
-        onOpenChange(false);
+        dialog.close();
 
-        onDeleted();
+        onReasonDeleted(reason.id);
       } catch (error: unknown) {
         if (error instanceof Error) {
           toast.error(error.message);
@@ -51,7 +75,7 @@ export function DeleteReasonDialog({
   };
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog open={isDialogOpen} onOpenChange={dialog.close}>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle>Delete Reason</DialogTitle>
@@ -64,7 +88,7 @@ export function DeleteReasonDialog({
           <Button
             type="button"
             variant="outline"
-            onClick={() => onOpenChange(false)}
+            onClick={() => dialog.close()}
             disabled={isPending}
             className="cursor-pointer"
           >

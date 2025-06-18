@@ -4,6 +4,7 @@ import { ReasonCard } from "@/components/reasons/reason-card";
 import { ReasonCardSkeleton } from "@/components/reasons/reason-card-skeleton";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { useReasonCallbackStore } from "@/hooks/use-reason-callback-store";
 import { createReason } from "@/lib/actions/reason-actions";
 import { Reason } from "@/types";
 import { useEffect, useState, useTransition } from "react";
@@ -36,9 +37,15 @@ export function ReasonsPage({ initialReasons }: ReasonsPageProps) {
     });
   };
 
+  const setOnReasonDeleted = useReasonCallbackStore((s) => s.setOnReasonDeleted);
+
   const refreshReasonsAfterDeleted = (id: string) => {
     setReasons((prev) => prev.filter((r) => r.id !== id));
   };
+
+  useEffect(() => {
+    setOnReasonDeleted(refreshReasonsAfterDeleted);
+  }, [setOnReasonDeleted]);
 
   return (
     <main className="container max-w-3xl space-y-6 py-10">
@@ -59,9 +66,7 @@ export function ReasonsPage({ initialReasons }: ReasonsPageProps) {
       <div className="grid grid-cols-1 gap-4">
         {!mounted
           ? Array.from({ length: 3 }).map((_, i) => <ReasonCardSkeleton key={i} />)
-          : reasons.map((reason) => (
-              <ReasonCard key={reason.id} reason={reason} onDelete={refreshReasonsAfterDeleted} />
-            ))}
+          : reasons.map((reason) => <ReasonCard key={reason.id} reason={reason} />)}
       </div>
     </main>
   );
