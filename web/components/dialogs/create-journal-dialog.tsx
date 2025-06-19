@@ -22,11 +22,15 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useDialogStore } from "@/hooks/use-dialog-store";
-import { createJournalSchema } from "@/lib/validators/journal";
+import {
+  createJournalSchema,
+  MAX_DESCRIPTION_LENGTH,
+  MAX_TITLE_LENGTH
+} from "@/lib/validators/journal";
 import { zodResolver } from "@hookform/resolvers/zod";
 import axios from "axios";
 import { useState } from "react";
-import { useForm } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
 import { toast } from "sonner";
 import * as z from "zod";
 
@@ -36,7 +40,6 @@ interface CreateJournalDialogProps {
 
 export function CreateJournalDialog({ onJournalCreated }: CreateJournalDialogProps) {
   const dialog = useDialogStore();
-
   const isDialogOpen = dialog.isOpen && dialog.type === "create-journal";
 
   const [color, setColor] = useState("#99aab5");
@@ -48,6 +51,9 @@ export function CreateJournalDialog({ onJournalCreated }: CreateJournalDialogPro
       description: ""
     }
   });
+
+  const title = useWatch({ control: form.control, name: "title" }) || "";
+  const description = useWatch({ control: form.control, name: "description" }) || "";
 
   async function handleCreate(values: z.infer<typeof createJournalSchema>) {
     const { title, description } = values;
@@ -91,6 +97,13 @@ export function CreateJournalDialog({ onJournalCreated }: CreateJournalDialogPro
                   <FormControl>
                     <Input placeholder="My awesome journal" {...field} />
                   </FormControl>
+                  <div
+                    className={`text-right text-sm ${
+                      title.length > MAX_TITLE_LENGTH ? "text-red-500" : "text-muted-foreground"
+                    }`}
+                  >
+                    {title.length}/{MAX_TITLE_LENGTH}
+                  </div>
                   <FormMessage />
                 </FormItem>
               )}
@@ -107,6 +120,15 @@ export function CreateJournalDialog({ onJournalCreated }: CreateJournalDialogPro
                       {...field}
                     />
                   </FormControl>
+                  <div
+                    className={`text-right text-sm ${
+                      (description?.length ?? 0) > MAX_DESCRIPTION_LENGTH
+                        ? "text-red-500"
+                        : "text-muted-foreground"
+                    }`}
+                  >
+                    {description?.length ?? 0}/{MAX_DESCRIPTION_LENGTH}
+                  </div>
                   <FormMessage />
                 </FormItem>
               )}
@@ -116,11 +138,7 @@ export function CreateJournalDialog({ onJournalCreated }: CreateJournalDialogPro
               <ColorPicker selectedColor={color} onColorChange={setColor} />
             </div>
             <DialogFooter>
-              <Button
-                type="submit"
-                className="cursor-pointer"
-                onClick={() => handleCreate(form.getValues())}
-              >
+              <Button type="submit" className="cursor-pointer">
                 Create
               </Button>
             </DialogFooter>
