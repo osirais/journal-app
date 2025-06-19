@@ -146,7 +146,6 @@ function Theme({
       const newTheme = { ...theme, palette: newPalette };
 
       mutate(newTheme, { revalidate: false });
-      console.log(newTheme);
 
       saveToLS(storageKey, JSON.stringify(newTheme));
 
