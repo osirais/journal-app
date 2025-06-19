@@ -4,6 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { DAILY_MOOD_ENTRY_REWARD } from "@/constants/rewards";
 import { updateMood } from "@/lib/actions/mood-actions";
+import { updateMoodSchema } from "@/lib/validators/mood";
 import { receiveReward } from "@/utils/receive-reward";
 import { FlameIcon as FireIcon } from "lucide-react";
 import { useOptimistic, useTransition } from "react";
@@ -36,6 +37,13 @@ export function MoodCardCSR({ initialMood, eligible, streak }: MoodCardCSRProps)
 
     const selectedMood = moods.find((mood) => mood.label === moodLabel);
     if (!selectedMood) return;
+
+    const validation = updateMoodSchema.safeParse({ scale: selectedMood.scale });
+
+    if (!validation.success) {
+      toast.error(validation.error.errors[0].message);
+      return;
+    }
 
     startTransition(async () => {
       setOptimisticMood(selectedMood.scale);

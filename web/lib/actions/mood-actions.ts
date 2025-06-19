@@ -1,6 +1,7 @@
 "use server";
 
 import { DAILY_MOOD_ENTRY_REWARD } from "@/constants/rewards";
+import { updateMoodSchema } from "@/lib/validators/mood";
 import { getUserOrThrow } from "@/utils/get-user-throw";
 import { createClient } from "@/utils/supabase/server";
 import { revalidatePath } from "next/cache";
@@ -27,17 +28,18 @@ export async function getCurrentMood() {
 }
 
 export async function updateMood(scale: number) {
-  const supabase = await createClient();
+  const validation = updateMoodSchema.safeParse({ scale });
 
+  if (!validation.success) {
+    return { success: false, error: validation.error.errors[0].message };
+  }
+
+  const supabase = await createClient();
   const user = await getUserOrThrow(supabase);
 
   const today = new Date().toISOString().split("T")[0];
   const startOfDay = `${today}T00:00:00.000Z`;
   const endOfDay = `${today}T23:59:59.999Z`;
-
-  if (typeof scale !== "number" || scale < 1 || scale > 5) {
-    throw new Error("Mood must be a number between 1 and 5");
-  }
 
   const { data: existingEntry } = await supabase
     .from("mood_entry")
