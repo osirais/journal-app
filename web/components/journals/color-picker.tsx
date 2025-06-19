@@ -1,5 +1,6 @@
 "use client";
 
+import { DEFAULT_JOURNAL_COLOR, JOURNAL_COLORS } from "@/constants/journal-colors";
 import { cn } from "@/lib/utils";
 import { Check } from "lucide-react";
 
@@ -8,33 +9,7 @@ interface ColorPickerProps {
   onColorChange: (color: string) => void;
 }
 
-const JOURNAL_COLORS = [
-  "#99aab5",
-  "#1abc9c",
-  "#2ecc71",
-  "#3498db",
-  "#9b59b6",
-  "#e91e63",
-  "#f1c40f",
-  "#e67e22",
-  "#e74c3c",
-  "#95a5a6",
-  "#607d8b",
-  "#11806a",
-  "#1f8b4c",
-  "#206694",
-  "#71368a",
-  "#ad1457",
-  "#c27c0e",
-  "#a84300",
-  "#992d22",
-  "#979c9f",
-  "#546e7a"
-];
-
 export function ColorPicker({ selectedColor, onColorChange }: ColorPickerProps) {
-  const defaultColor = "#99aab5";
-
   return (
     <div className="space-y-4">
       <div className="grid grid-cols-2 gap-3">
@@ -42,11 +17,11 @@ export function ColorPicker({ selectedColor, onColorChange }: ColorPickerProps) 
           <div className="text-muted-foreground text-sm">Default</div>
           <button
             type="button"
-            onClick={() => onColorChange(defaultColor)}
+            onClick={() => onColorChange(DEFAULT_JOURNAL_COLOR)}
             className="relative h-12 w-full rounded-md border-2 border-gray-600 transition hover:border-white/40"
-            style={{ backgroundColor: defaultColor }}
+            style={{ backgroundColor: DEFAULT_JOURNAL_COLOR }}
           >
-            {selectedColor === defaultColor && (
+            {selectedColor === DEFAULT_JOURNAL_COLOR && (
               <Check className="absolute inset-0 m-auto h-5 w-5 text-white drop-shadow" />
             )}
           </button>
@@ -60,7 +35,7 @@ export function ColorPicker({ selectedColor, onColorChange }: ColorPickerProps) 
         </div>
       </div>
       <div className="grid grid-cols-10 gap-1">
-        {JOURNAL_COLORS.filter((color) => color !== defaultColor).map((color) => (
+        {JOURNAL_COLORS.filter((color) => color !== DEFAULT_JOURNAL_COLOR).map((color) => (
           <button
             key={color}
             type="button"

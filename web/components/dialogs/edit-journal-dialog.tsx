@@ -21,20 +21,21 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { DEFAULT_JOURNAL_COLOR } from "@/constants/journal-colors";
 import { useDialogStore } from "@/hooks/use-dialog-store";
 import { updateJournal } from "@/lib/actions/journal-actions";
+import {
+  editJournalSchema,
+  MAX_DESCRIPTION_LENGTH,
+  MAX_TITLE_LENGTH
+} from "@/lib/validators/journal";
 import type { JournalWithEntryCount } from "@/types";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2 } from "lucide-react";
-import { useEffect, useState, useTransition } from "react";
-import { useForm } from "react-hook-form";
+import { useEffect, useTransition } from "react";
+import { useForm, useWatch } from "react-hook-form";
 import { toast } from "sonner";
 import * as z from "zod";
-
-const formSchema = z.object({
-  title: z.string().nonempty({ message: "Title is required" }),
-  description: z.string().optional()
-});
 
 type EditJournalDialogProps = {
   journal: JournalWithEntryCount;
@@ -46,23 +47,28 @@ export function EditJournalDialog({ journal, onJournalEdited }: EditJournalDialo
   const isDialogOpen = dialog.isOpen && dialog.type === "edit-journal";
 
   const [isPending, startTransition] = useTransition();
-  const [color, setColor] = useState(journal?.color_hex ?? "#000000");
 
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
+  const form = useForm<z.infer<typeof editJournalSchema>>({
+    resolver: zodResolver(editJournalSchema),
     defaultValues: {
+      id: journal?.id ?? "",
       title: journal?.title ?? "",
-      description: journal?.description ?? ""
+      description: journal?.description ?? "",
+      color: journal?.color_hex ?? DEFAULT_JOURNAL_COLOR
     }
   });
+
+  const title = useWatch({ control: form.control, name: "title" }) || "";
+  const description = useWatch({ control: form.control, name: "description" }) || "";
 
   useEffect(() => {
     if (isDialogOpen && journal) {
       form.reset({
+        id: journal.id,
         title: journal.title,
-        description: journal.description || ""
+        description: journal.description || "",
+        color: journal.color_hex || "#000000"
       });
-      setColor(journal.color_hex);
     }
   }, [journal, isDialogOpen, form]);
 
@@ -92,13 +98,13 @@ export function EditJournalDialog({ journal, onJournalEdited }: EditJournalDialo
     );
   }
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
+  function handleEdit(values: z.infer<typeof editJournalSchema>) {
     startTransition(async () => {
       const formData = new FormData();
       formData.append("title", values.title.trim());
       formData.append("description", values.description?.trim() || "");
 
-      const result = await updateJournal(journal.id, formData, color);
+      const result = await updateJournal(values.id, formData, values.color);
 
       if (result.error) {
         toast.error(result.error);
@@ -111,12 +117,17 @@ export function EditJournalDialog({ journal, onJournalEdited }: EditJournalDialo
         ...journal,
         title: values.title.trim(),
         description: values.description?.trim() || "",
-        color_hex: color
+        color_hex: values.color
       };
 
       onJournalEdited(updatedJournal);
       dialog.close();
     });
+  }
+
+  function onFormError(errors: any) {
+    console.log("Form validation errors:", errors);
+    toast.error("Please fix the form errors before submitting");
   }
 
   return (
@@ -129,7 +140,7 @@ export function EditJournalDialog({ journal, onJournalEdited }: EditJournalDialo
           </DialogDescription>
         </DialogHeader>
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+          <form onSubmit={form.handleSubmit(handleEdit, onFormError)} className="space-y-6">
             <FormField
               control={form.control}
               name="title"
@@ -139,6 +150,13 @@ export function EditJournalDialog({ journal, onJournalEdited }: EditJournalDialo
                   <FormControl>
                     <Input placeholder="Journal title" {...field} disabled={isPending} />
                   </FormControl>
+                  <div
+                    className={`text-right text-sm ${
+                      title.length > MAX_TITLE_LENGTH ? "text-red-500" : "text-muted-foreground"
+                    }`}
+                  >
+                    {title.length}/{MAX_TITLE_LENGTH}
+                  </div>
                   <FormMessage />
                 </FormItem>
               )}
@@ -157,14 +175,32 @@ export function EditJournalDialog({ journal, onJournalEdited }: EditJournalDialo
                       disabled={isPending}
                     />
                   </FormControl>
+                  <div
+                    className={`text-right text-sm ${
+                      description.length > MAX_DESCRIPTION_LENGTH
+                        ? "text-red-500"
+                        : "text-muted-foreground"
+                    }`}
+                  >
+                    {description.length}/{MAX_DESCRIPTION_LENGTH}
+                  </div>
                   <FormMessage />
                 </FormItem>
               )}
             />
-            <div>
-              <Label htmlFor="color">Color</Label>
-              <ColorPicker selectedColor={color} onColorChange={setColor} />
-            </div>
+            <FormField
+              control={form.control}
+              name="color"
+              render={({ field }) => (
+                <FormItem>
+                  <Label htmlFor="color">Color</Label>
+                  <FormControl>
+                    <ColorPicker selectedColor={field.value} onColorChange={field.onChange} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
             <DialogFooter>
               <Button type="submit" className="cursor-pointer" disabled={isPending}>
                 {isPending && <Loader2 className="mr-2 size-4 animate-spin" />}

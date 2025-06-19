@@ -16,3 +16,7 @@ export const createJournalSchema = z.object({
     .optional(),
   color: z.string().nonempty({ message: "Color is required" })
 });
+
+export const editJournalSchema = createJournalSchema.extend({
+  id: z.string().nonempty({ message: "ID is required" })
+});

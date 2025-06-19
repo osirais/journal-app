@@ -19,8 +19,8 @@ import {
   FormMessage
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { DEFAULT_JOURNAL_COLOR } from "@/constants/journal-colors";
 import { useDialogStore } from "@/hooks/use-dialog-store";
 import {
   createJournalSchema,
@@ -32,7 +32,7 @@ import axios from "axios";
 import { useState } from "react";
 import { useForm, useWatch } from "react-hook-form";
 import { toast } from "sonner";
-import * as z from "zod";
+import type * as z from "zod";
 
 interface CreateJournalDialogProps {
   onJournalCreated: (journal: any) => void;
@@ -42,13 +42,14 @@ export function CreateJournalDialog({ onJournalCreated }: CreateJournalDialogPro
   const dialog = useDialogStore();
   const isDialogOpen = dialog.isOpen && dialog.type === "create-journal";
 
-  const [color, setColor] = useState("#99aab5");
+  const [isLoading, setIsLoading] = useState(false);
 
   const form = useForm<z.infer<typeof createJournalSchema>>({
     resolver: zodResolver(createJournalSchema),
     defaultValues: {
       title: "",
-      description: ""
+      description: "",
+      color: DEFAULT_JOURNAL_COLOR
     }
   });
 
@@ -56,7 +57,11 @@ export function CreateJournalDialog({ onJournalCreated }: CreateJournalDialogPro
   const description = useWatch({ control: form.control, name: "description" }) || "";
 
   async function handleCreate(values: z.infer<typeof createJournalSchema>) {
-    const { title, description } = values;
+    if (isLoading) return;
+
+    setIsLoading(true);
+
+    const { title, description, color } = values;
 
     try {
       const res = await axios.post("/api/journals", {
@@ -71,12 +76,18 @@ export function CreateJournalDialog({ onJournalCreated }: CreateJournalDialogPro
       onJournalCreated(journal);
 
       form.reset();
-      setColor("#99aab5");
       dialog.close();
     } catch (err: any) {
-      toast.error("Failed to create journal");
-      console.error(err);
+      console.error("Error creating journal:", err);
+      toast.error(err.response?.data?.message || "Failed to create journal");
+    } finally {
+      setIsLoading(false);
     }
+  }
+
+  function onFormError(errors: any) {
+    console.log("Form validation errors:", errors);
+    toast.error("Please fix the form errors before submitting");
   }
 
   return (
@@ -87,7 +98,7 @@ export function CreateJournalDialog({ onJournalCreated }: CreateJournalDialogPro
           <DialogDescription>Add a new journal to your collection.</DialogDescription>
         </DialogHeader>
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(handleCreate)} className="space-y-6">
+          <form onSubmit={form.handleSubmit(handleCreate, onFormError)} className="space-y-6">
             <FormField
               control={form.control}
               name="title"
@@ -95,7 +106,7 @@ export function CreateJournalDialog({ onJournalCreated }: CreateJournalDialogPro
                 <FormItem>
                   <FormLabel>Title</FormLabel>
                   <FormControl>
-                    <Input placeholder="My awesome journal" {...field} />
+                    <Input placeholder="My awesome journal" {...field} disabled={isLoading} />
                   </FormControl>
                   <div
                     className={`text-right text-sm ${
@@ -118,6 +129,7 @@ export function CreateJournalDialog({ onJournalCreated }: CreateJournalDialogPro
                     <Textarea
                       placeholder="A brief description of what this journal is about"
                       {...field}
+                      disabled={isLoading}
                     />
                   </FormControl>
                   <div
@@ -133,13 +145,30 @@ export function CreateJournalDialog({ onJournalCreated }: CreateJournalDialogPro
                 </FormItem>
               )}
             />
-            <div>
-              <Label htmlFor="color">Color</Label>
-              <ColorPicker selectedColor={color} onColorChange={setColor} />
-            </div>
+            <FormField
+              control={form.control}
+              name="color"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Color</FormLabel>
+                  <FormControl>
+                    <ColorPicker selectedColor={field.value} onColorChange={field.onChange} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
             <DialogFooter>
-              <Button type="submit" className="cursor-pointer">
-                Create
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => dialog.close()}
+                disabled={isLoading}
+              >
+                Cancel
+              </Button>
+              <Button type="submit" disabled={isLoading} className="cursor-pointer">
+                {isLoading ? "Creating..." : "Create"}
               </Button>
             </DialogFooter>
           </form>
