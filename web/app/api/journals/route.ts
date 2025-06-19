@@ -1,3 +1,4 @@
+import { createJournalSchema } from "@/lib/validators/journal";
 import { JournalWithEntryCount } from "@/types";
 import { getUserOrThrow } from "@/utils/get-user-throw";
 import { createClient } from "@/utils/supabase/server";
@@ -30,15 +31,14 @@ export async function POST(req: Request) {
   const user = await getUserOrThrow(supabase);
 
   const body = await req.json();
-  const { title, description, color } = body;
+  const result = createJournalSchema.safeParse(body);
 
-  if (!title || typeof title !== "string") {
-    return NextResponse.json({ error: "Title is required" }, { status: 400 });
+  if (!result.success) {
+    const error = result.error.errors[0];
+    return NextResponse.json({ error: error.message }, { status: 400 });
   }
 
-  if (!color || typeof color !== "string") {
-    return NextResponse.json({ error: "Color is required" }, { status: 400 });
-  }
+  const { title, description, color } = result.data;
 
   const { data: journal, error } = await supabase
     .from("journal")

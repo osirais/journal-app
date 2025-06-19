@@ -22,17 +22,13 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useDialogStore } from "@/hooks/use-dialog-store";
+import { createJournalSchema } from "@/lib/validators/journal";
 import { zodResolver } from "@hookform/resolvers/zod";
 import axios from "axios";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import * as z from "zod";
-
-const formSchema = z.object({
-  title: z.string().nonempty({ message: "Title is required" }),
-  description: z.string().optional()
-});
 
 interface CreateJournalDialogProps {
   onJournalCreated: (journal: any) => void;
@@ -45,16 +41,17 @@ export function CreateJournalDialog({ onJournalCreated }: CreateJournalDialogPro
 
   const [color, setColor] = useState("#99aab5");
 
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
+  const form = useForm<z.infer<typeof createJournalSchema>>({
+    resolver: zodResolver(createJournalSchema),
     defaultValues: {
       title: "",
       description: ""
     }
   });
 
-  async function handleCreate(values: z.infer<typeof formSchema>) {
+  async function handleCreate(values: z.infer<typeof createJournalSchema>) {
     const { title, description } = values;
+
     try {
       const res = await axios.post("/api/journals", {
         title,
@@ -119,7 +116,11 @@ export function CreateJournalDialog({ onJournalCreated }: CreateJournalDialogPro
               <ColorPicker selectedColor={color} onColorChange={setColor} />
             </div>
             <DialogFooter>
-              <Button type="submit" className="cursor-pointer">
+              <Button
+                type="submit"
+                className="cursor-pointer"
+                onClick={() => handleCreate(form.getValues())}
+              >
                 Create
               </Button>
             </DialogFooter>
