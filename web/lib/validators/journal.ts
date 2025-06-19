@@ -20,3 +20,7 @@ export const createJournalSchema = z.object({
 export const editJournalSchema = createJournalSchema.extend({
   id: z.string().nonempty({ message: "ID is required" })
 });
+
+export const deleteJournalSchema = z.object({
+  id: z.string().nonempty({ message: "ID is required" })
+});

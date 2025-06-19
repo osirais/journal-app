@@ -23,7 +23,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { DEFAULT_JOURNAL_COLOR } from "@/constants/journal-colors";
 import { useDialogStore } from "@/hooks/use-dialog-store";
-import { updateJournal } from "@/lib/actions/journal-actions";
+import { editJournal } from "@/lib/actions/journal-actions";
 import {
   editJournalSchema,
   MAX_DESCRIPTION_LENGTH,
@@ -104,7 +104,7 @@ export function EditJournalDialog({ journal, onJournalEdited }: EditJournalDialo
       formData.append("title", values.title.trim());
       formData.append("description", values.description?.trim() || "");
 
-      const result = await updateJournal(values.id, formData, values.color);
+      const result = await editJournal(values.id, formData, values.color);
 
       if (result.error) {
         toast.error(result.error);

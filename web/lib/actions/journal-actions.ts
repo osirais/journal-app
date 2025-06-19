@@ -1,18 +1,27 @@
 "use server";
 
+import { deleteJournalSchema, editJournalSchema } from "@/lib/validators/journal";
 import { getUserOrThrow } from "@/utils/get-user-throw";
 import { createClient } from "@/utils/supabase/server";
 import { revalidatePath } from "next/cache";
 
-export async function updateJournal(journalId: string, formData: FormData, color: string) {
-  const supabase = await createClient();
+export async function editJournal(journalId: string, formData: FormData, color: string) {
+  const title = formData.get("title");
+  const description = formData.get("description");
 
-  const title = formData.get("title") as string;
-  const description = formData.get("description") as string;
+  const parseResult = editJournalSchema.safeParse({
+    id: journalId,
+    title,
+    description,
+    color
+  });
 
-  if (!title?.trim()) {
-    return { error: "Title is required" };
+  if (!parseResult.success) {
+    const firstError = parseResult.error.errors[0];
+    return { error: firstError.message };
   }
+
+  const supabase = await createClient();
 
   try {
     const user = await getUserOrThrow(supabase);
@@ -20,9 +29,9 @@ export async function updateJournal(journalId: string, formData: FormData, color
     const { error } = await supabase
       .from("journal")
       .update({
-        title: title.trim(),
-        description: description?.trim() || null,
-        color_hex: color,
+        title: parseResult.data.title.trim(),
+        description: parseResult.data.description?.trim() || null,
+        color_hex: parseResult.data.color,
         updated_at: new Date().toISOString()
       })
       .eq("id", journalId)
@@ -44,12 +53,17 @@ export async function updateJournal(journalId: string, formData: FormData, color
 }
 
 export async function deleteJournal(journalId: string) {
+  const validation = deleteJournalSchema.safeParse({ id: journalId });
+
+  if (!validation.success) {
+    return { error: validation.error.errors[0].message };
+  }
+
   const supabase = await createClient();
 
   try {
     const user = await getUserOrThrow(supabase);
 
-    // Soft delete the journal
     const { error } = await supabase
       .from("journal")
       .delete()
