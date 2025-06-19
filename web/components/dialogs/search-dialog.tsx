@@ -68,7 +68,7 @@ export function SearchDialog() {
 
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
-  }, [open, filteredActions, selectedIndex, dialog, executeAction]);
+  }, [open, filteredActions, selectedIndex, dialog, executeAction, isDialogOpen]);
 
   return (
     <Dialog open={isDialogOpen} onOpenChange={dialog.close}>

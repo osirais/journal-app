@@ -61,7 +61,7 @@ export function TasksGrid() {
     setOnTaskCreated(handleTaskCreated);
     setOnTaskDeleted(handleTaskDeleted);
     setOnTaskEdited(handleTaskEdited);
-  }, [setOnTaskCreated, setOnTaskDeleted, setOnTaskEdited]);
+  }, [setOnTaskCreated, setOnTaskDeleted, setOnTaskEdited, handleTaskCreated]);
 
   const filtered = tasks.filter((t) => t.name.toLowerCase().includes(searchQuery.toLowerCase()));
 

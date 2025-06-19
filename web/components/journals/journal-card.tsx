@@ -52,7 +52,7 @@ export const JournalCard: FC<JournalCardProps> = ({ journal: initialJournal, onE
 
   useEffect(() => {
     setOnJournalEdited(handleJournalEdited);
-  }, [setOnJournalEdited]);
+  }, [setOnJournalEdited, handleJournalEdited]);
 
   return (
     <>

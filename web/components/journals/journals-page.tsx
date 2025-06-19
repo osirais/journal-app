@@ -106,7 +106,8 @@ export function JournalsPage() {
       ) : (
         <div className="grid gap-3 md:grid-cols-2">
           {journals.map((journal) => (
-            <JournalCard key={journal.id} journal={journal} />
+            // TODO: fix later
+            <JournalCard key={journal.id} journal={journal} onEdit={() => {}} />
           ))}
         </div>
       )}

@@ -43,8 +43,28 @@ type EditJournalDialogProps = {
 
 export function EditJournalDialog({ journal, onJournalEdited }: EditJournalDialogProps) {
   const dialog = useDialogStore();
-
   const isDialogOpen = dialog.isOpen && dialog.type === "edit-journal";
+
+  const [isPending, startTransition] = useTransition();
+  const [color, setColor] = useState(journal?.color_hex ?? "#000000");
+
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      title: journal?.title ?? "",
+      description: journal?.description ?? ""
+    }
+  });
+
+  useEffect(() => {
+    if (isDialogOpen && journal) {
+      form.reset({
+        title: journal.title,
+        description: journal.description || ""
+      });
+      setColor(journal.color_hex);
+    }
+  }, [journal, isDialogOpen, form]);
 
   if (!journal) {
     return (
@@ -61,7 +81,7 @@ export function EditJournalDialog({ journal, onJournalEdited }: EditJournalDialo
             <Button
               type="button"
               variant="outline"
-              onClick={() => dialog.close()}
+              onClick={dialog.close}
               className="cursor-pointer"
             >
               Close
@@ -71,26 +91,6 @@ export function EditJournalDialog({ journal, onJournalEdited }: EditJournalDialo
       </Dialog>
     );
   }
-
-  const [isPending, startTransition] = useTransition();
-  const [color, setColor] = useState(journal.color_hex);
-
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
-    defaultValues: {
-      title: journal.title,
-      description: journal.description || ""
-    }
-  });
-
-  useEffect(() => {
-    if (isDialogOpen) {
-      form.reset({
-        title: journal.title,
-        description: journal.description || ""
-      });
-    }
-  }, [journal, form]);
 
   function onSubmit(values: z.infer<typeof formSchema>) {
     startTransition(async () => {
@@ -115,7 +115,6 @@ export function EditJournalDialog({ journal, onJournalEdited }: EditJournalDialo
       };
 
       onJournalEdited(updatedJournal);
-
       dialog.close();
     });
   }

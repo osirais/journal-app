@@ -71,7 +71,7 @@ export function PickJournalDialog() {
 
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
-  }, [isDialogOpen, filteredJournals, selectedIndex]);
+  }, [isDialogOpen, filteredJournals, selectedIndex, dialog, handleSelect]);
 
   return (
     <Dialog open={isDialogOpen} onOpenChange={dialog.close}>
