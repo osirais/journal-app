@@ -67,7 +67,7 @@ export const DialogProvider = () => {
         onTaskDeleted={onTaskDeleted}
       />
       <EditJournalDialog
-        journal={dialogStore.data.deleteJournalData?.journal as JournalWithEntryCount}
+        journal={dialogStore.data.editJournalData?.journal as JournalWithEntryCount}
         onJournalEdited={onJournalEdited}
       />
       <EditTaskDialog
