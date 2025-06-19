@@ -8,7 +8,7 @@ import useSWR from "swr";
 
 export interface Theme {
   palette: { name: string; colors?: Record<string, string> };
-  favoritePalettes: Set<string>;
+  favoritePalettes?: string[];
 }
 
 declare global {
@@ -33,7 +33,9 @@ export interface UseThemeProps {
 
   setPaletteName: (name: string) => Promise<void>;
 
-  favoritePalettes?: Set<string>;
+  favoritePalettes?: string[];
+
+  setFavoritePalette: (name: string, isFavorite?: boolean) => Promise<void>;
 }
 
 export interface ThemeProviderProps extends React.PropsWithChildren {
@@ -53,13 +55,12 @@ export interface ThemeProviderProps extends React.PropsWithChildren {
   scriptProps?: ScriptProps;
 }
 
-const colorSchemes = ["light", "dark"];
 const MEDIA = "(prefers-color-scheme: dark)";
 const ThemeContext = createContext<UseThemeProps | undefined>(undefined);
 
 const DEFAULT_THEME: Theme = {
   palette: { name: "system" },
-  favoritePalettes: new Set(["light", "dark"])
+  favoritePalettes: ["light", "dark"]
 };
 
 function saveToLS(storageKey: string, value: string) {
@@ -123,7 +124,7 @@ function resolveTheme(overrides: Partial<Theme> = {}) {
 function Theme({
   forcedTheme,
   disableTransitionOnChange = false,
-  storageKey = "palette",
+  storageKey = "theme",
   themes = systemThemes,
   defaultTheme = DEFAULT_THEME,
   children,
@@ -132,9 +133,8 @@ function Theme({
 }: ThemeProviderProps) {
   const { data: theme, mutate } = useSWR("theme", fetchTheme, {
     fallbackData: resolveTheme(globalThis.__THEME__),
-    keepPreviousData: true,
     onSuccess: (theme) => {
-      saveToLS(storageKey, JSON.stringify(theme.palette));
+      saveToLS(storageKey, JSON.stringify(theme));
     }
   });
 
@@ -144,9 +144,12 @@ function Theme({
     async (name: string) => {
       const newPalette = getPalette(name) || { name: name };
 
-      mutate({ ...theme, palette: newPalette }, { revalidate: false });
+      const newTheme = { ...theme, palette: newPalette };
 
-      saveToLS(storageKey, JSON.stringify(newPalette));
+      mutate(newTheme, { revalidate: false });
+      console.log(newTheme);
+
+      saveToLS(storageKey, JSON.stringify(newTheme));
 
       const supabase = createClient();
       const {
@@ -156,7 +159,7 @@ function Theme({
       if (user) {
         await supabase
           .from("user_settings")
-          .upsert({ user_id: user.id, theme: { palette: { name } } });
+          .upsert({ user_id: user.id, theme: { ...theme, palette: { name } } });
       }
     },
     [mutate, storageKey, theme]
@@ -175,13 +178,9 @@ function Theme({
     el.classList.remove(...themes);
     if (resolved) el.classList.add(resolved);
 
-    const colorScheme = colorSchemes.includes(resolved)
-      ? resolved
-      : colorSchemes.includes(defaultTheme.palette.name)
-        ? defaultTheme.palette.name
-        : null;
-
-    (el.style as any).colorScheme = colorScheme;
+    if (resolved === "light" || resolved === "dark") {
+      el.style.colorScheme = resolved;
+    }
 
     const palette = getPalette(resolved);
     if (!palette) return;
@@ -189,7 +188,7 @@ function Theme({
     Object.entries(palette.colors).forEach(([k, v]) => {
       el.style.setProperty(k, v);
     });
-  }, [defaultTheme.palette.name, disableTransitionOnChange, nonce, paletteName, themes]);
+  }, [disableTransitionOnChange, nonce, paletteName, themes]);
 
   useEffect(() => {
     applyTheme();
@@ -218,6 +217,40 @@ function Theme({
     return () => window.removeEventListener("storage", handleStorage);
   }, [mutate, storageKey, applyTheme, theme]);
 
+  const setFavoritePalette = useCallback(
+    async (name: string, isFavorite: boolean = true) => {
+      let newFavoritePalettes = [...(theme.favoritePalettes || [])];
+
+      if (isFavorite && !newFavoritePalettes.includes(name)) {
+        newFavoritePalettes.push(name);
+      } else {
+        newFavoritePalettes = newFavoritePalettes.filter((n) => n !== name);
+      }
+
+      const newTheme = { ...theme, favoritePalettes: newFavoritePalettes };
+
+      mutate(newTheme, { revalidate: false });
+
+      saveToLS(storageKey, JSON.stringify(newTheme));
+
+      const supabase = createClient();
+      const {
+        data: { user }
+      } = await supabase.auth.getUser();
+
+      if (user) {
+        await supabase.from("user_settings").upsert({
+          user_id: user.id,
+          theme: {
+            palette: paletteName,
+            favoritePalettes: newFavoritePalettes
+          }
+        });
+      }
+    },
+    [mutate, paletteName, storageKey, theme]
+  );
+
   const providerValue = useMemo(
     () => ({
       theme,
@@ -225,9 +258,10 @@ function Theme({
       setPaletteName,
       forcedTheme,
       themes: themes,
-      favoritePalettes: theme.favoritePalettes
+      favoritePalettes: theme.favoritePalettes,
+      setFavoritePalette
     }),
-    [theme, paletteName, setPaletteName, forcedTheme, themes]
+    [theme, paletteName, setPaletteName, forcedTheme, themes, setFavoritePalette]
   );
 
   return (
@@ -259,7 +293,7 @@ function script(storageKey: string, defaultTheme: string, forcedTheme: string, t
     } else {
       const { colors }: { colors: Record<string, string> } = JSON.parse(
         localStorage.getItem(storageKey) || "{}"
-      );
+      ).palette;
 
       if (colors) {
         Object.entries(colors).forEach(([k, v]) => {
@@ -273,11 +307,12 @@ function script(storageKey: string, defaultTheme: string, forcedTheme: string, t
     return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
   }
 
-  const palette = JSON.parse(localStorage.getItem(storageKey) || "{}");
-  globalThis.__THEME__ = { palette: palette };
+  const theme = JSON.parse(localStorage.getItem(storageKey) || "{}");
+
+  globalThis.__THEME__ = theme;
 
   try {
-    const themeName = forcedTheme || palette.name || defaultTheme;
+    const themeName = forcedTheme || theme.palette?.name || defaultTheme;
     updateDOM(!forcedTheme && themeName === "system" ? getSystemTheme() : themeName);
   } catch {
     //

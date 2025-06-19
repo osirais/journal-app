@@ -7,7 +7,7 @@ import { useTheme } from "@/contexts/theme-context";
 import { Palette, palettes } from "@/lib/theme-palettes";
 import { cn } from "@/lib/utils";
 import { Separator } from "@radix-ui/react-dropdown-menu";
-import { Search } from "lucide-react";
+import { Search, Star, StarHalf } from "lucide-react";
 import { createContext, ReactNode, useContext, useEffect, useState } from "react";
 
 export function PaletteInput() {
@@ -35,24 +35,58 @@ function formatPaletteName(name: string) {
 }
 
 export function PaletteGrid({ palettes }: { palettes: Palette[] }) {
-  const { paletteName, setPaletteName } = useTheme();
+  const { paletteName, setPaletteName, favoritePalettes, setFavoritePalette } = useTheme();
+
+  const [isFavoriteHovered, setIsFavoriteHovered] = useState(false);
 
   return (
     <div className="grid grid-cols-2 gap-2 px-4">
-      {palettes.map(({ name, colors }) => (
-        <Button
-          key={name}
-          type="button"
-          className={cn("py-5", paletteName === name && "ring-2")}
-          style={{
-            backgroundColor: colors["--color-background"],
-            color: colors["--color-primary"]
-          }}
-          onClick={() => setPaletteName(name)}
-        >
-          <span className="block truncate text-sm font-medium">{formatPaletteName(name)}</span>
-        </Button>
-      ))}
+      {palettes.map(({ name, colors }) => {
+        const isFavorite = favoritePalettes?.includes(name);
+        return (
+          <div
+            key={name}
+            className="group relative flex items-center"
+            style={{ color: colors["--color-primary"] }}
+          >
+            <Button
+              type="button"
+              className={cn(
+                "w-full cursor-pointer py-5 text-current",
+                paletteName === name && "ring-2"
+              )}
+              style={{ backgroundColor: colors["--color-background"] }}
+              onClick={() => setPaletteName(name)}
+            >
+              <span className="truncate text-sm font-medium">{formatPaletteName(name)}</span>
+            </Button>
+            <div className="pointer-events-none absolute flex aspect-square min-h-full items-center justify-center opacity-0 transition-opacity group-hover:opacity-100">
+              <button
+                className="group/favorite pointer-events-auto flex cursor-pointer items-center"
+                style={{
+                  color: isFavoriteHovered ? colors["--color-accent-foreground"] : "inherit"
+                }}
+                onClick={() => setFavoritePalette(name, !isFavorite)}
+                onMouseEnter={() => setIsFavoriteHovered(true)}
+                onMouseLeave={() => setIsFavoriteHovered(false)}
+              >
+                <Star
+                  className={cn(
+                    "size-4",
+                    isFavorite && "fill-current group-hover/favorite:fill-none"
+                  )}
+                />
+                <StarHalf
+                  className={cn(
+                    "absolute size-4 fill-current opacity-0 group-hover/favorite:opacity-100",
+                    isFavorite && "-scale-x-100"
+                  )}
+                />
+              </button>
+            </div>
+          </div>
+        );
+      })}
     </div>
   );
 }
@@ -85,10 +119,10 @@ export function PaletteSelector({ children }: { children?: ReactNode }) {
   }, [query]);
 
   const favoriteFiltered = favoritePalettes
-    ? filteredPalettes.filter((p) => favoritePalettes.has(p.name))
+    ? filteredPalettes.filter((p) => favoritePalettes.includes(p.name))
     : [];
   const nonFavoriteFiltered = favoritePalettes
-    ? filteredPalettes.filter((p) => !favoritePalettes.has(p.name))
+    ? filteredPalettes.filter((p) => !favoritePalettes.includes(p.name))
     : filteredPalettes;
 
   return (
@@ -104,7 +138,7 @@ export function PaletteSelector({ children }: { children?: ReactNode }) {
                 <>
                   {favoriteFiltered.length > 0 && <PaletteGrid palettes={favoriteFiltered} />}
                   {favoriteFiltered.length > 0 && nonFavoriteFiltered.length > 0 && (
-                    <Separator className="border mx-4" />
+                    <Separator className="mx-4 border" />
                   )}
                   {nonFavoriteFiltered.length > 0 && <PaletteGrid palettes={nonFavoriteFiltered} />}
                 </>
