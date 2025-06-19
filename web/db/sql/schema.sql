@@ -1,4 +1,5 @@
 CREATE EXTENSION IF NOT EXISTS citext SCHEMA extensions;
+CREATE EXTENSION IF NOT EXISTS pg_cron WITH SCHEMA extensions;
 
 DROP TABLE IF EXISTS entry_tag;
 DROP TABLE IF EXISTS tag;
@@ -163,6 +164,30 @@ CREATE TABLE IF NOT EXISTS streak (
     CONSTRAINT user_category_unique UNIQUE(user_id, category)
 );
 
+CREATE OR REPLACE FUNCTION reset_stale_streaks()
+RETURNS void AS $$
+BEGIN
+  UPDATE streak
+  SET
+    current_streak = 0,
+    last_completed_date = NULL,
+    updated_at = now()
+  WHERE
+    last_completed_date IS NOT NULL AND (
+      (category = 'journal_entries' AND last_completed_date < current_date - INTERVAL '1 day') OR
+      (category = 'mood_entries' AND last_completed_date < current_date - INTERVAL '1 day') OR
+      (category = 'task_completions' AND last_completed_date < current_date - INTERVAL '1 day')
+    );
+END;
+$$ LANGUAGE plpgsql;
+
+-- schedules the reset function to run daily at 3 AM UTC
+SELECT cron.schedule(
+  'reset_streaks_daily',
+  '0 3 * * *',
+  $$CALL reset_stale_streaks();$$
+);
+
 CREATE TABLE IF NOT EXISTS user_activity_summary (
   user_id UUID NOT NULL,
   date DATE NOT NULL,
@@ -207,3 +232,4 @@ CREATE TABLE IF NOT EXISTS reason (
     created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
+
