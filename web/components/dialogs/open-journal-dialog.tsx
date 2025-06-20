@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { useDialogStore } from "@/hooks/use-dialog-store";
 import { fuzzyFind } from "@/utils/fuzzy-find";
+import { createClient } from "@/utils/supabase/client";
 import { BookOpen, Search, X } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -18,13 +19,43 @@ export function OpenJournalDialog() {
 
   const router = useRouter();
 
+  const supabase = createClient();
+
   useEffect(() => {
     const loadJournals = async () => {
-      const res = await fetch("/api/journal-names-ids");
-      const { journals } = await res.json();
-      setJournals(journals);
+      const {
+        data: { session }
+      } = await supabase.auth.getSession();
+
+      if (!session?.user) {
+        console.log("User not logged in");
+        setJournals([]);
+        return;
+      }
+
+      try {
+        const res = await fetch("/api/journal-names-ids");
+        const { journals } = await res.json();
+        setJournals(journals);
+      } catch (error) {
+        console.error("Error loading journals:", error);
+        setJournals([]);
+      }
     };
+
+    const {
+      data: { subscription }
+    } = supabase.auth.onAuthStateChange((event, session) => {
+      if (session?.user) {
+        loadJournals();
+      } else {
+        setJournals([]);
+      }
+    });
+
     loadJournals();
+
+    return () => subscription.unsubscribe();
   }, []);
 
   const filteredJournals = query === "" ? journals : fuzzyFind(journals, "title", query);
@@ -119,7 +150,9 @@ export function OpenJournalDialog() {
             ) : (
               <div className="py-8 text-center">
                 <Search className="text-muted-foreground mx-auto mb-2 h-8 w-8" />
-                <p className="text-muted-foreground text-sm">No journals found</p>
+                <p className="text-muted-foreground text-sm">
+                  {journals.length === 0 ? "No journals available" : "No journals found"}
+                </p>
               </div>
             )}
           </div>
