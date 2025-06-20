@@ -27,7 +27,7 @@ import { receiveReward } from "@/utils/receive-reward";
 import { zodResolver } from "@hookform/resolvers/zod";
 import axios from "axios";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm, useWatch } from "react-hook-form";
 import { WithContext as ReactTags, SEPARATORS, type Tag } from "react-tag-input";
 import { toast } from "sonner";
@@ -45,17 +45,25 @@ export function CreateEntryDialog({ journalId, onEntryCreated }: CreateEntryDial
   const router = useRouter();
 
   const isDialogOpen = dialog.isOpen && dialog.type === "create-entry";
+
   const [tags, setTags] = useState<Tag[]>([]);
   const [isLoading, setIsLoading] = useState(false);
 
   const form = useForm<z.infer<typeof createEntrySchema>>({
     resolver: zodResolver(createEntrySchema),
     defaultValues: {
+      journalId,
       title: "",
       content: "",
       tags: []
     }
   });
+
+  useEffect(() => {
+    if (journalId) {
+      form.setValue("journalId", journalId);
+    }
+  }, [journalId, form]);
 
   const title = useWatch({ control: form.control, name: "title" }) || "";
   const content = useWatch({ control: form.control, name: "content" }) || "";
@@ -77,6 +85,7 @@ export function CreateEntryDialog({ journalId, onEntryCreated }: CreateEntryDial
     try {
       const validatedData = createEntrySchema.parse({
         ...values,
+        journalId,
         tags: tags.map((t) => t.text.toLowerCase())
       });
 
