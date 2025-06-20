@@ -22,18 +22,16 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useDialogStore } from "@/hooks/use-dialog-store";
-import { createEntrySchema } from "@/lib/validators/entry";
+import { createEntrySchema, MAX_CONTENT_LENGTH, MAX_TITLE_LENGTH } from "@/lib/validators/entry";
 import { receiveReward } from "@/utils/receive-reward";
 import { zodResolver } from "@hookform/resolvers/zod";
 import axios from "axios";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { useForm } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
 import { WithContext as ReactTags, SEPARATORS, type Tag } from "react-tag-input";
 import { toast } from "sonner";
 import z from "zod";
-
-// adjust path as needed
 
 const separators = [SEPARATORS.COMMA, SEPARATORS.ENTER, SEPARATORS.SEMICOLON, SEPARATORS.TAB];
 
@@ -58,6 +56,9 @@ export function CreateEntryDialog({ journalId, onEntryCreated }: CreateEntryDial
       tags: []
     }
   });
+
+  const title = useWatch({ control: form.control, name: "title" }) || "";
+  const content = useWatch({ control: form.control, name: "content" }) || "";
 
   const handleDeleteTag = (index: number) => {
     setTags(tags.filter((_, i) => i !== index));
@@ -127,8 +128,20 @@ export function CreateEntryDialog({ journalId, onEntryCreated }: CreateEntryDial
                 <FormItem>
                   <FormLabel>Title</FormLabel>
                   <FormControl>
-                    <Input placeholder="Entry title" {...field} disabled={isLoading} />
+                    <Input
+                      placeholder="Entry title"
+                      {...field}
+                      disabled={isLoading}
+                      maxLength={MAX_TITLE_LENGTH}
+                    />
                   </FormControl>
+                  <div
+                    className={`text-right text-sm ${
+                      title.length > MAX_TITLE_LENGTH ? "text-red-500" : "text-muted-foreground"
+                    }`}
+                  >
+                    {title.length}/{MAX_TITLE_LENGTH}
+                  </div>
                   <FormMessage />
                 </FormItem>
               )}
@@ -146,6 +159,13 @@ export function CreateEntryDialog({ journalId, onEntryCreated }: CreateEntryDial
                       placeholder="Write your entry..."
                     />
                   </FormControl>
+                  <div
+                    className={`text-right text-sm ${
+                      content.length > MAX_CONTENT_LENGTH ? "text-red-500" : "text-muted-foreground"
+                    }`}
+                  >
+                    {content.length}/{MAX_CONTENT_LENGTH}
+                  </div>
                   <FormMessage />
                 </FormItem>
               )}
