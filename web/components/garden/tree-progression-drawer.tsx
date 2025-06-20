@@ -110,7 +110,7 @@ export function TreeProgressionDrawer({ droplets }: { droplets: number }) {
       >
         View Stages
       </Button>
-      <Drawer open={open} onOpenChange={setOpen}>
+      <Drawer open={open} onOpenChange={handleOpenChange}>
         <DrawerContent className="max-h-[80vh] md:max-h-[600px]">
           <DrawerHeader className="pb-3 md:pb-4">
             <DrawerTitle className="text-lg md:text-xl">Growth Stages</DrawerTitle>
