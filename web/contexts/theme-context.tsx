@@ -9,6 +9,8 @@ import useSWR from "swr";
 export interface Theme {
   palette: { name: string; colors?: Record<string, string> };
   favoritePalettes?: string[];
+  sortPalettesBy: "name" | "lightness" | "chroma" | "hue";
+  sortPalettesAscending: boolean;
 }
 
 declare global {
@@ -35,6 +37,14 @@ export interface UseThemeProps {
   favoritePalettes?: string[];
   /** Function to set a palette as favorite or remove it from favorites */
   setFavoritePalette: (name: string, isFavorite?: boolean) => Promise<void>;
+
+  sortPalettesBy: "name" | "lightness" | "chroma" | "hue";
+
+  setSortPalettesBy: (sortBy: "name" | "lightness" | "chroma" | "hue") => void;
+
+  sortPalettesAscending: boolean;
+
+  setSortPalettesAscending: (ascending?: boolean) => void;
 }
 
 export interface ThemeProviderProps extends React.PropsWithChildren {
@@ -59,7 +69,9 @@ const ThemeContext = createContext<UseThemeProps | undefined>(undefined);
 
 const DEFAULT_THEME: Theme = {
   palette: { name: "system" },
-  favoritePalettes: ["light", "dark"]
+  favoritePalettes: ["light", "dark"],
+  sortPalettesBy: "name",
+  sortPalettesAscending: true
 };
 
 function saveToLS(storageKey: string, value: string) {
@@ -177,7 +189,7 @@ function Theme({
     [mutateTheme]
   );
 
-  const applyTheme = useCallback(() => {
+  const applyPalette = useCallback(() => {
     if (!paletteName) return;
 
     if (disableTransitionOnChange) {
@@ -202,21 +214,21 @@ function Theme({
   }, [disableTransitionOnChange, nonce, paletteName]);
 
   useEffect(() => {
-    applyTheme();
+    applyPalette();
 
     if (paletteName === "system" && !forcedTheme) {
       const media = window.matchMedia(MEDIA);
 
       // Intentionally use deprecated listener methods to support iOS & old browsers
-      media.addListener?.(applyTheme);
-      media.addEventListener?.("change", applyTheme);
+      media.addListener?.(applyPalette);
+      media.addEventListener?.("change", applyPalette);
 
       return () => {
-        media.removeListener?.(applyTheme);
-        media.removeEventListener?.("change", applyTheme);
+        media.removeListener?.(applyPalette);
+        media.removeEventListener?.("change", applyPalette);
       };
     }
-  }, [applyTheme, forcedTheme, paletteName]);
+  }, [applyPalette, forcedTheme, paletteName]);
 
   useEffect(() => {
     function handleStorage(e: StorageEvent) {
@@ -226,7 +238,7 @@ function Theme({
     }
     window.addEventListener("storage", handleStorage);
     return () => window.removeEventListener("storage", handleStorage);
-  }, [mutate, storageKey, applyTheme, theme]);
+  }, [mutate, storageKey, applyPalette, theme]);
 
   const setFavoritePalette = useCallback(
     async (name: string, isFavorite: boolean = true) => {
@@ -243,6 +255,22 @@ function Theme({
     [mutateTheme, theme]
   );
 
+  const setSortPalettesBy = useCallback(
+    (sortBy: "name" | "lightness" | "chroma" | "hue") => {
+      if (sortBy === theme.sortPalettesBy) return;
+      mutateTheme({ sortPalettesBy: sortBy });
+    },
+    [mutateTheme, theme.sortPalettesBy]
+  );
+
+  const setSortPalettesAscending = useCallback(
+    (ascending: boolean = true) => {
+      if (ascending === theme.sortPalettesAscending) return;
+      mutateTheme({ sortPalettesAscending: ascending });
+    },
+    [mutateTheme, theme.sortPalettesAscending]
+  );
+
   const providerValue = useMemo(
     () => ({
       theme,
@@ -251,9 +279,21 @@ function Theme({
       setPaletteName,
       forcedTheme,
       favoritePalettes: theme.favoritePalettes,
-      setFavoritePalette
+      setFavoritePalette,
+      sortPalettesBy: theme.sortPalettesBy,
+      setSortPalettesBy,
+      sortPalettesAscending: theme.sortPalettesAscending,
+      setSortPalettesAscending
     }),
-    [theme, paletteName, setPaletteName, forcedTheme, setFavoritePalette]
+    [
+      theme,
+      paletteName,
+      setPaletteName,
+      forcedTheme,
+      setFavoritePalette,
+      setSortPalettesBy,
+      setSortPalettesAscending
+    ]
   );
 
   return (

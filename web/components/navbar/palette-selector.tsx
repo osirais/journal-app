@@ -19,8 +19,9 @@ import { ArrowDownUp, ArrowUpDown, Search, Star, StarHalf } from "lucide-react";
 import { createContext, ReactNode, useContext, useEffect, useState } from "react";
 
 export function PaletteInput() {
-  const { query, setQuery, sortBy, setSortBy, sortAscending, setSortAscending } =
-    usePaletteSelectorContext();
+  const { query, setQuery } = usePaletteSelectorContext();
+  const { sortPalettesBy, setSortPalettesBy, sortPalettesAscending, setSortPalettesAscending } =
+    useTheme();
 
   return (
     <div className="flex items-center p-4">
@@ -37,7 +38,7 @@ export function PaletteInput() {
         />
         <div className="absolute right-1 flex items-center gap-1">
           <Separator orientation="vertical" className="bg-muted-foreground min-h-5" />
-          <Select value={sortBy} onValueChange={setSortBy}>
+          <Select value={sortPalettesBy} onValueChange={setSortPalettesBy}>
             <Button variant="ghost" className="cursor-pointer" asChild>
               <SelectTrigger className="max-h-8 border-0 text-xs shadow-none dark:bg-transparent">
                 <SelectValue />
@@ -63,9 +64,9 @@ export function PaletteInput() {
             variant="ghost"
             size="icon"
             className="size-8 cursor-pointer"
-            onClick={() => setSortAscending(!sortAscending)}
+            onClick={() => setSortPalettesAscending(!sortPalettesAscending)}
           >
-            {sortAscending ? (
+            {sortPalettesAscending ? (
               <ArrowUpDown className="size-4" />
             ) : (
               <ArrowDownUp className="size-4" />
@@ -146,10 +147,6 @@ export const PaletteSelectorContext = createContext<{
   query: string;
   setQuery: (q: string) => void;
   filteredPalettes: Palette[];
-  sortBy: "name" | "lightness" | "chroma" | "hue";
-  setSortBy: (s: "name" | "lightness" | "chroma" | "hue") => void;
-  sortAscending: boolean;
-  setSortAscending: (a: boolean) => void;
 } | null>(null);
 
 export function usePaletteSelectorContext() {
@@ -163,11 +160,8 @@ export function usePaletteSelectorContext() {
 
 export function PaletteSelector({ children }: { children?: ReactNode }) {
   const [query, setQuery] = useState("");
-  const { favoritePalettes } = useTheme();
+  const { favoritePalettes, sortPalettesBy, sortPalettesAscending } = useTheme();
   const [filteredPalettes, setFilteredPalettes] = useState<Palette[]>(palettes);
-
-  const [sortBy, setSortBy] = useState<"name" | "lightness" | "chroma" | "hue">("name");
-  const [sortAscending, setSortAscending] = useState<boolean>(true);
 
   function getOKLCH(colorStr: string) {
     const parsed = parse(colorStr);
@@ -188,7 +182,7 @@ export function PaletteSelector({ children }: { children?: ReactNode }) {
       const bColor = getOKLCH(b.colors["--color-background"]);
 
       let comparison = 0;
-      switch (sortBy) {
+      switch (sortPalettesBy) {
         case "lightness":
           comparison = aColor.l - bColor.l;
           break;
@@ -207,11 +201,11 @@ export function PaletteSelector({ children }: { children?: ReactNode }) {
         return a.name.localeCompare(b.name);
       }
 
-      return sortAscending ? comparison : -comparison;
+      return sortPalettesAscending ? comparison : -comparison;
     });
 
     setFilteredPalettes(result);
-  }, [query, sortAscending, sortBy]);
+  }, [query, sortPalettesAscending, sortPalettesBy]);
 
   const favoriteFiltered = favoritePalettes
     ? filteredPalettes.filter((p) => favoritePalettes.includes(p.name))
@@ -225,11 +219,7 @@ export function PaletteSelector({ children }: { children?: ReactNode }) {
       value={{
         query,
         setQuery,
-        filteredPalettes,
-        sortBy,
-        setSortBy,
-        sortAscending,
-        setSortAscending
+        filteredPalettes
       }}
     >
       {children ? (
