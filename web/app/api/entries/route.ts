@@ -1,8 +1,10 @@
 import { DAILY_ENTRY_REWARD } from "@/constants/rewards";
+import { createEntrySchema } from "@/lib/validators/entry";
 import { TagType } from "@/types";
 import { getUserOrThrow } from "@/utils/get-user-throw";
 import { createClient } from "@/utils/supabase/server";
 import { NextResponse } from "next/server";
+import z from "zod";
 
 export const dynamic = "force-dynamic";
 
@@ -50,26 +52,19 @@ export async function POST(req: Request) {
   const user = await getUserOrThrow(supabase);
 
   const body = await req.json();
-  const { journalId, title, content, tags } = body;
 
-  if (!journalId || typeof journalId !== "string") {
-    return NextResponse.json({ error: "journalId is required" }, { status: 400 });
-  }
-
-  if (!title || typeof title !== "string") {
-    return NextResponse.json({ error: "title is required" }, { status: 400 });
-  }
-
-  if (!content || typeof content !== "string") {
+  let parsed;
+  try {
+    parsed = createEntrySchema.parse(body);
+  } catch (e) {
+    const zodError = e as z.ZodError;
     return NextResponse.json(
-      { error: "content is required and must be a string" },
+      { error: zodError.errors.map((err) => err.message).join(", ") },
       { status: 400 }
     );
   }
 
-  if (tags && !Array.isArray(tags)) {
-    return NextResponse.json({ error: "tags must be an array of strings" }, { status: 400 });
-  }
+  const { journalId, title, content, tags } = parsed;
 
   const { data: journal, error: journalError } = await supabase
     .from("journal")

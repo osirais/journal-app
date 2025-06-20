@@ -22,6 +22,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useDialogStore } from "@/hooks/use-dialog-store";
+import { createEntrySchema } from "@/lib/validators/entry";
 import { receiveReward } from "@/utils/receive-reward";
 import { zodResolver } from "@hookform/resolvers/zod";
 import axios from "axios";
@@ -30,35 +31,31 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { WithContext as ReactTags, SEPARATORS, type Tag } from "react-tag-input";
 import { toast } from "sonner";
-import * as z from "zod";
+import z from "zod";
+
+// adjust path as needed
 
 const separators = [SEPARATORS.COMMA, SEPARATORS.ENTER, SEPARATORS.SEMICOLON, SEPARATORS.TAB];
 
-const formSchema = z.object({
-  title: z.string().nonempty({ message: "Title is required" }),
-  content: z.string().nonempty({ message: "Content is required" })
-});
-
-type CreateEntryDialogProps = {
+interface CreateEntryDialogProps {
   journalId: string;
   onEntryCreated: (entry: any) => void;
-};
+}
 
 export function CreateEntryDialog({ journalId, onEntryCreated }: CreateEntryDialogProps) {
+  const dialog = useDialogStore();
   const router = useRouter();
 
-  const [tags, setTags] = useState<Tag[]>([]);
-  const [creating, setCreating] = useState(false);
-
-  const dialog = useDialogStore();
-
   const isDialogOpen = dialog.isOpen && dialog.type === "create-entry";
+  const [tags, setTags] = useState<Tag[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
 
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
+  const form = useForm<z.infer<typeof createEntrySchema>>({
+    resolver: zodResolver(createEntrySchema),
     defaultValues: {
       title: "",
-      content: ""
+      content: "",
+      tags: []
     }
   });
 
@@ -71,19 +68,26 @@ export function CreateEntryDialog({ journalId, onEntryCreated }: CreateEntryDial
     setTags([...tags, tag]);
   };
 
-  const handleCreate = async (values: z.infer<typeof formSchema>) => {
-    setCreating(true);
+  async function handleCreate(values: z.infer<typeof createEntrySchema>) {
+    if (isLoading) return;
+
+    setIsLoading(true);
+
     try {
-      const res = await axios.post("/api/entries", {
-        journalId,
-        title: values.title,
-        content: values.content,
+      const validatedData = createEntrySchema.parse({
+        ...values,
         tags: tags.map((t) => t.text.toLowerCase())
       });
 
-      const { reward, streak } = res.data;
-      if (reward) {
-        receiveReward(`Daily journal entry reward: +${reward} droplets!`, streak);
+      const res = await axios.post("/api/entries", {
+        journalId,
+        title: validatedData.title,
+        content: validatedData.content,
+        tags: validatedData.tags ?? []
+      });
+
+      if (res.data.reward) {
+        receiveReward(`Daily journal entry reward: +${res.data.reward} droplets!`, res.data.streak);
       }
 
       toast.success("Entry created");
@@ -95,11 +99,17 @@ export function CreateEntryDialog({ journalId, onEntryCreated }: CreateEntryDial
 
       router.push(`/entry/${res.data.entry.id}`);
     } catch (err: any) {
+      console.error("Error creating entry:", err);
       toast.error(err.response?.data?.error || "Failed to create entry");
     } finally {
-      setCreating(false);
+      setIsLoading(false);
     }
-  };
+  }
+
+  function onFormError(errors: any) {
+    console.log("Form validation errors:", errors);
+    toast.error("Please fix the form errors before submitting");
+  }
 
   return (
     <Dialog open={isDialogOpen} onOpenChange={dialog.close}>
@@ -109,7 +119,7 @@ export function CreateEntryDialog({ journalId, onEntryCreated }: CreateEntryDial
           <DialogDescription>Add a new entry to your journal.</DialogDescription>
         </DialogHeader>
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(handleCreate)} className="space-y-6">
+          <form onSubmit={form.handleSubmit(handleCreate, onFormError)} className="space-y-6">
             <FormField
               control={form.control}
               name="title"
@@ -117,7 +127,7 @@ export function CreateEntryDialog({ journalId, onEntryCreated }: CreateEntryDial
                 <FormItem>
                   <FormLabel>Title</FormLabel>
                   <FormControl>
-                    <Input placeholder="My journal entry title" {...field} disabled={creating} />
+                    <Input placeholder="Entry title" {...field} disabled={isLoading} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -154,7 +164,7 @@ export function CreateEntryDialog({ journalId, onEntryCreated }: CreateEntryDial
                   autocomplete
                   placeholder="Add new tag"
                   allowDragDrop={false}
-                  readOnly={creating}
+                  readOnly={isLoading}
                   classNames={{
                     tags: "flex flex-wrap gap-2 mt-2",
                     tag: "rounded-full px-2 py-0.5 text-xs text-muted-foreground bg-black/20 dark:bg-white/20",
@@ -167,8 +177,8 @@ export function CreateEntryDialog({ journalId, onEntryCreated }: CreateEntryDial
               </Card>
             </div>
             <DialogFooter>
-              <Button type="submit" className="cursor-pointer" disabled={creating}>
-                {creating ? "Creating..." : "Create"}
+              <Button type="submit" disabled={isLoading} className="cursor-pointer">
+                {isLoading ? "Creating..." : "Create"}
               </Button>
             </DialogFooter>
           </form>
