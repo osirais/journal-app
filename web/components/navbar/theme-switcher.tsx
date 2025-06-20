@@ -9,7 +9,7 @@ import {
   DropdownMenuRadioItem,
   DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu";
-import { systemThemes, useTheme } from "@/contexts/theme-context";
+import { useTheme } from "@/contexts/theme-context";
 import { Laptop, LoaderCircle, Moon, Palette, Sun } from "lucide-react";
 import { useEffect, useState } from "react";
 
@@ -45,7 +45,7 @@ export const ThemeSwitcher = () => {
         </DropdownMenuTrigger>
         <DropdownMenuContent className="w-content" align="start">
           <DropdownMenuRadioGroup
-            value={systemThemes.includes(paletteName) ? paletteName : "custom"}
+            value={["light", "dark", "system"].includes(paletteName) ? paletteName : "custom"}
             onValueChange={(value) => {
               if (value === "custom") setIsDrawerOpen(true);
               else setPaletteName(value);

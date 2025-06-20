@@ -1,6 +1,6 @@
 "use client";
 
-import { getPalette } from "@/lib/theme-palettes";
+import { getPalette, Palette, palettes } from "@/lib/theme-palettes";
 import { createClient } from "@/utils/supabase/client";
 import { createContext, memo, useCallback, useContext, useEffect, useMemo } from "react";
 import * as React from "react";
@@ -21,25 +21,25 @@ type ScriptProps = React.DetailedHTMLProps<
 >;
 
 export interface UseThemeProps {
-  /** List of all available theme names */
-  themes: string[];
+  /** List of all available palettes */
+  palettes: Palette[];
   /** Forced theme name for the current page */
   forcedTheme?: string;
-
+  /** Current theme */
   theme: Theme;
-
+  /** Name of the current palette */
   paletteName: string;
-
+  /** Function to set the current palette by name */
   setPaletteName: (name: string) => Promise<void>;
-
+  /** List of favorite palettes */
   favoritePalettes?: string[];
-
+  /** Function to set a palette as favorite or remove it from favorites */
   setFavoritePalette: (name: string, isFavorite?: boolean) => Promise<void>;
 }
 
 export interface ThemeProviderProps extends React.PropsWithChildren {
-  /** List of all available theme names */
-  themes?: string[];
+  /** List of all available palettes */
+  palettes?: Palette[];
   /** Forced theme name for the current page (wip) */
   forcedTheme?: string;
   /** Disable all CSS transitions when switching themes */
@@ -84,8 +84,6 @@ export function ThemeProvider(props: ThemeProviderProps) {
   return <Theme {...props} />;
 }
 
-export const systemThemes = ["light", "dark", "system"];
-
 async function fetchTheme(): Promise<Theme> {
   const supabase = createClient();
   const {
@@ -110,12 +108,18 @@ async function fetchTheme(): Promise<Theme> {
     data.theme.palette = getPalette(data.theme.palette.name) || { name: data.theme.palette.name };
   }
 
-  return resolveTheme(data.theme);
+  return resolveTheme({ overrides: data.theme });
 }
 
-function resolveTheme(overrides: Partial<Theme> = {}) {
+function resolveTheme({
+  base = DEFAULT_THEME,
+  overrides
+}: {
+  base?: Theme;
+  overrides: Partial<Theme>;
+}) {
   return {
-    ...DEFAULT_THEME,
+    ...base,
     ...overrides
   };
 }
@@ -124,26 +128,21 @@ function Theme({
   forcedTheme,
   disableTransitionOnChange = false,
   storageKey = "theme",
-  themes = systemThemes,
   defaultTheme = DEFAULT_THEME,
   children,
   nonce,
   scriptProps
 }: ThemeProviderProps) {
   const { data: theme, mutate } = useSWR("theme", fetchTheme, {
-    fallbackData: resolveTheme(globalThis.__THEME__),
+    fallbackData: resolveTheme({ overrides: globalThis.__THEME__ }),
     onSuccess: (theme) => {
       saveToLS(storageKey, JSON.stringify(theme));
     }
   });
 
-  const paletteName = theme.palette.name;
-
-  const setPaletteName = useCallback(
-    async (name: string) => {
-      const newPalette = getPalette(name) || { name: name };
-
-      const newTheme = { ...theme, palette: newPalette };
+  const mutateTheme = useCallback(
+    async (themeUpdates: Partial<Theme>) => {
+      const newTheme = resolveTheme({ base: theme, overrides: themeUpdates });
 
       mutate(newTheme, { revalidate: false });
 
@@ -155,12 +154,27 @@ function Theme({
       } = await supabase.auth.getUser();
 
       if (user) {
-        await supabase
-          .from("user_settings")
-          .upsert({ user_id: user.id, theme: { ...theme, palette: { name } } });
+        await supabase.from("user_settings").upsert({
+          user_id: user.id,
+          theme: {
+            ...newTheme,
+            palette: { name: newTheme.palette.name }
+          }
+        });
       }
     },
     [mutate, storageKey, theme]
+  );
+
+  const paletteName = theme.palette.name;
+
+  const setPaletteName = useCallback(
+    async (name: string) => {
+      const newPalette = getPalette(name) || { name: name };
+
+      mutateTheme({ palette: newPalette });
+    },
+    [mutateTheme]
   );
 
   const applyTheme = useCallback(() => {
@@ -173,7 +187,6 @@ function Theme({
     const resolved = paletteName === "system" ? (getSystemTheme() ?? "dark") : paletteName;
     const el = document.documentElement;
 
-    el.classList.remove(...themes);
     if (resolved) el.classList.add(resolved);
 
     if (resolved === "light" || resolved === "dark") {
@@ -186,7 +199,7 @@ function Theme({
     Object.entries(palette.colors).forEach(([k, v]) => {
       el.style.setProperty(k, v);
     });
-  }, [disableTransitionOnChange, nonce, paletteName, themes]);
+  }, [disableTransitionOnChange, nonce, paletteName]);
 
   useEffect(() => {
     applyTheme();
@@ -217,49 +230,30 @@ function Theme({
 
   const setFavoritePalette = useCallback(
     async (name: string, isFavorite: boolean = true) => {
-      let newFavoritePalettes = [...(theme.favoritePalettes || [])];
+      const current = theme.favoritePalettes || [];
 
-      if (isFavorite && !newFavoritePalettes.includes(name)) {
-        newFavoritePalettes.push(name);
-      } else {
-        newFavoritePalettes = newFavoritePalettes.filter((n) => n !== name);
-      }
+      if (isFavorite === current.includes(name)) return;
 
-      const newTheme = { ...theme, favoritePalettes: newFavoritePalettes };
+      const newFavoritePalettes = isFavorite
+        ? [...current, name]
+        : current.filter((n) => n !== name);
 
-      mutate(newTheme, { revalidate: false });
-
-      saveToLS(storageKey, JSON.stringify(newTheme));
-
-      const supabase = createClient();
-      const {
-        data: { user }
-      } = await supabase.auth.getUser();
-
-      if (user) {
-        await supabase.from("user_settings").upsert({
-          user_id: user.id,
-          theme: {
-            palette: paletteName,
-            favoritePalettes: newFavoritePalettes
-          }
-        });
-      }
+      mutateTheme({ favoritePalettes: newFavoritePalettes });
     },
-    [mutate, paletteName, storageKey, theme]
+    [mutateTheme, theme]
   );
 
   const providerValue = useMemo(
     () => ({
       theme,
+      palettes,
       paletteName,
       setPaletteName,
       forcedTheme,
-      themes: themes,
       favoritePalettes: theme.favoritePalettes,
       setFavoritePalette
     }),
-    [theme, paletteName, setPaletteName, forcedTheme, themes, setFavoritePalette]
+    [theme, paletteName, setPaletteName, forcedTheme, setFavoritePalette]
   );
 
   return (
@@ -269,7 +263,6 @@ function Theme({
           forcedTheme,
           storageKey,
           defaultPalette: defaultTheme.palette.name,
-          themes,
           nonce,
           scriptProps
         }}
@@ -279,11 +272,10 @@ function Theme({
   );
 }
 
-function script(storageKey: string, defaultTheme: string, forcedTheme: string, themes: string[]) {
+function script(storageKey: string, defaultTheme: string, forcedTheme: string) {
   const el = document.documentElement;
 
   function updateDOM(theme: string) {
-    el.classList.remove(...themes);
     el.classList.add(theme);
 
     if (theme === "light" || theme === "dark") {
@@ -322,14 +314,10 @@ const ThemeScript = memo(
     forcedTheme,
     storageKey,
     defaultPalette,
-    themes,
     nonce,
     scriptProps
   }: Omit<ThemeProviderProps, "children"> & { defaultPalette: string }) => {
-    const scriptArgs = JSON.stringify([storageKey, defaultPalette, forcedTheme, themes]).slice(
-      1,
-      -1
-    );
+    const scriptArgs = JSON.stringify([storageKey, defaultPalette, forcedTheme]).slice(1, -1);
 
     return (
       <script
