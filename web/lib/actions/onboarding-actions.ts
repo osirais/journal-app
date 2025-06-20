@@ -1,8 +1,10 @@
 "use server";
 
 import { DAILY_ENTRY_REWARD, DAILY_MOOD_ENTRY_REWARD } from "@/constants/rewards";
+import { createJournalSchema } from "@/lib/validators/journal";
 import { getUserOrThrow } from "@/utils/get-user-throw";
 import { createClient } from "@/utils/supabase/server";
+import z from "zod";
 
 export async function completeOnboarding() {
   try {
@@ -22,30 +24,24 @@ export async function completeOnboarding() {
   }
 }
 
-export async function createFirstJournal(form: { title: string; description?: string }) {
-  const { title } = form;
-
-  if (!title || typeof title !== "string") {
-    throw new Error("Title is required");
-  }
+export async function createFirstJournal(form: z.infer<typeof createJournalSchema>) {
+  const validated = createJournalSchema.parse(form);
 
   const supabase = await createClient();
   const user = await getUserOrThrow(supabase);
 
-  // check if user already has a journal (not deleted)
-  const { data: existingJournals, error: fetchError } = await supabase
+  const { data: existingJournal, error: fetchError } = await supabase
     .from("journal")
     .select("id")
     .eq("author_id", user.id)
     .limit(1)
-    .single();
+    .maybeSingle();
 
   if (fetchError && fetchError.code !== "PGRST116") {
-    // PGRST116 means no rows found, so safe to ignore
     throw new Error(fetchError.message);
   }
 
-  if (existingJournals) {
+  if (existingJournal) {
     throw new Error("User already has a journal");
   }
 
@@ -54,8 +50,9 @@ export async function createFirstJournal(form: { title: string; description?: st
     .insert([
       {
         author_id: user.id,
-        title,
-        description: ""
+        title: validated.title,
+        description: validated.description || "",
+        color_hex: validated.color
       }
     ])
     .select()
