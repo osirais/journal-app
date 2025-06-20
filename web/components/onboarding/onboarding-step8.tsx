@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { createFirstReason } from "@/lib/actions/onboarding-actions";
+import { createReasonSchema, MAX_REASON_TEXT_LENGTH } from "@/lib/validators/reasons";
 import { useState } from "react";
 
 interface OnboardingStep8Props {
@@ -17,9 +18,17 @@ export function OnboardingStep8({ onSuccess }: OnboardingStep8Props) {
 
   async function handleNext() {
     setError(null);
+
+    const parsed = createReasonSchema.safeParse({ text: reminder.trim() });
+    if (!parsed.success) {
+      const firstError = parsed.error.errors[0]?.message || "Invalid input";
+      setError(firstError);
+      return;
+    }
+
     setLoading(true);
     try {
-      await createFirstReason(reminder.trim());
+      await createFirstReason(parsed.data.text);
       onSuccess();
     } catch (err: any) {
       setError(err.message || "Failed to create reason");
@@ -46,6 +55,13 @@ export function OnboardingStep8({ onSuccess }: OnboardingStep8Props) {
             autoComplete="off"
             disabled={loading}
           />
+          <div
+            className={`text-right text-sm ${
+              reminder.length > MAX_REASON_TEXT_LENGTH ? "text-red-500" : "text-muted-foreground"
+            }`}
+          >
+            {reminder.length}/{MAX_REASON_TEXT_LENGTH}
+          </div>
           {error && <p className="text-sm text-red-600">{error}</p>}
         </div>
       </div>

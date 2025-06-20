@@ -4,6 +4,7 @@ import { DAILY_ENTRY_REWARD, DAILY_MOOD_ENTRY_REWARD } from "@/constants/rewards
 import { createEntrySchemaOnboarding } from "@/lib/validators/entry";
 import { createJournalSchema } from "@/lib/validators/journal";
 import { updateMoodSchema } from "@/lib/validators/mood";
+import { createReasonSchema } from "@/lib/validators/reasons";
 import { getUserOrThrow } from "@/utils/get-user-throw";
 import { createClient } from "@/utils/supabase/server";
 import z from "zod";
@@ -266,6 +267,12 @@ export async function createFirstMoodEntry(scale: number) {
 }
 
 export async function createFirstReason(text: string) {
+  const validation = createReasonSchema.safeParse({ text });
+
+  if (!validation.success) {
+    throw new Error(validation.error.errors[0]?.message || "Invalid reason text");
+  }
+
   const supabase = await createClient();
   const user = await getUserOrThrow(supabase);
 
@@ -287,7 +294,7 @@ export async function createFirstReason(text: string) {
   const { error: insertError } = await supabase.from("reason").insert([
     {
       user_id: user.id,
-      text
+      text: validation.data.text
     }
   ]);
 

@@ -1,11 +1,16 @@
 "use server";
 
+import { createReasonSchema } from "@/lib/validators/reasons";
 import { getUserOrThrow } from "@/utils/get-user-throw";
 import { createClient } from "@/utils/supabase/server";
 import { revalidatePath } from "next/cache";
 
 export async function createReason(text: string) {
-  if (!text) throw new Error("Missing reason text");
+  const validation = createReasonSchema.safeParse({ text });
+
+  if (!validation.success) {
+    throw new Error(validation.error.errors[0]?.message || "Invalid reason text");
+  }
 
   const supabase = await createClient();
   const user = await getUserOrThrow(supabase);
@@ -14,7 +19,7 @@ export async function createReason(text: string) {
     .from("reason")
     .insert({
       user_id: user.id,
-      text
+      text: validation.data.text
     })
     .select()
     .single();
