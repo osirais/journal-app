@@ -3,6 +3,7 @@
 import { DAILY_ENTRY_REWARD, DAILY_MOOD_ENTRY_REWARD } from "@/constants/rewards";
 import { createEntrySchemaOnboarding } from "@/lib/validators/entry";
 import { createJournalSchema } from "@/lib/validators/journal";
+import { updateMoodSchema } from "@/lib/validators/mood";
 import { getUserOrThrow } from "@/utils/get-user-throw";
 import { createClient } from "@/utils/supabase/server";
 import z from "zod";
@@ -178,8 +179,11 @@ export async function createFirstEntry(form: { title: string; content: string })
 }
 
 export async function createFirstMoodEntry(scale: number) {
-  if (typeof scale !== "number" || scale < 1 || scale > 5)
-    throw new Error("Scale must be a number between 1 and 5");
+  const validation = updateMoodSchema.safeParse({ scale });
+
+  if (!validation.success) {
+    throw new Error(validation.error.errors[0].message);
+  }
 
   const supabase = await createClient();
   const user = await getUserOrThrow(supabase);

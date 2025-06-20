@@ -3,6 +3,7 @@
 import { Button } from "@/components/ui/button";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { createFirstMoodEntry } from "@/lib/actions/onboarding-actions";
+import { updateMoodSchema } from "@/lib/validators/mood";
 import { useOptimistic, useState, useTransition } from "react";
 import { toast } from "sonner";
 
@@ -33,6 +34,13 @@ export function OnboardingStep6({ onSuccess }: OnboardingStep6Props) {
   const handleMoodChange = (moodLabel: string) => {
     const mood = moods.find((m) => m.label === moodLabel);
     if (!mood) return;
+
+    const validation = updateMoodSchema.safeParse({ scale: mood.scale });
+
+    if (!validation.success) {
+      toast.error(validation.error.errors[0].message);
+      return;
+    }
 
     startTransition(async () => {
       setOptimisticMood(mood.scale);
