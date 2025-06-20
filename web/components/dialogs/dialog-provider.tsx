@@ -8,6 +8,7 @@ import { DeleteReasonDialog } from "@/components/dialogs/delete-reason-dialog";
 import { DeleteTaskDialog } from "@/components/dialogs/delete-task-dialog";
 import { EditJournalDialog } from "@/components/dialogs/edit-journal-dialog";
 import { EditTaskDialog } from "@/components/dialogs/edit-task-dialog";
+import { OpenJournalDialog } from "@/components/dialogs/open-journal-dialog";
 import { PickJournalDialog } from "@/components/dialogs/pick-journal-dialog";
 import { SearchDialog } from "@/components/dialogs/search-dialog";
 import { SignOutDialog } from "@/components/dialogs/sign-out-dialog";
@@ -74,6 +75,7 @@ export const DialogProvider = () => {
         task={dialogStore.data.editTaskData?.task as Task}
         onTaskEdited={onTaskEdited}
       />
+      <OpenJournalDialog />
       <PickJournalDialog />
       <SearchDialog />
       <SignOutDialog />

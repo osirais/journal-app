@@ -54,6 +54,13 @@ export function useSearchActions() {
         dialog.open("pick-journal");
       },
       icon: NotebookPen
+    },
+    {
+      name: "Open Journal",
+      action: () => {
+        dialog.open("open-journal");
+      },
+      icon: NotebookPen
     }
   ];
 }

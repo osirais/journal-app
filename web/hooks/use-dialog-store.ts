@@ -10,6 +10,7 @@ export type DialogType =
   | "delete-task"
   | "edit-journal"
   | "edit-task"
+  | "open-journal"
   | "pick-journal"
   | "search"
   | "sign-out"
