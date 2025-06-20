@@ -1,6 +1,7 @@
 "use server";
 
 import { DAILY_ENTRY_REWARD, DAILY_MOOD_ENTRY_REWARD } from "@/constants/rewards";
+import { createEntrySchemaOnboarding } from "@/lib/validators/entry";
 import { createJournalSchema } from "@/lib/validators/journal";
 import { getUserOrThrow } from "@/utils/get-user-throw";
 import { createClient } from "@/utils/supabase/server";
@@ -66,12 +67,9 @@ export async function createFirstJournal(form: z.infer<typeof createJournalSchem
 }
 
 export async function createFirstEntry(form: { title: string; content: string }) {
-  const { title, content } = form;
-  if (!title || typeof title !== "string") throw new Error("Title is required");
-  if (!content || typeof content !== "string") throw new Error("Content is required");
-
   const supabase = await createClient();
   const user = await getUserOrThrow(supabase);
+  const { title, content } = form;
 
   const { data: journals, error: fetchError } = await supabase
     .from("journal")
@@ -79,10 +77,16 @@ export async function createFirstEntry(form: { title: string; content: string })
     .eq("author_id", user.id);
 
   if (fetchError) throw new Error(fetchError.message);
-  if (!journals || journals.length === 0) throw new Error("User does not have a journal");
+  if (!journals?.length) throw new Error("User does not have a journal");
   if (journals.length > 1) throw new Error("User has more than one journal");
 
-  const journalId = journals[0].id;
+  const [{ id: journalId }] = journals;
+
+  const validated = createEntrySchemaOnboarding.parse({
+    title,
+    content,
+    journalId
+  });
 
   const { data: existingEntry, error: entryFetchError } = await supabase
     .from("entry")
@@ -115,7 +119,13 @@ export async function createFirstEntry(form: { title: string; content: string })
 
   const { data: entry, error: insertError } = await supabase
     .from("entry")
-    .insert([{ journal_id: journalId, title, content }])
+    .insert([
+      {
+        journal_id: journalId,
+        title: validated.title,
+        content: validated.content
+      }
+    ])
     .select()
     .single();
 
@@ -129,13 +139,18 @@ export async function createFirstEntry(form: { title: string; content: string })
     .maybeSingle();
 
   if (!balance) {
-    await supabase
-      .from("user_balance")
-      .insert([{ user_id: user.id, currency: "droplets", balance: DAILY_ENTRY_REWARD }]);
+    await supabase.from("user_balance").insert([
+      {
+        user_id: user.id,
+        currency: "droplets",
+        balance: DAILY_ENTRY_REWARD
+      }
+    ]);
   } else {
+    const { balance: currentBalance } = balance;
     await supabase
       .from("user_balance")
-      .update({ balance: balance.balance + DAILY_ENTRY_REWARD })
+      .update({ balance: currentBalance + DAILY_ENTRY_REWARD })
       .eq("user_id", user.id)
       .eq("currency", "droplets");
   }

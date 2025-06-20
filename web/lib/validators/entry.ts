@@ -3,8 +3,7 @@ import z from "zod";
 export const MAX_TITLE_LENGTH = 100;
 export const MAX_CONTENT_LENGTH = 5000;
 
-export const createEntrySchema = z.object({
-  journalId: z.string().nonempty({ message: "Journal ID is required" }),
+export const createEntrySchemaOnboarding = z.object({
   title: z
     .string()
     .nonempty({ message: "Title is required" })
@@ -23,4 +22,8 @@ export const createEntrySchema = z.object({
         .regex(/^[a-z0-9\s-]+$/i, "Tags can only contain letters, numbers, spaces, and hyphens")
     )
     .optional()
+});
+
+export const createEntrySchema = createEntrySchemaOnboarding.extend({
+  journalId: z.string().nonempty({ message: "Journal ID is required" })
 });
