@@ -6,15 +6,15 @@ export async function middleware(request: NextRequest) {
 
   const nonce = Buffer.from(crypto.randomUUID()).toString("base64");
   const csp = `
-    script-src 'self' 'nonce-${nonce}' 'strict-dynamic' https: http: ${
-      process.env.NODE_ENV === "production" ? "" : `'unsafe-eval'`
+    default-src 'self';
+    script-src 'nonce-${nonce}' 'strict-dynamic' ${
+      process.env.NODE_ENV !== "production" && `'unsafe-eval'`
     };
-    style-src 'self' 'unsafe-inline' https://accounts.google.com/gsi/style;
+    style-src 'self' 'unsafe-inline';
+    connect-src 'self' ${process.env.NEXT_PUBLIC_SUPABASE_URL};
     img-src 'self' blob: data:;
-    font-src 'self';
     object-src 'none';
     base-uri 'none';
-    form-action 'self';
     frame-ancestors 'none';
     upgrade-insecure-requests;
 `
