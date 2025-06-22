@@ -2,10 +2,14 @@
 
 export type Palette = {
   name: string;
-  colors: Record<string, string>;
+  colors: React.CSSProperties & {
+    [K in `--color-${keyof ShadcnColors}`]: string;
+  } & {
+    [key: `--${string}`]: string;
+  };
 };
 
-type UnresolvedPalette = Palette &
+type UnresolvedPalette = Omit<Palette, "colors"> &
   ({ type?: "shadcn"; colors: ShadcnColors } | { type: "monkeytype"; colors: MonkeytypeColors });
 
 type ShadcnColors = Record<
@@ -66,22 +70,23 @@ const shadcnToMonkeytypeMap = {
 } as const satisfies Record<keyof ShadcnColors, keyof MonkeytypeColors>;
 
 function resolvePalette(palette: UnresolvedPalette): Palette {
-  let colors: Record<string, string> = palette.colors;
+  let colors: React.CSSProperties = palette.colors;
   switch (palette.type) {
-    case "monkeytype":
+    case "monkeytype": {
       colors = Object.fromEntries(
         Object.entries(shadcnToMonkeytypeMap).map(([shadcnKey, monkeytypeKey]) => [
           shadcnKey,
-          colors[monkeytypeKey]
+          palette.colors[monkeytypeKey]
         ])
       );
+    }
   }
 
   return {
     ...palette,
     colors: Object.fromEntries(
       Object.entries(colors).map(([key, value]) => [`--color-${key}`, value])
-    )
+    ) as Palette["colors"]
   };
 }
 

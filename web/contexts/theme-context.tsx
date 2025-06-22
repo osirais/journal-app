@@ -7,7 +7,7 @@ import * as React from "react";
 import useSWR from "swr";
 
 export interface Theme {
-  palette: { name: string; colors?: Record<string, string> };
+  palette: Palette | { name: "system" };
   favoritePalettes?: string[];
   sortPalettesBy: "name" | "lightness" | "chroma" | "hue";
   sortPalettesAscending: boolean;
@@ -182,7 +182,7 @@ function Theme({
 
   const setPaletteName = useCallback(
     async (name: string) => {
-      const newPalette = getPalette(name) || { name: name };
+      const newPalette = getPalette(name) || DEFAULT_THEME.palette;
 
       mutateTheme({ palette: newPalette });
     },
