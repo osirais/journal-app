@@ -1,18 +1,18 @@
 "use client";
 
-import { EntryDrawer } from "@/components/entries/entry-drawer";
-import { OutlineCombobox } from "@/components/entries/outline-combobox";
 import { TiptapEditor } from "@/components/entries/tiptap-editor";
 import { Markdown } from "@/components/markdown";
-import { TagComponent } from "@/components/tag-component";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { Form, FormControl, FormField, FormItem, FormMessage } from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useArrowKeyNavigation } from "@/hooks/use-arrow-key-navigation";
+import { editEntrySchema, MAX_CONTENT_LENGTH, MAX_TITLE_LENGTH } from "@/lib/validators/entry";
 import { getUserOrThrow } from "@/utils/get-user-throw";
 import { createClient } from "@/utils/supabase/client";
-import type { Editor } from "@tiptap/react";
+import { zodResolver } from "@hookform/resolvers/zod";
 import {
   ArrowLeft,
   ArrowRight,
@@ -27,13 +27,17 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
-import { Suspense, useEffect, useRef, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { ErrorBoundary } from "react-error-boundary";
+import { useForm, useWatch } from "react-hook-form";
 import { WithContext as ReactTags } from "react-tag-input";
+import { toast } from "sonner";
 import useSWR from "swr";
 import useSWRMutation from "swr/mutation";
+import type { z } from "zod";
 
 const separators = [",", "Enter"];
+
 async function fetchEntry(entryId: string) {
   const supabase = createClient();
 
@@ -128,14 +132,13 @@ function EntrySkeleton() {
   );
 }
 
-function EntryContent() {
+function EditEntryContent() {
   const { entryId } = useParams<{ entryId: string }>();
-  const editorRef = useRef<Editor | null>(null);
-  const [isEditing, setIsEditing] = useState(false);
-  const [isEditingTags, setIsEditingTags] = useState(false);
-  const [tags, setTags] = useState<{ id: string; text: string; className: string }[]>([]);
-
   const router = useRouter();
+  const [tags, setTags] = useState<{ id: string; text: string; className: string }[]>([]);
+  const [isEditingContent, setIsEditingContent] = useState(false);
+  const [isEditingTags, setIsEditingTags] = useState(false);
+  const [isEditingTitle, setIsEditingTitle] = useState(false);
 
   const { data, mutate } = useSWR(entryId, fetchEntry, {
     suspense: true,
@@ -144,30 +147,40 @@ function EntryContent() {
     }
   });
 
-  useEffect(() => {
-    if (editorRef.current) {
-      editorRef.current.setEditable(isEditing);
-    }
-  }, [isEditing]);
-
   const { data: userTags } = useSWR(data?.userId ? `user-tags-${data.userId}` : null, () =>
     data?.userId ? fetchUserTags(data.userId) : null
   );
 
-  const { trigger: saveEntry, isMutating: isSavingEntry } = useSWRMutation(
-    "entry_save",
-    async () => {
-      const supabase = createClient();
+  const form = useForm<z.infer<typeof editEntrySchema>>({
+    resolver: zodResolver(editEntrySchema),
+    defaultValues: {
+      entryId,
+      title: data?.entry.title || "",
+      content: data?.entry.content || "",
+      tags: []
+    }
+  });
 
-      const markdown = editorRef.current?.storage.markdown.getMarkdown();
-      if (!markdown) {
-        return;
-      }
+  useEffect(() => {
+    if (data?.entry) {
+      form.setValue("title", data.entry.title);
+      form.setValue("content", data.entry.content);
+    }
+  }, [data, form]);
+
+  const title = useWatch({ control: form.control, name: "title" }) || "";
+  const content = useWatch({ control: form.control, name: "content" }) || "";
+
+  const { trigger: saveEntry, isMutating: isSaving } = useSWRMutation(
+    "entry_save",
+    async (_, { arg }: { arg: z.infer<typeof editEntrySchema> }) => {
+      const supabase = createClient();
 
       const { error: entryError } = await supabase
         .from("entry")
         .update({
-          content: markdown,
+          title: arg.title,
+          content: arg.content,
           updated_at: new Date().toISOString()
         })
         .eq("id", entryId);
@@ -176,72 +189,47 @@ function EntryContent() {
         throw new Error("Failed to save entry");
       }
 
-      setIsEditing(false);
-      mutate();
-    }
-  );
+      await supabase.from("entry_tag").delete().eq("entry_id", entryId);
 
-  const { trigger: saveTags, isMutating: isSavingTags } = useSWRMutation("tags_save", async () => {
-    const supabase = createClient();
+      for (const tag of tags) {
+        let tagId = tag.id;
 
-    await supabase.from("entry_tag").delete().eq("entry_id", entryId);
-
-    for (const tag of tags) {
-      let tagId = tag.id;
-
-      if (!tagId || tagId.startsWith("new-")) {
-        const { data: existingTag } = await supabase
-          .from("tag")
-          .select("id")
-          .eq("user_id", data?.userId)
-          .eq("name", tag.text.toLowerCase())
-          .single();
-
-        if (existingTag) {
-          tagId = existingTag.id;
-        } else {
-          const { data: newTag, error: tagError } = await supabase
+        if (!tagId || tagId.startsWith("new-")) {
+          const { data: existingTag } = await supabase
             .from("tag")
-            .insert({
-              user_id: data?.userId,
-              name: tag.text.toLowerCase()
-            })
             .select("id")
+            .eq("user_id", data?.userId)
+            .eq("name", tag.text.toLowerCase())
             .single();
 
-          if (tagError) throw new Error("Failed to create tag");
-          tagId = newTag.id;
+          if (existingTag) {
+            tagId = existingTag.id;
+          } else {
+            const { data: newTag, error: tagError } = await supabase
+              .from("tag")
+              .insert({
+                user_id: data?.userId,
+                name: tag.text.toLowerCase()
+              })
+              .select("id")
+              .single();
+
+            if (tagError) throw new Error("Failed to create tag");
+            tagId = newTag.id;
+          }
         }
+
+        await supabase.from("entry_tag").insert({
+          entry_id: entryId,
+          tag_id: tagId
+        });
       }
 
-      await supabase.from("entry_tag").insert({
-        entry_id: entryId,
-        tag_id: tagId
-      });
+      mutate();
+      toast.success("Entry updated successfully");
+      router.push(`/entry/${entryId}`);
     }
-
-    setIsEditingTags(false);
-    mutate();
-  });
-
-  const { entry, prevEntryId, nextEntryId } = data;
-
-  function goToPrevEntry() {
-    if (prevEntryId) {
-      router.push(`/entry/${prevEntryId}`);
-    }
-  }
-
-  function goToNextEntry() {
-    if (nextEntryId) {
-      router.push(`/entry/${nextEntryId}`);
-    }
-  }
-
-  useArrowKeyNavigation({
-    onLeft: goToPrevEntry,
-    onRight: goToNextEntry
-  });
+  );
 
   const handleDeleteTag = (i: number) => {
     setTags(tags.filter((_, index) => index !== i));
@@ -261,92 +249,240 @@ function EntryContent() {
 
   const suggestions = userTags?.map((tag) => ({ id: tag.id, text: tag.name, className: "" })) || [];
 
-  const creating = isSavingTags;
+  const { entry, prevEntryId, nextEntryId } = data;
 
-  const handleEditTags = () => {
-    setTags(data.tags.map((tag) => ({ id: tag.id, text: tag.name, className: "" })));
-    setIsEditingTags(true);
-  };
+  function goToPrevEntry() {
+    if (prevEntryId) {
+      router.push(`/entry/${prevEntryId}/edit`);
+    }
+  }
 
-  const handleCancelTagEdit = () => {
-    setTags(data.tags.map((tag) => ({ id: tag.id, text: tag.name, className: "" })));
-    setIsEditingTags(false);
-  };
+  function goToNextEntry() {
+    if (nextEntryId) {
+      router.push(`/entry/${nextEntryId}/edit`);
+    }
+  }
+
+  useArrowKeyNavigation({
+    onLeft: goToPrevEntry,
+    onRight: goToNextEntry
+  });
+
+  async function handleSave(values: z.infer<typeof editEntrySchema>) {
+    try {
+      await saveEntry(values);
+    } catch (error) {
+      toast.error("Failed to save entry");
+    }
+  }
+
+  function onFormError(errors: any) {
+    console.log("Form validation errors:", errors);
+    toast.error("Please fix the form errors before submitting");
+  }
 
   return (
     <>
-      <div className="fixed left-2 top-20 z-10">
-        <EntryDrawer journalId={entry.journal_id} currentEntryId={entryId} />
-      </div>
       <div className="grid w-full">
-        <h1 className="wrap-anywhere text-center text-2xl font-bold">{entry.title}</h1>
-        <div className="grid items-center">
-          <div className="text-muted-foreground mt-2 flex items-center justify-center gap-4 text-sm">
-            <div className="flex items-center gap-1">
-              <Calendar className="size-3" />
-              <span>Created {new Date(entry.created_at).toLocaleDateString()}</span>
+        <div className="mb-4 flex items-center justify-between">
+          <Button variant="outline" asChild>
+            <Link href={`/entry/${entryId}`} className="flex items-center gap-2">
+              <ArrowLeft className="size-4" /> Back to Entry
+            </Link>
+          </Button>
+        </div>
+
+        <div className="space-y-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2 text-lg font-semibold">
+              <FileText className="size-4" />
+              <span>Title</span>
             </div>
-            {entry.updated_at && entry.updated_at !== entry.created_at && (
-              <div className="flex items-center gap-1">
-                <Clock className="size-3" />
-                <span>Updated {new Date(entry.updated_at).toLocaleDateString()}</span>
-              </div>
-            )}
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setIsEditingTitle(!isEditingTitle)}
+              className="cursor-pointer"
+            >
+              <Edit3 className="size-3" />
+              <span className="sr-only">{isEditingTitle ? "Stop Editing" : "Edit Title"}</span>
+            </Button>
           </div>
+
+          {isEditingTitle ? (
+            <Form {...form}>
+              <FormField
+                control={form.control}
+                name="title"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormControl>
+                      <Input placeholder="Entry title" {...field} disabled={isSaving} />
+                    </FormControl>
+                    <div
+                      className={`text-right text-sm ${
+                        title.length > MAX_TITLE_LENGTH ? "text-red-500" : "text-muted-foreground"
+                      }`}
+                    >
+                      {title.length}/{MAX_TITLE_LENGTH}
+                    </div>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </Form>
+          ) : (
+            <div className="text-2xl font-bold">{entry.title || "Untitled Entry"}</div>
+          )}
+        </div>
+
+        <div className="text-muted-foreground mt-2 flex items-center justify-center gap-4 text-sm">
+          <div className="flex items-center gap-1">
+            <Calendar className="size-3" />
+            <span>Created {new Date(entry.created_at).toLocaleDateString()}</span>
+          </div>
+          {entry.updated_at && entry.updated_at !== entry.created_at && (
+            <div className="flex items-center gap-1">
+              <Clock className="size-3" />
+              <span>Updated {new Date(entry.updated_at).toLocaleDateString()}</span>
+            </div>
+          )}
         </div>
       </div>
 
       <Separator className="my-6" />
 
-      <div className="space-y-4">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2 text-lg font-semibold">
-            <FileText className="size-4" />
-            <span>Content</span>
-          </div>
-          {!isEditing ? (
-            <div className="flex items-center gap-2">
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => setIsEditing(true)}
-                className="cursor-pointer"
-              >
-                <Edit3 className="size-3" />
-                <span className="sr-only">Edit Content</span>
-              </Button>
-              {editorRef.current && <OutlineCombobox editor={editorRef.current} />}
+      <div className="space-y-6">
+        <Separator className="my-6" />
+
+        <div className="space-y-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2 text-lg font-semibold">
+              <FileText className="size-4" />
+              <span>Content</span>
             </div>
-          ) : (
             <Button
               variant="ghost"
               size="sm"
-              onClick={() => setIsEditing(false)}
+              onClick={() => setIsEditingContent(!isEditingContent)}
               className="cursor-pointer"
             >
-              <X className="size-3" />
-              <span className="sr-only">Cancel Edit</span>
+              <Edit3 className="size-3" />
+              <span className="sr-only">{isEditingContent ? "Stop Editing" : "Edit Content"}</span>
             </Button>
+          </div>
+
+          {isEditingContent ? (
+            <Form {...form}>
+              <FormField
+                control={form.control}
+                name="content"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormControl>
+                      <div className="w-full overflow-x-auto">
+                        <TiptapEditor
+                          content={field.value}
+                          onChange={field.onChange}
+                          placeholder="Write your entry..."
+                        />
+                      </div>
+                    </FormControl>
+                    <div
+                      className={`text-right text-sm ${
+                        content.length > MAX_CONTENT_LENGTH
+                          ? "text-red-500"
+                          : "text-muted-foreground"
+                      }`}
+                    >
+                      {content.length}/{MAX_CONTENT_LENGTH}
+                    </div>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </Form>
+          ) : (
+            <div className="prose max-w-none">
+              {entry.content ? (
+                <Markdown>{entry.content}</Markdown>
+              ) : (
+                <p className="text-muted-foreground italic">No content</p>
+              )}
+            </div>
           )}
         </div>
 
-        {isEditing ? (
-          <TiptapEditor
-            content={entry.content}
-            onCreate={(editor) => (editorRef.current = editor)}
-          />
-        ) : (
-          <Markdown>{entry.content}</Markdown>
-        )}
+        <Separator className="my-6" />
 
-        {isEditing && (
-          <div className="flex gap-2">
+        <div className="space-y-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <TagIcon className="size-4" />
+              <span className="text-lg font-semibold">Tags</span>
+            </div>
             <Button
-              onClick={() => saveEntry()}
-              disabled={isSavingEntry}
+              variant="ghost"
+              size="sm"
+              onClick={() => setIsEditingTags(!isEditingTags)}
+              className="cursor-pointer"
+            >
+              <Edit3 className="size-3" />
+              <span className="sr-only">{isEditingTags ? "Stop Editing" : "Edit Tags"}</span>
+            </Button>
+          </div>
+
+          {isEditingTags ? (
+            <div>
+              <Card className="p-2">
+                <ReactTags
+                  tags={tags}
+                  handleDelete={handleDeleteTag}
+                  handleAddition={(tag) => handleAdditionTag({ id: "", text: tag.text })}
+                  separators={separators}
+                  inputFieldPosition="top"
+                  autocomplete
+                  suggestions={suggestions}
+                  placeholder="Add new tag"
+                  allowDragDrop={false}
+                  readOnly={isSaving}
+                  classNames={{
+                    tags: "flex flex-wrap gap-2 mt-2",
+                    tag: "rounded-full px-2 py-0.5 text-xs text-muted-foreground bg-black/20 dark:bg-white/20",
+                    tagInput: "w-full",
+                    tagInputField: "w-full focus:outline-none text-sm",
+                    selected: "flex flex-wrap gap-2",
+                    remove: "ml-2 text-xs cursor-pointer text-destructive hover:underline"
+                  }}
+                />
+              </Card>
+            </div>
+          ) : (
+            <div className="flex min-h-8 flex-wrap items-center gap-2">
+              {tags.length > 0 ? (
+                tags.map((tag) => (
+                  <span
+                    key={tag.id}
+                    className="text-muted-foreground rounded-full bg-black/20 px-2 py-0.5 text-xs dark:bg-white/20"
+                  >
+                    {tag.text}
+                  </span>
+                ))
+              ) : (
+                <span className="text-muted-foreground text-sm">No tags</span>
+              )}
+            </div>
+          )}
+        </div>
+
+        <div className="flex gap-2 pt-4">
+          <Form {...form}>
+            <Button
+              onClick={form.handleSubmit(handleSave, onFormError)}
+              disabled={isSaving}
               className="flex cursor-pointer items-center gap-2"
             >
-              {isSavingEntry ? (
+              {isSaving ? (
                 <>
                   <LoaderCircle className="size-4 animate-spin" />
                   Saving...
@@ -354,134 +490,51 @@ function EntryContent() {
               ) : (
                 <>
                   <Save className="size-4" />
-                  Save
+                  Save Changes
                 </>
               )}
             </Button>
-            <Button
-              variant="outline"
-              onClick={() => setIsEditing(false)}
-              disabled={isSavingEntry}
-              className="cursor-pointer"
-            >
-              Cancel
-            </Button>
-          </div>
-        )}
-      </div>
-
-      <Separator className="my-6" />
-
-      <div className="space-y-4">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <TagIcon className="size-4" />
-            <span className="text-lg font-semibold">Tags</span>
-          </div>
-          {!isEditingTags && (
-            <Button variant="ghost" size="sm" onClick={handleEditTags} className="cursor-pointer">
-              <Edit3 className="size-3" />
-              <span className="sr-only">Edit Tags</span>
-            </Button>
-          )}
+          </Form>
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => router.push(`/entry/${entryId}`)}
+            disabled={isSaving}
+            className="flex cursor-pointer items-center gap-2"
+          >
+            <X className="size-4" />
+            Cancel
+          </Button>
         </div>
 
-        {isEditingTags ? (
-          <div className="space-y-4">
-            <Card className="p-2">
-              <ReactTags
-                tags={tags}
-                handleDelete={handleDeleteTag}
-                handleAddition={(tag) => handleAdditionTag({ id: "", text: tag.text })}
-                separators={separators}
-                inputFieldPosition="top"
-                autocomplete
-                suggestions={suggestions}
-                placeholder="Add new tag"
-                allowDragDrop={false}
-                readOnly={creating}
-                classNames={{
-                  tags: "flex flex-wrap gap-2 mt-2",
-                  tag: "rounded-full px-2 py-0.5 text-xs text-muted-foreground bg-black/20 dark:bg-white/20",
-                  tagInput: "w-full",
-                  tagInputField: "w-full focus:outline-none text-sm",
-                  selected: "flex flex-wrap gap-2",
-                  remove: "ml-2 text-xs cursor-pointer text-destructive hover:underline"
-                }}
-              />
-            </Card>
-            <div className="flex gap-2">
-              <Button
-                onClick={() => saveTags()}
-                disabled={isSavingTags}
-                className="flex cursor-pointer items-center gap-2"
-              >
-                {isSavingTags ? (
-                  <>
-                    <LoaderCircle className="size-4 animate-spin" />
-                    Saving...
-                  </>
-                ) : (
-                  <>
-                    <Save className="size-4" />
-                    Save Tags
-                  </>
-                )}
+        <Separator className="my-6" />
+
+        <div className="flex justify-between pt-4">
+          <div>
+            {prevEntryId && (
+              <Button variant="outline" asChild>
+                <Link href={`/entry/${prevEntryId}`} className="flex items-center gap-2">
+                  <ArrowLeft className="size-4" /> Previous Entry
+                </Link>
               </Button>
-              <Button
-                variant="outline"
-                onClick={handleCancelTagEdit}
-                disabled={isSavingTags}
-                className="cursor-pointer"
-              >
-                Cancel
-              </Button>
-            </div>
-          </div>
-        ) : (
-          <div className="flex min-h-8 flex-wrap items-center gap-2">
-            {data.tags.length > 0 ? (
-              data.tags.map((tag) => (
-                <TagComponent
-                  key={tag.id}
-                  journalId={entry.journal_id}
-                  tag={{ id: tag.id, name: tag.name }}
-                />
-              ))
-            ) : (
-              <span className="text-muted-foreground text-sm">No tags</span>
             )}
           </div>
-        )}
-      </div>
-
-      <Separator className="my-6" />
-
-      <div className="flex justify-between pt-4">
-        <div>
-          {prevEntryId && (
-            <Button variant="outline" asChild>
-              <Link href={`/entry/${prevEntryId}`} className="flex items-center gap-2">
-                <ArrowLeft className="size-4" /> Previous Entry
-              </Link>
-            </Button>
-          )}
-        </div>
-        <div>
-          {nextEntryId && (
-            <Button asChild>
-              <Link href={`/entry/${nextEntryId}`} className="flex items-center gap-2">
-                Next Entry <ArrowRight className="size-4" />
-              </Link>
-            </Button>
-          )}
+          <div>
+            {nextEntryId && (
+              <Button variant="outline" asChild>
+                <Link href={`/entry/${nextEntryId}`} className="flex items-center gap-2">
+                  Next Entry <ArrowRight className="size-4" />
+                </Link>
+              </Button>
+            )}
+          </div>
         </div>
       </div>
     </>
   );
 }
 
-export default function EntryPage() {
+export default function EditEntryPage() {
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -497,7 +550,7 @@ export default function EntryPage() {
               <ErrorBoundary FallbackComponent={EntryErrorFallback}>
                 {mounted ? (
                   <Suspense fallback={<EntrySkeleton />}>
-                    <EntryContent />
+                    <EditEntryContent />
                   </Suspense>
                 ) : (
                   <EntrySkeleton />

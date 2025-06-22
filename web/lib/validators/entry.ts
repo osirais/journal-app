@@ -27,3 +27,7 @@ export const createEntrySchemaOnboarding = z.object({
 export const createEntrySchema = createEntrySchemaOnboarding.extend({
   journalId: z.string().nonempty({ message: "Journal ID is required" })
 });
+
+export const editEntrySchema = createEntrySchemaOnboarding.extend({
+  entryId: z.string().uuid({ message: "Invalid entry ID" })
+});
