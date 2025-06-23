@@ -13,7 +13,7 @@ import { useTheme } from "@/contexts/theme-context";
 import { Laptop, LoaderCircle, Moon, Palette, Sun } from "lucide-react";
 import { useEffect, useState } from "react";
 
-export const ThemeSwitcher = () => {
+export function ThemeSwitcher() {
   const [mounted, setMounted] = useState(false);
   const { paletteName, setPaletteName } = useTheme();
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
@@ -41,6 +41,7 @@ export const ThemeSwitcher = () => {
         <DropdownMenuTrigger asChild className="cursor-pointer">
           <Button variant="ghost" size="sm">
             {mounted ? getThemeIcon() : <LoaderCircle className="size-4 animate-spin" />}
+            <span className="sr-only">Switch theme</span>
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent className="w-content" align="start">
@@ -73,4 +74,4 @@ export const ThemeSwitcher = () => {
       <ThemeDrawer open={isDrawerOpen} onOpenChange={setIsDrawerOpen} />
     </>
   );
-};
+}
