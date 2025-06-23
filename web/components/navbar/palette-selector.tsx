@@ -1,7 +1,7 @@
 "use client";
 
+import { Input, InputField, InputIcon } from "@/components/input";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import {
   Select,
@@ -24,57 +24,55 @@ export function PaletteInput() {
     useTheme();
 
   return (
-    <div className="flex items-center p-4">
-      <div className="text-muted-foreground relative flex h-10 items-center">
-        <div className="absolute flex aspect-square h-full items-center justify-center">
-          <Search className="size-4" />
-        </div>
-        <Input
-          type="search"
-          placeholder="Search palettes..."
-          className="h-full pl-10 pr-40"
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-        />
-        <div className="absolute right-1 flex items-center gap-1">
-          <Separator orientation="vertical" className="bg-muted-foreground min-h-5" />
-          <Select value={sortPalettesBy} onValueChange={setSortPalettesBy}>
-            <Button variant="ghost" className="cursor-pointer" asChild>
-              <SelectTrigger className="max-h-8 border-0 text-xs shadow-none dark:bg-transparent">
-                <SelectValue />
-              </SelectTrigger>
-            </Button>
-            <SelectContent>
-              <SelectItem value="name" className="cursor-pointer">
-                Name
-              </SelectItem>
-              <SelectItem value="lightness" className="cursor-pointer">
-                Lightness
-              </SelectItem>
-              <SelectItem value="chroma" className="cursor-pointer">
-                Chroma
-              </SelectItem>
-              <SelectItem value="hue" className="cursor-pointer">
-                Hue
-              </SelectItem>
-            </SelectContent>
-          </Select>
-          <Separator orientation="vertical" className="bg-muted-foreground min-h-5" />
-          <Button
-            variant="ghost"
-            size="icon"
-            className="size-8 cursor-pointer"
-            onClick={() => setSortPalettesAscending(!sortPalettesAscending)}
-          >
-            {sortPalettesAscending ? (
-              <ArrowUpDown className="size-4" />
-            ) : (
-              <ArrowDownUp className="size-4" />
-            )}
+    <Input className="text-muted-foreground m-4 flex h-10 items-center">
+      <InputIcon>
+        <Search />
+      </InputIcon>
+      <InputField
+        type="search"
+        placeholder="Search palettes..."
+        className="h-full w-full"
+        value={query}
+        onChange={(e) => setQuery(e.target.value)}
+      />
+      <div className="flex items-center gap-1 px-1 pl-3">
+        <Separator orientation="vertical" className="bg-muted-foreground min-h-5" />
+        <Select value={sortPalettesBy} onValueChange={setSortPalettesBy}>
+          <Button variant="ghost" className="cursor-pointer" asChild>
+            <SelectTrigger className="max-h-8 border-0 text-xs shadow-none dark:bg-transparent">
+              <SelectValue />
+            </SelectTrigger>
           </Button>
-        </div>
+          <SelectContent>
+            <SelectItem value="name" className="cursor-pointer">
+              Name
+            </SelectItem>
+            <SelectItem value="lightness" className="cursor-pointer">
+              Lightness
+            </SelectItem>
+            <SelectItem value="chroma" className="cursor-pointer">
+              Chroma
+            </SelectItem>
+            <SelectItem value="hue" className="cursor-pointer">
+              Hue
+            </SelectItem>
+          </SelectContent>
+        </Select>
+        <Separator orientation="vertical" className="bg-muted-foreground min-h-5" />
+        <Button
+          variant="ghost"
+          size="icon"
+          className="size-8 cursor-pointer"
+          onClick={() => setSortPalettesAscending(!sortPalettesAscending)}
+        >
+          {sortPalettesAscending ? (
+            <ArrowUpDown className="size-4" />
+          ) : (
+            <ArrowDownUp className="size-4" />
+          )}
+        </Button>
       </div>
-    </div>
+    </Input>
   );
 }
 
@@ -225,15 +223,17 @@ export function PaletteSelector({ children }: { children?: ReactNode }) {
       {children ? (
         children
       ) : (
-        <div className="flex min-h-0 w-full flex-1 flex-col">
+        <div className="flex min-h-0 w-full flex-1 flex-col items-center">
           <PaletteInput />
-          <ScrollArea className="min-h-0 flex-1">
-            <div className="flex flex-col gap-4 pb-4 pt-1">
+          <ScrollArea className="min-h-0 w-full flex-1">
+            <div className="flex flex-col items-center gap-4 pb-4 pt-1">
               {filteredPalettes.length ? (
                 <>
                   {favoriteFiltered.length > 0 && <PaletteGrid palettes={favoriteFiltered} />}
                   {favoriteFiltered.length > 0 && nonFavoriteFiltered.length > 0 && (
-                    <Separator className="mx-4 border" />
+                    <div className="w-full px-4">
+                      <Separator className="border" />
+                    </div>
                   )}
                   {nonFavoriteFiltered.length > 0 && <PaletteGrid palettes={nonFavoriteFiltered} />}
                 </>
