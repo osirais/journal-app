@@ -12,11 +12,12 @@ import {
 } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
 import { useTheme } from "@/contexts/theme-context";
+import { useArrowKeyNavigation } from "@/hooks/use-arrow-key-navigation";
 import { Palette, palettes } from "@/lib/theme-palettes";
 import { cn } from "@/lib/utils";
 import { parse } from "culori";
 import { ArrowDownUp, ArrowUpDown, Search, Star, StarHalf } from "lucide-react";
-import { createContext, ReactNode, useContext, useEffect, useState } from "react";
+import { createContext, ReactNode, useContext, useEffect, useRef, useState } from "react";
 
 export function PaletteInput() {
   const { query, setQuery } = usePaletteSelectorContext();
@@ -88,9 +89,68 @@ export function PaletteGrid({ palettes }: { palettes: Palette[] }) {
 
   const [isFavoriteHovered, setIsFavoriteHovered] = useState(false);
 
+  const numCols = 2;
+
+  const gridRef = useRef<HTMLDivElement>(null);
+  const paletteRefs = useRef<(HTMLButtonElement | null)[]>([]);
+
+  const [focusedIndex, _setFocusedIndex] = useState(0);
+
+  const setFocusedIndex = (next: number | ((prev: number) => number)) => {
+    _setFocusedIndex((prev) => {
+      const value = typeof next === "function" ? (next as (n: number) => number)(prev) : next;
+      return value >= 0 && value < palettes.length ? value : prev;
+    });
+  };
+
+  const skipScrollRef = useRef(false);
+
+  useEffect(() => {
+    const el = paletteRefs.current[focusedIndex];
+    if (!el) return;
+
+    if (skipScrollRef.current) {
+      skipScrollRef.current = false;
+    } else {
+      el.scrollIntoView({ behavior: "smooth", block: "center" });
+    }
+
+    el.focus({ preventScroll: true });
+  }, [focusedIndex]);
+
+  useArrowKeyNavigation({
+    containerRef: gridRef,
+    onUp: () => setFocusedIndex((i) => i - numCols),
+    onDown: () => setFocusedIndex((i) => i + numCols),
+    onLeft: () => setFocusedIndex((i) => i - 1),
+    onRight: () => setFocusedIndex((i) => i + 1)
+  });
+
+  const [isContainerFocused, setIsContainerFocused] = useState(false);
+
+  useEffect(() => {
+    const grid = gridRef.current;
+    if (!grid) return;
+
+    const onFocusIn = () => setIsContainerFocused(true);
+    const onFocusOut = (e: FocusEvent) => {
+      if (!grid.contains(e.relatedTarget as Node)) setIsContainerFocused(false);
+    };
+
+    grid.addEventListener("focusin", onFocusIn);
+    grid.addEventListener("focusout", onFocusOut);
+
+    return () => {
+      grid.removeEventListener("focusin", onFocusIn);
+      grid.removeEventListener("focusout", onFocusOut);
+    };
+  }, []);
+
   return (
-    <div className="grid w-full grid-cols-2 gap-2 px-4">
-      {palettes.map(({ name, colors }) => {
+    <div className="grid w-full grid-cols-2 gap-2 px-4" ref={gridRef}>
+      {palettes.map(({ name, colors }, i) => {
+        const isCurrent = paletteName === name;
+        const isFocused = i === focusedIndex;
         const isFavorite = favoritePalettes?.includes(name);
         return (
           <div
@@ -99,13 +159,24 @@ export function PaletteGrid({ palettes }: { palettes: Palette[] }) {
             style={{ color: colors["--color-primary"] }}
           >
             <Button
+              ref={(el) => {
+                paletteRefs.current[i] = el;
+              }}
               type="button"
-              className={cn(
-                "peer w-full cursor-pointer py-5 text-current",
-                paletteName === name && "ring-2"
-              )}
-              style={{ backgroundColor: colors["--color-background"] }}
-              onClick={() => setPaletteName(name)}
+              className={cn("peer w-full cursor-pointer py-5 text-current", isCurrent && "ring-2")}
+              style={{
+                backgroundColor: colors["--color-background"],
+                boxShadow:
+                  !isCurrent && isContainerFocused && isFocused
+                    ? `0 0 0 3px ${colors["--color-ring"].replace(")", " / 0.5)")}`
+                    : undefined
+              }}
+              onClick={() => {
+                setPaletteName(name);
+                skipScrollRef.current = true;
+                setFocusedIndex(i);
+              }}
+              tabIndex={isFocused ? 0 : -1}
             >
               <span className="truncate text-sm font-medium">{formatPaletteName(name)}</span>
             </Button>
@@ -118,6 +189,7 @@ export function PaletteGrid({ palettes }: { palettes: Palette[] }) {
                 onClick={() => setFavoritePalette(name, !isFavorite)}
                 onMouseEnter={() => setIsFavoriteHovered(true)}
                 onMouseLeave={() => setIsFavoriteHovered(false)}
+                tabIndex={isFocused ? 0 : -1}
               >
                 <Star className="size-4" />
                 <StarHalf
