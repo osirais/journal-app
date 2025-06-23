@@ -1,6 +1,6 @@
 "use client";
 
-import { useDropletStore } from "@/app/stores/droplets-store";
+import { useDropletStore } from "@/stores/droplets-store";
 import { createClient } from "@/utils/supabase/client";
 import { Droplet } from "lucide-react";
 import React, { FC, useCallback, useEffect } from "react";
