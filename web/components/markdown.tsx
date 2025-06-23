@@ -7,7 +7,7 @@ interface MarkdownProps {
 
 export const Markdown: FC<MarkdownProps> = ({ children }) => {
   return (
-    <div className="break-words">
+    <div className="text-foreground break-words">
       <ReactMarkdown>{children as string}</ReactMarkdown>
     </div>
   );
