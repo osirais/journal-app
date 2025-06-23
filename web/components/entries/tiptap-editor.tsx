@@ -48,6 +48,7 @@ export const TiptapEditor: FC<TiptapEditorProps> = ({
     editorProps: {
       attributes: {
         class: cn(
+          "text-foreground",
           "prose prose-slate dark:prose-invert max-w-none",
           "focus:outline-none min-h-[150px] p-4"
         )
