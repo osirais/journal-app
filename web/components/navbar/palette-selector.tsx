@@ -226,7 +226,7 @@ export function PaletteSelector({ children }: { children?: ReactNode }) {
         <div className="flex min-h-0 w-full flex-1 flex-col items-center">
           <PaletteInput />
           <ScrollArea className="min-h-0 w-full flex-1">
-            <div className="flex flex-col items-center gap-4 pb-4 pt-1">
+            <div className="flex w-full flex-col items-center gap-4 pb-4 pt-1">
               {filteredPalettes.length ? (
                 <>
                   {favoriteFiltered.length > 0 && <PaletteGrid palettes={favoriteFiltered} />}
@@ -238,8 +238,14 @@ export function PaletteSelector({ children }: { children?: ReactNode }) {
                   {nonFavoriteFiltered.length > 0 && <PaletteGrid palettes={nonFavoriteFiltered} />}
                 </>
               ) : (
-                <div className="text-muted-foreground p-8 text-center">
-                  No palettes found matching "{query}"
+                <div className="mt-6 w-full px-4">
+                  <p className="text-muted-foreground text-center">
+                    No palettes found matching{" "}
+                    <span className="inline-block max-w-72 overflow-hidden text-ellipsis whitespace-nowrap align-bottom">
+                      "{query}
+                    </span>
+                    "
+                  </p>
                 </div>
               )}
             </div>
