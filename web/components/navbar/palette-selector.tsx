@@ -101,7 +101,7 @@ export function PaletteGrid({ palettes }: { palettes: Palette[] }) {
             <Button
               type="button"
               className={cn(
-                "w-full cursor-pointer py-5 text-current",
+                "peer w-full cursor-pointer py-5 text-current",
                 paletteName === name && "ring-2"
               )}
               style={{ backgroundColor: colors["--color-background"] }}
@@ -109,7 +109,7 @@ export function PaletteGrid({ palettes }: { palettes: Palette[] }) {
             >
               <span className="truncate text-sm font-medium">{formatPaletteName(name)}</span>
             </Button>
-            <div className="pointer-events-none absolute flex aspect-square min-h-full items-center justify-center opacity-0 transition-opacity group-hover:opacity-100">
+            <div className="pointer-events-none absolute flex aspect-square min-h-full items-center justify-center opacity-0 transition-opacity focus-within:opacity-100 group-hover:opacity-100 peer-focus:opacity-100">
               <button
                 className="group/favorite pointer-events-auto flex cursor-pointer items-center"
                 style={{
