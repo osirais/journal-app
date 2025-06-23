@@ -4,6 +4,7 @@ import { PaletteSelector } from "@/components/navbar/palette-selector";
 import {
   Drawer,
   DrawerContent,
+  DrawerDescription,
   DrawerHeader,
   DrawerTitle,
   DrawerTrigger
@@ -25,6 +26,9 @@ export function ThemeDrawer({
         <DrawerHeader className="border-b p-4">
           <DrawerTitle className="text-left">Theme</DrawerTitle>
         </DrawerHeader>
+        <DrawerDescription className="sr-only">
+          Choose a theme that suits your style.
+        </DrawerDescription>
         <PaletteSelector />
       </DrawerContent>
     </Drawer>
