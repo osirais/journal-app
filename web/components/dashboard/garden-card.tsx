@@ -1,10 +1,10 @@
 "use client";
 
-import { useDropletStore } from "@/app/stores/droplets-store";
 import { Garden } from "@/components/garden/garden";
 import { TreeProgressionDrawer } from "@/components/garden/tree-progression-drawer";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { TREE_PROGRESSION_STAGES } from "@/constants/tree-stages";
+import { useDropletStore } from "@/stores/droplets-store";
 import { getCurrentTreeStage, getNextRequiredDroplets } from "@/utils/tree-stage-utils";
 import { OrbitControls } from "@react-three/drei";
 import { Canvas } from "@react-three/fiber";
