@@ -11,7 +11,8 @@ import { useDialogStore } from "@/hooks/use-dialog-store";
 import type { EntryWithTags, JournalWithEntryCount, TagType } from "@/types";
 import { formatDateAgo } from "@/utils/format-date-ago";
 import axios from "axios";
-import { CalendarIcon, FileText, Plus } from "lucide-react";
+import { ArrowLeft, CalendarIcon, FileText, Plus } from "lucide-react";
+import Link from "next/link";
 import { useParams, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
@@ -89,7 +90,14 @@ export function EntriesPage() {
 
   return (
     <div className="container mx-auto max-w-3xl py-8">
-      <h1 className="mb-2 text-3xl font-bold">Entries</h1>
+      <div className="mb-4 flex items-center justify-between">
+        <Button variant="outline" asChild>
+          <Link href="/journals" className="flex items-center gap-2">
+            <ArrowLeft className="size-4" /> Back to Journals
+          </Link>
+        </Button>
+      </div>
+      <h1 className="mb-2 text-3xl font-bold">{journalInfo?.title}</h1>
 
       {tagId && (
         <div className="grid grid-cols-[max-content_max-content] place-items-center gap-2 py-4">
