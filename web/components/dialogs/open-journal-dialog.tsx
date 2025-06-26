@@ -56,7 +56,7 @@ export function OpenJournalDialog() {
     loadJournals();
 
     return () => subscription.unsubscribe();
-  }, []);
+  }, [supabase.auth]);
 
   const filteredJournals = query === "" ? journals : fuzzyFind(journals, "title", query);
 
@@ -102,7 +102,7 @@ export function OpenJournalDialog() {
 
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
-  }, [isDialogOpen, filteredJournals, selectedIndex]);
+  }, [isDialogOpen, filteredJournals, selectedIndex, dialog, handleSelect]);
 
   return (
     <Dialog open={isDialogOpen} onOpenChange={dialog.close}>

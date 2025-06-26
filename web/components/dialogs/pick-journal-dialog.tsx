@@ -6,7 +6,7 @@ import { useDialogStore } from "@/hooks/use-dialog-store";
 import { fuzzyFind } from "@/utils/fuzzy-find";
 import { createClient } from "@/utils/supabase/client";
 import { BookOpen, Search, X } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 export function PickJournalDialog() {
   const dialog = useDialogStore();
@@ -53,7 +53,7 @@ export function PickJournalDialog() {
     loadJournals();
 
     return () => subscription.unsubscribe();
-  }, []);
+  }, [supabase.auth]);
 
   const filteredJournals = query === "" ? journals : fuzzyFind(journals, "title", query);
 
@@ -61,10 +61,13 @@ export function PickJournalDialog() {
     setSelectedIndex(0);
   }, [query, filteredJournals.length]);
 
-  const handleSelect = (journal: { id: string; title: string }) => {
-    dialog.open("create-entry", { createEntryData: { journalId: journal.id } });
-    setQuery("");
-  };
+  const handleSelect = useCallback(
+    (journal: { id: string; title: string }) => {
+      dialog.open("create-entry", { createEntryData: { journalId: journal.id } });
+      setQuery("");
+    },
+    [dialog]
+  );
 
   useEffect(() => {
     function onKeyDown(e: KeyboardEvent) {

@@ -17,10 +17,12 @@ import { getTasks } from "@/lib/actions/task-actions";
 import { cn } from "@/lib/utils";
 import { Task } from "@/types";
 import { Edit, MoreHorizontal, Plus, Search, Trash2 } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
 
 export function TasksGrid() {
+  const dialog = useDialogStore();
+
   const [tasks, setTasks] = useState<Task[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [isLoading, setIsLoading] = useState(true);
@@ -44,10 +46,13 @@ export function TasksGrid() {
   const setOnTaskDeleted = useTaskCallbackStore((s) => s.setOnTaskDeleted);
   const setOnTaskEdited = useTaskCallbackStore((s) => s.setOnTaskEdited);
 
-  function handleTaskCreated(task: Task) {
-    setTasks((prev) => [task, ...prev]);
-    dialog.close();
-  }
+  const handleTaskCreated = useCallback(
+    (task: Task) => {
+      setTasks((prev) => [task, ...prev]);
+      dialog.close();
+    },
+    [setTasks, dialog]
+  );
 
   function handleTaskDeleted(taskId: string) {
     setTasks((prev) => prev.filter((t) => t.id !== taskId));
@@ -64,8 +69,6 @@ export function TasksGrid() {
   }, [setOnTaskCreated, setOnTaskDeleted, setOnTaskEdited, handleTaskCreated]);
 
   const filtered = tasks.filter((t) => t.name.toLowerCase().includes(searchQuery.toLowerCase()));
-
-  const dialog = useDialogStore();
 
   return (
     <div className="container mx-auto max-w-4xl p-6">

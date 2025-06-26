@@ -464,7 +464,11 @@ function EditEntryContent() {
             <div className="flex min-h-8 flex-wrap items-center gap-2">
               {tags.length > 0 ? (
                 tags.map((tag) => (
-                  <TagComponent journalId={entry.journal_id} tag={{ id: tag.id, name: tag.text }} />
+                  <TagComponent
+                    journalId={entry.journal_id}
+                    tag={{ id: tag.id, name: tag.text }}
+                    key={tag.id}
+                  />
                 ))
               ) : (
                 <span className="text-muted-foreground text-sm">No tags</span>
