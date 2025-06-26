@@ -286,8 +286,8 @@ function EditEntryContent() {
       <div className="grid w-full">
         <div className="mb-4 flex items-center justify-between">
           <Button variant="outline" asChild>
-            <Link href={`/entry/${entryId}`} className="flex items-center gap-2">
-              <ArrowLeft className="size-4" /> Back to Entry
+            <Link href={`/journal/${entry.journal_id}`} className="flex items-center gap-2">
+              <ArrowLeft className="size-4" /> Back to Journal
             </Link>
           </Button>
         </div>
