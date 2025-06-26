@@ -292,7 +292,7 @@ function EditEntryContent() {
           </Button>
         </div>
 
-        <div className="space-y-4">
+        <div className="space-y-4 overflow-hidden">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2 text-lg font-semibold">
               <FileText className="size-4" />
@@ -332,7 +332,9 @@ function EditEntryContent() {
               />
             </Form>
           ) : (
-            <div className="text-2xl font-bold">{entry.title || "Untitled Entry"}</div>
+            <h3 className="w-full overflow-hidden truncate whitespace-nowrap text-2xl font-bold">
+              {title || "Untitled Entry"}
+            </h3>
           )}
         </div>
 
