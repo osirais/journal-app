@@ -37,3 +37,15 @@ export type Reason = {
   created_at?: string;
   updated_at?: string;
 };
+
+export type Entry = {
+  id: string;
+  title: string | null;
+  content: string;
+  created_at: string;
+  updated_at: string;
+};
+
+export type EntryWithTags = Entry & {
+  entry_tags: TagType[];
+};

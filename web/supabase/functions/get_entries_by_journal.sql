@@ -34,12 +34,12 @@ BEGIN
       e.content,
       e.created_at,
       e.updated_at,
-      (
+      COALESCE((
         SELECT jsonb_agg(jsonb_build_object('id', t.id, 'name', t.name))
         FROM entry_tag et
         JOIN tag t ON t.id = et.tag_id
         WHERE et.entry_id = e.id
-      ) AS entry_tags
+      ), '[]'::jsonb) AS entry_tags
     FROM entry e
     JOIN journal j ON j.id = e.journal_id
     WHERE e.journal_id = $2

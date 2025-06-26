@@ -2,6 +2,7 @@
 
 import { TiptapEditor } from "@/components/entries/tiptap-editor";
 import { Markdown } from "@/components/markdown";
+import { TagComponent } from "@/components/tag-component";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Form, FormControl, FormField, FormItem, FormMessage } from "@/components/ui/form";
@@ -463,12 +464,7 @@ function EditEntryContent() {
             <div className="flex min-h-8 flex-wrap items-center gap-2">
               {tags.length > 0 ? (
                 tags.map((tag) => (
-                  <span
-                    key={tag.id}
-                    className="text-muted-foreground rounded-full bg-black/20 px-2 py-0.5 text-xs dark:bg-white/20"
-                  >
-                    {tag.text}
-                  </span>
+                  <TagComponent journalId={entry.journal_id} tag={{ id: tag.id, name: tag.text }} />
                 ))
               ) : (
                 <span className="text-muted-foreground text-sm">No tags</span>

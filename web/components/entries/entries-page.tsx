@@ -8,28 +8,16 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useDialogStore } from "@/hooks/use-dialog-store";
-import type { JournalWithEntryCount, TagType } from "@/types";
+import type { EntryWithTags, JournalWithEntryCount, TagType } from "@/types";
 import { formatDateAgo } from "@/utils/format-date-ago";
 import axios from "axios";
 import { CalendarIcon, FileText, Plus } from "lucide-react";
 import { useParams, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
-type Entry = {
-  id: string;
-  title: string | null;
-  content: string;
-  created_at: string;
-  updated_at: string;
-};
-
-type EntryWithTags = Entry & {
-  tags: TagType[];
-};
-
 type SortOption = "newest" | "oldest";
 
-export default function EntriesPage() {
+export function EntriesPage() {
   const { journalId } = useParams();
 
   const searchParams = useSearchParams();
@@ -189,7 +177,7 @@ export default function EntriesPage() {
               entryId={entry.id}
               title={entry.title!}
               content={entry.content}
-              tags={entry.tags}
+              tags={entry.entry_tags}
               journalId={journalId as string}
               created_at={entry.created_at}
               updated_at={entry.updated_at}

@@ -1,4 +1,4 @@
-import EntriesPage from "@/components/entries/entries-page";
+import { EntriesPage } from "@/components/entries/entries-page";
 import { createClient } from "@/utils/supabase/server";
 import { Metadata } from "next";
 
